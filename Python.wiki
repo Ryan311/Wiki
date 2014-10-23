@@ -1,0 +1,179 @@
+%toc
+== Python ==
+*   Author: *Guido van Rossum*      1991
+*   编程范型： 命令式编程、多范型、面向对象、函数式编程、面向切面编程
+*   型态系统： [[强类型]]、[[动态类型]]、[[duck typing]]
+*   [[Basic]]
+*   [[Library]]
+*   [[Distribute and Install package]]
+*   [[http://www.ibm.com/developerworks/cn/linux/l-cn-pythondebugger/|Debug]]
+*   [[PythonVirtualEnviroment]]
+*   [[Useful Library]]
+*   Books & Docs
+    *   [[Python Cook Book]]
+    *   [[http://www.tummy.com/presentations/vimpython-20070225/|python&vim]]
+    *   [[Python Core Programming]]
+*   [[https://github.com/philipbjorge/EditREPL|EditREPL use vim in python interacive shell]]
+*   [[Python Coding Style]]
+*   [[http://www.cnblogs.com/moinmoin/archive/2011/03/10/lsit-comprehensions-generators.html|python列表解析和生成表达式]]
+*   [[Iterator and Generator]] [[http://www.dabeaz.com/generators-uk/|Generator Tricks]] [[file://F:/Wiki/wiki2_html/GeneratorsUK.pdf|Generator!!!]]
+*   *Linux System Mining with Python* [[http://amitsaha.github.io/site/notes/articles/python_linux/article.html|English]] [[http://www.linuxeden.com/html/news/20130802/141990.html|Chinese]]
+*   [[Parse cmd line argument]]
+*   [[遍历文件夹下的文件]]
+*   [[Decorator]]
+*   [[Closure]]
+*   [[Python Tricky]]
+*   [[Python Challenge]]
+*   [[http://legacy.python.org/dev/peps/|PEP]](Python增强建议书)
+    *   PEP是Python Enhancement Proposals的缩写
+    *   一个PEP是一份为Python社区提供各种增强功能的技术规格
+        *   跟踪Python中的新特性
+        *   说明Python中的某一个设计问题
+        *   关于Python的提案，但不针对Python语言本身
+    *   PEP 0       //index of PEPs
+    *   PEP 1       //PEP Purpose and Guidelines
+
+== Tools ==
+*   Show image in terminal when call Image.show() within PIL
+    *   sudo apt-get install imagemagick
+*   [[Py2exe]]
+*   [[http://stackoverflow.com/questions/3220404/why-use-pip-over-easy-install|easy_install & pip]]
+*   [[https://github.com/philipbjorge/EditREPL|EditREPL use vim in python interacive shell]]
+*   [[PythonVirtualEnviroment]]
+*   [[http://www.ibm.com/developerworks/cn/linux/l-cn-pythondebugger/|Debug]]
+*   [[http://www.lfd.uci.edu/~gohlke/pythonlibs/|Unofficial Windows Binaries for Python Extension Packages]]
+*   [[Distribute and Install package]]
+*   [[http://www.pythonforbeginners.com/basics/ipython-a-short-introduction/|IPython]] ===
+    *   Tab completion              " very useful
+    *   Using Python debugger
+    *   Profiles
+    *   QT-based
+*   [[http://yangzetian.github.io/2013/02/08/ipython-notebook-interactive-computing-new-era/|IPython-notebook]]
+{{{
+IPython Notebook 是一种新兴的交互式数据分析与记录工具，它定义了一种全新的计算文件格式，其中包含了代码，
+代码说明以及每一步的计算输出(数值或图片等)，也就是说这一个文件完整记录了计算过程中的所有相关信息。此外，
+该文件还可以嵌入网络视频，图片， 公式等众多副文本格式，实为交互计算，记录思维，传播思想的好帮手。
+}}}
+    *   > sudo ipython notebook
+    *   > sudo ipython notebook --pylab
+    *   > sudo ipython notebook --pylab inline
+    *   As ipython notebook kernel must run as root while chrome can't run as root
+        *   modify /usr/bin/google-chrome, add *--user-data-dir* in the end of last line
+
+== Books & Docs ==
+*   [[Python Cook Book]]
+*   [[http://www.tummy.com/presentations/vimpython-20070225/|python&vim]]
+*   [[Python Core Programming]]
+*   [[http://woodpecker.org.cn/diveintopython3/special-method-names.html|特殊方法 深入Python3]] [[http://www.cnblogs.com/vamei/archive/2012/11/19/2772441.html|Examples]]
+*   [[http://effbot.org/zone/python-for-statement.htm|For Statement]]
+    *  original     __getitem___  
+    *  new          ___iter___ and ___next___
+*   [[http://effbot.org/zone/python-with-statement.htm|With Statement]]
+    *   ___enter___ and ___exit___ 
+*   [[http://effbot.org/zone/python-getattr.htm|getattr Function]]
+    *   ___getattr___ 
+
+=== Tools make live easier ===
+*   [[WppFormat]]
+*   [[SymStore]]
+*   [[LogChange]]   
+*   [[GetFileVersion]]
+*   [[WppLogConvert]]    
+*   [[DelCorruptSymFle]]
+
+
+== Python3 ==
+*   sudo apt-get install python3
+*   sudo apt-get install python3-setuptools
+
+=== Web Framework for Python ===
+
+==== Web.py ====
+http://webpy.org/ ::
+"Django lets you write web apps in Django. TurboGears lets you write web apps in TurboGears. Web.py lets you write web apps in Python."
+
+A Complete web.py application
+{{{class = "brash: python"
+import web
+urls = (
+        '/(.*)', 'hello'
+)
+app = web.application(urls, globals())
+
+class hello:
+    def GET(self, name):
+        if not name:
+           name = 'World'
+           return 'Hello, ' + name + '!'
+
+if __name__ == "__main__":
+    app.run()
+}}}
+
+Start the server::
+    $python code.py
+    <br>$python code.py 1234
+
+==== Django ====
+
+*   *Install*
+*   *Command*
+Create Project::
+{{{class="brush: bash"
+    >django-admin.py startproject mysite    #Creating a project    
+}}}
+
+Run Development Server::
+{{{class="brush: bash"
+    >python manage.py runserver
+}}}
+
+Create App::
+{{{class="brush: bash"
+    >python manage.py startapp wiki 
+}}}
+Add mysite.wiki in the INSTALLED_APPS in settings.py
+
+Config Database::
+    settings.py:
+        DATABASE_ENGINE = "sqlite3"
+        DATABASE_NAME = "django.db"
+{{{class="brush: bash"
+    >python manage.py syncdb    #create list in database
+}}}
+
+    [[https://docs.djangoproject.com/en/1.5/ref/django-admin/#django-admin-runserver|more command...]]
+    
+Other::
+    Django－Python 解释器
+    manage.py shell它能进行一些必要的Django环境设置
+    如果安装ipython，manage.py shell会默认使用它。
+* [[http://showmedo.com/videotutorials/video?name=1100000&fromSeriesID=110|Wiki over Django]]
+
+=== [[http://www.pythonforbeginners.com/basics/ipython-a-short-introduction/|IPython]] ===
+*   Tab completion              " very useful
+*   Using Python debugger
+*   Profiles
+*   QT-based
+ 
+==== [[http://yangzetian.github.io/2013/02/08/ipython-notebook-interactive-computing-new-era/|IPython-notebook]] ====
+{{{
+IPython Notebook 是一种新兴的交互式数据分析与记录工具，它定义了一种全新的计算文件格式，其中包含了代码，
+代码说明以及每一步的计算输出(数值或图片等)，也就是说这一个文件完整记录了计算过程中的所有相关信息。此外，
+该文件还可以嵌入网络视频，图片， 公式等众多副文本格式，实为交互计算，记录思维，传播思想的好帮手。
+}}}
+*   > sudo ipython notebook
+*   > sudo ipython notebook --pylab
+*   > sudo ipython notebook --pylab inline
+*   As ipython notebook kernel must run as root while chrome can't run as root
+    *   modify /usr/bin/google-chrome, add *--user-data-dir* in the end of last line
+
+=== [[http://www.scipy.org/|Scipy]] ===
+*   SciPy (pronounced “Sigh Pie”) is a Python-based ecosystem of opensource software for mathematics, science, and engineering. 
+*   NumPy是一个定义了数值数组和矩阵类型和它们的基本运算的语言扩展。
+*   SciPy是另一种使用NumPy来做高等数学、信号处理、优化、统计和许多其它科学任务的语言扩展。
+*   Matplotlib是一个帮助绘图的语言扩展。
+*   [[http://reverland.org/python/2012/08/24/scipy/#scipynumpymatplotlib|Example]]
+
+=== [[http://pypy.org/|PyPy]] ===
+*   JIT(Just in time)   compile -> cache -> run

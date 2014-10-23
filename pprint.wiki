@@ -1,0 +1,46 @@
+= [[http://docs.python.org/2/library/pprint.html|pprint]] =
+*   可以更直观的打印Python数据结构
+*   pprint.PrettyPrinter(indent=1, width=80, depth=None, stream=None) => Construct a PrettyPrinter instance
+{{{class = "brush: python"
+>>> import pprint
+>>> stuff = ['spam', 'eggs', 'lumberjack', 'knights', 'ni']
+>>> stuff.insert(0, stuff[:])
+>>> pp = pprint.PrettyPrinter(indent=4)
+>>> pp.pprint(stuff)
+[   ['spam', 'eggs', 'lumberjack', 'knights', 'ni'],
+    'spam',
+    'eggs',
+    'lumberjack',
+    'knights',
+    'ni']
+}}}
+*   pprint.pprint(object, stream=None, indent=1, width=80, depth=None) => Prints the formatted representation of object on stream.
+{{{class = "brush: python"
+>>> import pprint
+>>> tup = ('spam', ('eggs', ('lumberjack', ('knights', ('ni', ('dead',
+... ('parrot', ('fresh fruit',))))))))
+>>> stuff = ['a' * 10, tup, ['a' * 30, 'b' * 30], ['c' * 20, 'd' * 20]]
+>>> pprint.pprint(stuff)
+['aaaaaaaaaa',
+ ('spam',
+  ('eggs',
+   ('lumberjack',
+    ('knights', ('ni', ('dead', ('parrot', ('fresh fruit',)))))))),
+ ['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'],
+ ['cccccccccccccccccccc', 'dddddddddddddddddddd']]
+>>> pprint.pprint(stuff, depth=3)
+['aaaaaaaaaa',
+ ('spam', ('eggs', (...))),
+ ['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'],
+ ['cccccccccccccccccccc', 'dddddddddddddddddddd']]
+>>> pprint.pprint(stuff, width=60)
+['aaaaaaaaaa',
+ ('spam',
+  ('eggs',
+   ('lumberjack',
+    ('knights',
+     ('ni', ('dead', ('parrot', ('fresh fruit',)))))))),
+ ['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+  'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'],
+ ['cccccccccccccccccccc', 'dddddddddddddddddddd']]
+}}}

@@ -1,0 +1,4 @@
+%toc
+= JavaScript =
+*   [[www.HotScript.com]]
+*   [[www.javascriptkit.com]]

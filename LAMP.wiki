@@ -1,0 +1,23 @@
+%toc    
+= LAMP =
+
+== Install and Config ==
+* Install packet
+{{{class="brush: bash"
+sudo apt-get install apache2 mysql-server mysql-client php5 php5-gd php5-mysql
+}}}
+
+* change defualt direction right
+{{{class="brush: bash"
+sudo chmod 777 /var/www/
+}}}
+
+* install PHPAdmin
+{{{class="brush: bash"
+sudo apt-get install phpmyadmin
+}}}
+
+* make connection between phpmyadmin and apache2
+{{{class="brush: bash"
+sudo ln -s /usr/share/phpmyadmin /var/www
+}}}

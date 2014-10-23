@@ -1,0 +1,11 @@
+%toc
+== Install Package ==
+*   http://llvm.org/releases/download.html#3.0
+*   http://stackoverflow.com/questions/17657261/how-to-install-clang-pre-built-binaries-ubuntu-12-04
+*   http://www.cnblogs.com/ralphjzhang/archive/2011/12/02/2272671.html
+== CLang ==
+*   http://www.ibm.com/developerworks/cn/opensource/os-cn-clang/
+
+== LLVM ==
+*   http://blog.csdn.net/snsn1984/article/category/1249418/3
+

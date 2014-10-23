@@ -1,0 +1,43 @@
+= Editor =
+
+== VIM ==
+*   [[VIM Tricky]]
+*   [[VIM Commands]] 
+*   [[Plugins]]
+*   [[Writing VIM Plugins]]
+*   Docs
+    *   [[http://blog.sanctum.geek.nz/buffers-windows-tabs/|Buffer Window Tab]]
+    *   [[file:///F:/Wiki/wiki2_html/Vimwiki1.1.1QR.pdf|VimWiki help]]
+    *   [[http://vim.wikia.com/wiki/Mapping_keys_in_Vim_-_Tutorial_(Part_1)|Key map]]
+*   MyVimrc
+    *   [[vimrc_for_linux]] 
+*   在Source Insight中使用VIM编缉文件
+    {{{
+    1.Source Insight中,Options->Custom Commands...->Add...,New Command name 随便 写,如"Edit with Vim"
+    2.Run中写入: "C:\Program Files\Vim\vim63\gvim.exe" --remote-silent +%l %f
+        意思是在当前已经打开的gvim窗口里面打开当前的文件,并且跳转到指定行 %l为当前的行号,%f为文件名
+        使用 --remote-silent 的作用是,如果已经打开了对应文件,就不会打开第二次,而是在 已经打开的文件里跳转到对应行
+    3.还是同一个对话框里面,选择Keys->Assign New Key...->按F2,如果你已经将F2设置 给其他命令,选择其他的按键就行了
+    4.设置完
+    }}}
+*   TODO:
+    *   INF Syntax
+    
+== Eclipse ==
+*   Plugins
+    *   CDT for C/C++ project
+    *   Pydev for python project
+    *   Erlide for Erlang project
+*   Show eclipse icon in the Unity launcher
+    <br>*sudo cp ~/Persnail_WorkSpace/eclipse/icon.xpm /usr/share/pixmaps/eclispe.xpm*
+*   Pydev
+    *   下载最新版http://www.pydev.org/download.html#pydev-does-not-appear-after-install
+    *   将Zip文件解压到eclipse的主目录(两个目录features和plugins)
+    *   需要jdk1.7才能运行, 所以要安装jdk7和jre7
+    {{{
+        sudo apt-get install openjdk-7-dbg openjdk-7-jdk openjdk-7-jre openjdk-7-jre-headless
+    }}}
+    *   安装完之后,可以用命令java -version 看当前运行的是java的哪个版本,如果不是已安装的version7
+    *   运行sudo update-alternatives --config java, 然后选择正确的mode, 并再次运行java -version查看
+    *   在Eclipse目录下,修改eclipse.ini文件, 将Dosgi.requiredJavaVersion修改为1.7
+    *   再次运行Eclipse就可以看到pydev了

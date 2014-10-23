@@ -1,0 +1,256 @@
+%toc
+---------------------------------------------------------------------------
+=== Linux Command ===
+*   [[https://wiki.gnome.org/action/show/Apps/Nautilus?action=show&redirect=Nautilus|Nautilus]]: the file manager for GNOME desktop
+    *   F9  打开/隐藏侧边栏
+    *   Ctrl+L  在文件浏览器中呼出地址栏
+    *   Ctrl+H  切换显示隐藏文件
+    *   nautilus -q     Restart Nautilus
+    *   nautilus-refresh    刷新
+    {{{
+    # gksu扩展允许在nautilus浏览文件时以管理员权限打开文件
+    >   sudo apt-add-repository ppa:upubuntu-com/ppa
+    >   sudo apt-get update
+    >   sudo apt-get install nautilus-gksu
+    >   nautilus -q
+    
+    >   sudo add-apt-repository ppa:dr3mro/nautilus-actions-extra
+    >   sudo apt-get update
+    >   sudo apt-get install nautilus-actions nautilus-actions-extra 
+    }}}
+    *   [[http://www.ibm.com/developerworks/cn/linux/l-script-linux-desktop-2/index.html?ca=drs/|扩展Nautilus]]
+*   Ctrl+Alt+T  打开终端
+*   ps -aux     list all user and system process(包括守护进程)
+*   pstree      查看进程与线程的树形结构
+*   ps -eLf     -L显示进程并显示线程ID和线程个数
+*   top -H      实时显示各个线程情况
+*   ipcalc      learn ip address
+*   find <path> <condition> <action>
+    *   find . -name 'my*'
+    *   find . -name 'my*' -ls    在当前目录中搜索以ｍｙ开头的文件并显示详细信息
+    *   find . -type [dfs] -mmin -10    搜索当前目录中，所有过去１０分钟中更新过的*[目录|普通|Socket]*文件。
+    *   find . -size [+-]100M
+    *   http://blog.jobbole.com/48856/
+    *   find . -name "*.tmp" -exec rm {} \; 删除当前目录中的.tmp文件
+*   locate      find　-name的另一种写法，但是要比后者快得多，原因在于它不搜索具体目录，而是搜索一个数据库（/var/lib/locatedb），这个数据库中含有本地所有文件信息。Linux系统自动创建这个数据库，并且每天自动更新一次，所以使用locate命令查不到最新变动过的文件。为了避免这种情况，可以在使用locate之前，先使用updatedb命令，手动更新数据库。
+    *   locate /etc/sh  搜索etc目录下所有以sh开头的文件
+    *   locate　～/m搜索用户目录下所有以m开头的文件
+*   whereis     只能用于程序名的搜索，[-b|-m|-s]
+*   which   在PATH变量指定的路径中搜索某个命令的位置，并返回第一个搜索结果
+*   Ubuntu快捷键
+    *   Super+W 在同一屏幕列出工作区所有窗口
+    *   Super+S 俯瞰多个工作区
+    *   Alt+Tab 切换不同程序
+    *   Alt+`　　细化预览
+    *   在文件浏览器中, CTRL+H可以切换显示隐藏文件夹和文件
+*   Ubuntu下的文件关联
+    *   /etc/gnome/defaults.list保存了全局的打开方式
+    *   ~/.local/share/applications/mimeapps.list保存了个人的打开方式
+    *   当两者不一致时,优先采用局部的个人设置
+*   pbcopy/pbpaste(OS X command-line tool, work with standard input and clipboard)
+    *   sudo apt-get install xsel
+    *   modify .bashrc
+    {{{
+    #add this two lines
+    alias pbcopy='xsel --clipboard --input'
+    alias pbpaste='xsel --clipboard --output'
+    
+    #example
+    $ cat test.txt | pbcopy
+    }}}
+*   dmesg   显示linux内核的环形缓冲区信息，我们可以从中获得诸如系统架构、cpu、挂载的硬件，RAM等多个运行级别的大量的系统信息。
+    *   dmesg | [more|less|tail]        列出加载到内核中的所有驱动
+    *   dmesg | grep sda                列出所有被检测到的硬件
+    *   dmesg | head  -20               只输出dmesg命令的前20行日志
+    *   dmesg | tail -20                只输出dmesg命令最后20行日志
+    *   dmesg | grep -i usb             搜索包含特定字符串的被检测到的硬件
+    *   dmesg -c                        清空dmesg缓冲区日志
+    *   watch "dmesg | tail -20"        实时监控dmesg日志输出
+
+---------------------------------------------------------------------------
+=== Ubuntu ===
+==== Tricks ====
+*   显示或隐藏文件管理器侧边栏      F9 toggle/
+*   ubuntu unity, 已挂载的磁盘不显示在左边侧栏（启动器）
+{{{
+Ubuntu 默认总会将挂载的磁盘(硬盘分区)在桌面建立一捷径，Unity 桌面，则除了桌面外，还会在左边侧栏(Launcher)中也建一个捷径。
+
+事实上，Launcher 上面已有了固定的软件、开启的软件的小图示，所以很容易就占着许多图示，因此不必要再让已挂载的磁盘的图示显示在Launcher 上。
+
+若想移除（不再显示）已挂载磁盘的图示：
+
+安装Compiz Config Settings Manager( ccsm)，打开终端(Ctrl - Alt - T)，贴上
+
+sudo apt-get install compizconfig-settings-manager
+
+安装后，打开终端，输入 ccsm
+
+点Desktop(桌面) → 点Ubuntu Unity plugin → 点上方的Experimental → 最下方Show Devices 选择Never → 上一步→ 关闭。
+}}}
+
+*   ubuntu-tweak0.8.5在清理时会把/etc/X11/X误删除掉，重启后黑屏或停留在logo或startx失败
+{{{
+解决方法是：   在grup界面按e编辑，在Linux一午上加text，进入文本模式启动，在终端输入以下内容，创建新的软链接
+sudo ln -s /usr/bin/Xorg /etc/X11/X
+重启即可
+将tweak换成0.8.3
+}}}
+
+*   自动挂载其它分区
+{{{
+修改/etc/fstab文件
+sudo gedit /etc/fstab
+每一行使用一个tab分成6列，分别为filesystem, mountpoint, type, options,dump, pass
+分别表示:原来在文件系统的位置，加载点位置，类型，参数等，可以使用man fstab来查看各个参数的定义
+将以下内容添加到/etc/fstab 文件尾部，保存，重启即可自动挂载其他分区了。
+
+#Entry for /dev/sda6 :
+UUID=0004FF2F00048EBB   /media/sda6 ntfs-3g defaults,locale=en_US.UTF-8 0   0
+#Entry for /dev/sda7 :
+UUID=00048FA50008DD3A   /media/sda7 ntfs-3g defaults,locale=en_US.UTF-8 0   0
+#Entry for /dev/sda8 :
+UUID=000F3D290008D7EE   /media/sda8 ntfs-3g defaults,locale=en_US.UTF-8 0   0
+
+也可以写成
+/dev/sda6 /media/sda6 ntfs-3g defaults,locale=en_US.UTF-8 0   0
+/dev/sda7 /media/sda7 ntfs-3g defaults,locale=en_US.UTF-8 0   0
+/dev/sda8 /media/sda8 ntfs-3g defaults,locale=en_US.UTF-8 0   0
+}}}
+*   Backup system
+    * [[back.sh]] 
+    * move back.sh to /home
+      <br> cd /home
+      <br> chmod +x back.sh
+      <br> ./back.s
+*   [[http://www.cnblogs.com/vimmer/articles/2645734.html|GoldenDict]]
+    *   sudo apt-get install goldendict
+    *   download dictionaries and unzip to a dir
+    *   open goldendict -> edit this group -> add online dict and local dict
+*   Ubuntu加速
+    *   Preload, 可以预先加载程序使用的库或二进制文件进内存，加快程序启动速度
+        *   sudo apt-get install preload
+    *   随机启动项
+        *   sudo sed -i 's/NoDisplay=true/NoDisplay=false/g' /etc/xdg/autostart/*.desktop     修改随机启动服务的文件属性，显示隐藏的随机启动系统服务
+        *   startup －> 修改
+*   Vim中文显示乱码
+    *   Windows上默认是GBK编码，而vim默认是utf-8（gedit默认也是utf-8)，所以在vim上打开windows上的文件中文会显示乱码，只需要修改配置文件，使vim支持gbk编码就可以了。
+    *   在vimrc中添加*set fileencoding=utf-8,gbk*
+*   Unity Configure
+    *   sudo add-apt-repository  ppa:myunity/ppa
+    *   sudo apt-get update
+    *   sudo apt-get install myunity
+*   Ubuntu Chrome 白屏
+    *   sudo mkdir /etc/adobe
+    *   echo "OverrideGPUValidation=true" >~/mms.cfg
+    *   sudo mv ~/mms.cfg /etc/adobe
+*   Ubuntu下玩魔兽
+    *   安装Wine
+    *   进入War3的目录
+    *   wine War3.exe -opengl -window
+*   Uninstall Wine
+    *   安装wine后会在系统中添加一些新的启动项,比如文本文件会以Notepad方式打开的选项
+    *   卸载wine后这些东西仍然残留, 要想彻底删除需要将~/.local/share/applications目录下所有以wine开头的destop文件删除掉
+    *   还要将该目录下的mimeinfo.cache删除掉, 里面引用了wine*文件, 重新登录一次就看不到残留内容了
+*   在线制作icon图标
+    *   http://www.bitbug.net/
+*   [[http://www.playonlinux.com/en|Playonlinux]]
+    *   还需要安装curl: sudo apt-get install curl
+*   Sysinfo显示系统硬件信息
+    *   sudo apt-get install sysinfo
+    *   >sudo sysinfo
+*   我的机器是双显卡，Intel集成显卡和Ｎvidia Geforce620
+    *   千万不要自己下Nvidia的显卡驱动来安装，重启后进不去Unity
+    *   安装Bumblebee（大黄蜂）, 让它来安装nvidia驱动bumblebee-nvidia
+        *   sudo add-apt-repository ppa:bumblebee/stable
+        *   sudo add-apt-repository ppa:ubuntu-x-swatx/x-updates    //more drivers
+        *   sudo apt-get update
+        *   sudo apt-get install bumblebee bumblebee-nvidia
+        *   sudo reboot
+        *   有时会发现重启后执行optirun glxinfo，显示如下错误
+        {{{
+            Optirun glxgears: Cannot access secondary GPU - error: [XORG] (EE) No devices detected
+        }}}
+        *   解决方法是sudo gedit /etc/bumblebee/xorg.conf.nvidia, 加上BusID行
+        {{{// BUSID可以由lspci, 查看3D Controller
+            Section "Device"
+            Identifier  "DiscreteNvidia"
+            Driver      "nvidia"
+            VendorName  "NVIDIA Corporation"
+            BusID "PCI:02:00:0"
+        }}}
+    *   测试 >optirun glxgears  使用独显运行，可以看到3D效果
+    *   独显运行chrome, >optirun google-chrome，就可以显示webgl绘制的动画
+*   glxgears
+    *   测试Linux是否可以顺利运行2D、3D的测试软件
+    *   >optirun　glxgears
+    *   弹出窗口中有三个转动的齿轮，在terminal中会显示每５s转动多少栅，齿轮跑的越快说明显卡支持越好
+*   glxinfo
+    *   查看当前的渲染引擎
+    *   glxinfo | grep "OpenGL version"
+    *   optirun glxinfo | grep "OpenGL version"
+*   Rhythmbox中文乱码
+    *   Ubuntu使用的UTF-8字符集，而rhythmbox等播放器不可以调整MP3歌曲中所包含的ID3标签信息的字符集，造成乱码显示. mutagen可以批量修改MP3曲目中的ID3标签的字符集。
+    *   sudo apt-get install python-mutagen
+    *   mid3iconv -e GBK *.mp3
+    *   find . -iname "*.mp3" -execdir mid3iconv -e gbk {} \; 
+*   Install JDK
+    *   sudo apt-get install openjdk-7-jdk
+*   Ubuntu13.04 No sound
+    *   sudo vim /etc/modprobe.d/alsa-base.conf
+    *   add the following line at the end of the file:
+        *   options snd-hda-intel model=3stack
+    *   reboot
+*   开机运行程序
+    *   Dash ==> Startup Applications
+    *   Add apps
+*   添加右键扩展
+    *   添加右键菜单以管理 员打开：
+        *   sudo apt-get install nautilus-gksu     
+    *   添加右键菜单打开终端：
+        *   sudo apt-get install nautilus-open-terminal
+    *   添加右键菜单图片转换：
+        *   sudo apt-get install nautilus-image-converter
+    *   清理体系孤独库的软件:
+        *   sudo apt-get install gtkorphan
+        *   sudo gtkorphan
+*   Chromium    stable, 不会白屏
+    *   sudo add-apt-repository ppa:chromium-daily/stable
+    *   sudo apt-get update
+    *   sudo apt-get chromium-browser
+*   在顶部状态栏显示CPU&Mem&网络信息
+    *   sudo add-apt-repository ppa:alexeftimie/ppa
+    *   sudo apt-get update
+    *   sudo apt-get install indicator-sysmonitor
+    *   sudo apt-get install dstat
+    *   wget http://webupd8.googlecode.com/files/sysmon_0.2.tar.gz && tar -xvf sysmon_0.2.tar.gz
+    *   sudo cp sysmon /usr/local/bin
+    *   indicator-sysmonitor => Preferences => Advanced => Use this command: */usr/local/bin/sysmon*
+*   MenuLibre: a menu editor that provides an easy-to-use interface
+    *   sudo add-apt-repository ppa:menulibre-dev/devel
+    *   sudo apt-get update
+    *   sudo apt-get install menulibre
+*   Screenlets: linux桌面小工具的开发框架
+    *   sudo apt-add-repository ppa:screenlets/ppa
+    *   sudo apt-get update
+    *   sudo apt-get install screenlets
+    *   http://www.ibm.com/developerworks/cn/linux/l-script-linux-desktop-1/
+
+---------------------------------------------------------------------------
+=== Linux Should known ===
+http://coolshell.cn/articles/8883.html
+
+*   Bash
+*   vim
+*   ssh
+*   bash作业管理
+{{{
+    &, Ctrl-Z, Ctrl-C, jobs, fg, bg, kill, 等等。当然，你也要知道Ctrl+\（SIGQUIT）和Ctrl+C （SIGINT）的区别
+}}}
+*   简单文件管理
+{{{
+ls 和 ls -l (你最好知道 “ls -l” 的每一列的意思), less, head, tail 和 tail -f, ln 和 ln -s (你知道明白hard link和soft link的不同和优缺点), chown, chmod, du (如果你想看看磁盘的大小 du -sk *), df, mount。当然，原作者忘了find命令。
+}}}
+
+*   [[http://coolshell.cn/articles/9104.html|Sed]]
+*   [[http://coolshell.cn/articles/9070.html|Awk]]
+*   [[http://os.51cto.com/art/201312/424212.htm|Shell技巧]]

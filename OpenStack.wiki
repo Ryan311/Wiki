@@ -1,0 +1,5 @@
+%toc
+= OpenStack =
+== Install Single Node in SandBox ==
+*   配置网络后重启， /etc/init.d/networking restart
+*   完成后可以在Host ping下虚拟机的网络是否连通, ping 192.168.100.51

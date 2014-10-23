@@ -1,0 +1,9 @@
+= PIL(Python Imaging Library) =
+*   Image类是PIL库中一个非常重要的类
+{{{class = "brush: python"
+>>> import Image
+>>> im = Image.open("j.jpg")
+>>> print im.format, im.size, im.mode
+JPEG (440, 330) RG
+}}}
+

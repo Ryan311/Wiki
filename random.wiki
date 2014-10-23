@@ -1,0 +1,60 @@
+= random =
+*   random.seed([x])
+{{{class = "brush: python"
+# 如果不提供seed，默认使用系统时间, 使用相同的seed，可以获得相同的随机的数序列
+>>>from random import *
+>>>a = Random(); a.seed(1)
+>>>[a.randint(1, 100) for i in range(20)]
+[14, 85, 77, 26, 50, 45, 66, 79, 10, 3, 84, 44, 77, 1, 45, 73, 23, 95, 91, 4]
+
+>>>b = Random(); b.seed(1)
+>>>[b.randint(1, 100) for i in range(20)]
+[14, 85, 77, 26, 50, 45, 66, 79, 10, 3, 84, 44, 77, 1, 45, 73, 23, 95, 91, 4]
+}}}
+*   random.randint(a, b)
+{{{class = "brush: python"
+# 生成随机整数， a<=n<=b
+print random.randint(12, 20)
+print random.randint(20, 20)
+print random.randint(20, 12)    #error, must b>a
+}}}
+*   random.randrange(stop)
+*   random.randrange(start, stop[, step])
+{{{class = "brush: python"
+print random.ranrange(10, 100, 2)
+# 从序列[10, 12, 14, ...96, 98]中获取一个随机数
+# 等价于random.choice(rande(10, 100, 2)), 只是不会产生中间的随机列表
+}}}
+*   random.choice(seq)
+{{{class = "brush: python"
+# 从序列中获取一个随机元素，seq是有序类型，如string, list, tuple
+print random.choice("hello")
+print random.choice(("Tuple", "list", "Dict"))
+}}}
+*   random.shuffle(x[, random])
+{{{class = "brush: python"
+# 将序列中的元素打乱， 可以实现洗牌程序
+l1 = ["Python", "C++", "Perl", "Erlang"]
+random.shuffle(l1)
+print l1
+}}}
+*   random.sample(seq, k)
+{{{class = "brush: python"
+# 从指定序列中随机获取指定长度的片段, 原序列不会改变
+list = [1,2,3,4,5,6]
+slice = random.sample(list,3)
+print slice
+print list
+}}}
+*   random.random()
+{{{class = "brush: python"
+# 返回在[0.0, 1.0]之间的随机浮点数
+}}}
+*   random.uniform(a, b)
+{{{class = "brush: python"
+# 返回在[a, b]之前的随机浮点数
+# 等价于a + (b-a)random()
+}}}
+*   这个模块很 "变态"，还支持三角、β分布、指数分布、伽马分布、高斯分布等等非常专业的随机算法
+
+

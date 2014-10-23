@@ -1,0 +1,72 @@
+%toc
+= git =
+== Install or Update ==
+*Install*::
+sudo apt-get install git git-core
+
+*Update*::
+git clone git://git.kernel.org/pug/scm/git/git.git
+
+== Create a local repository ==
+# mkdir my_app
+# cd my_app
+# git init  // init current repository
+# git add . // add sources to repository in current dir
+# git commit -m "Add the original files"    // commit files to repo
+# git show  // show status
+# git log   // show all changes we've committed so far
+
+== Remote Repositories ==
+# Create a new empty GitHub repository
+# Put our local repo to the GitHub server, we'll need to add a remote repository<br>git remote add origin https://github.com/Ryan311/MyWiki.git
+# push our local changes to origin repo on Github<br>git push -u origin master   //-u tells Git to remember the para
+# Pulling Remotely  other people commit and we want to see the changes<br>git pull origin master
+# git push  // push everything to the remote repository
+
+== Differences ==
+# git diff HEAD
+# git diff --staged
+
+== Other ==
+# git reset octofamily/octodog.txt
+# git checkout -- octocat.txt
+# git brahch clean_up
+# git checkout clean_up
+# git rm '*.txt'    //removing all the things
+
+== ssh ==
+#   ssh-keygen
+#   copy ~/.ssh/id_rsa.pub to github
+#   ssh -T git@github.com
+
+== work with two computers ==
+#   Computer A (had the original git repo)
+#   Computer B (has the cloned repo)
+#   git push origin master  (make some changes on computer A)
+#   git pull origin master  (go to computer B)
+#   git push origin master
+
+== [[http://try.github.io/levels/1/challenges/1|Exercise on line]] ==
+=== [[http://josephj.com/entry.php?id=308|more...]] ===
+=== [[http://marklodato.github.io/visual-git-guide/index-zh-cn.html#basic-usage|图解Git]] ===
+=== [[http://www.worldhello.net/gotgit/|Git权威指南]] ===
+
+----------------------------------------------------------------------------------------------------------------------------------------
+= github =
+== ssh连接github.com的SSH服务 ==
+*   $ssh-keygen ==> 在.ssh目录中创建默认的公钥／私钥对文件
+*   $ssh-keygen -C "persnail311@gmail.com" -f ~/.ssh/hr ==> 在目录hr下根据邮箱名创建公钥／私钥对文件，还要在.ssh/config文件中加入路径名
+*   将公钥Copy到GitHub中
+*   $ssh -T git@github.com ==> 登录
+*   $ssh -Tv git@github.com ==> 以诊断模式登录
+
+=== [[http://www.worldhello.net/doc/|GotGitHub]] ===
+=== [[http://www.yangzhiping.com/tech/github.html|如何高效使用GitHub]]
+== [[https://help.github.com/articles/generating-ssh-keys|generate SSH key: noneed type username and password everytime]] ==
+== [[https://help.github.com/articles/working-with-ssh-key-passphrases|SSH key passphrases???]] ==
+== [[http://pages.github.com/|github pages]] ==
+----------------------------------------------------------------------------------------------------------------------------------------
+= GitHub:Gist =
+*   http://www.worldhello.net/gotgithub/06-side-projects/gist.html
+*   可以将代码片断插入到网页中
+

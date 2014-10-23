@@ -1,0 +1,195 @@
+%toc
+=== wmic=Microsoft Windows Management Instrumentation ===
+{{{
+        查看wmic对象有何可用属性: wmic 对象名称 get /?   例如
+        wmic process get /?
+
+        查看wmic对象某个属性的值: wmic 对象名称 get 对象某个属性   例如 
+        wmic process get name
+
+        PROCESS - 进程管理
+
+            ::列出进程的核心信息,类似任务管理器
+            wmic process list brief
+
+            ::新建notepad进程
+            wmic process call create notepad
+
+            ::列出进程的信息
+            wmic process get caption,handle,commandline,executablepath
+
+            ::结束进程
+            wmic process [handle/PID] delete
+            wmic process [handle/PID] call terminate
+
+            ::结束svchost.exe进程,路径为非C:\WINDOWS\system32\svchost.exe的
+            wmic process where "name='svchost.exe' and ExecutablePath<>'C:\\WINDOWS\\system32\\svchost.exe'" call Terminate
+
+            ::结束svchost.exe进程,路径为C:\WINDOWS\svchost.exe的(关键点：路径中的\一定要换成\\)
+            wmic process where "name='svchost.exe' and ExecutablePath='C:\\WINDOWS\\svchost.exe'" call Terminate
+
+
+        BIOS - 基本输入/输出服务 (BIOS) 管理
+
+            ::查看bios版本型号
+            wmic bios get name,SMBIOSBIOSVersion,manufacturer
+
+        COMPUTERSYSTEM - 计算机系统管理
+
+            ::查看硬件、操作系统基本信息
+            wmic computersystem get Name,workgroup,NumberOfProcessors,manufacturer,Model
+
+            ::查看系统启动选项boot.ini的内容
+            wmic computersystem get SystemStartupOptions
+
+            ::查看工作组/域
+            wmic computersystem get domain
+
+            ::更改计算机名abc为123
+            wmic computersystem where "name='abc'" call rename 123
+
+            ::更改工作组google为MyGroup
+            wmic computersystem where "name='google'" call joindomainorworkgroup "","","MyGroup",1
+
+            CPU - CPU 管理
+
+            ::查看cpu型号
+            wmic cpu get name
+
+        DATAFILE - DataFile 管理
+
+            ::查找e盘下test目录(不包括子目录)下的cc.cmd文件
+            wmic datafile where "drive='e:' and path='\\test\\' and FileName='cc' and Extension='cmd'" list
+
+            ::查找e盘下所有目录和子目录下的cc.cmd文件,且文件大小大于1K
+            wmic datafile where "drive='e:' and FileName='cc' and Extension='cmd' and FileSize>'1000'" list
+
+            ::删除e盘下文件大小大于10M的.cmd文件
+            wmic datafile where "drive='e:' and Extension='cmd' and FileSize>'10000000'" call delete
+
+            ::删除e盘下test目录(不包括子目录)下的非.cmd文件
+            wmic datafile where "drive='e:' and Extension<>'cmd' and path='test'" call delete
+
+            ::复制e盘下test目录(不包括子目录)下的cc.cmd文件到e:\,并改名为aa.bat
+            wmic datafile where "drive='e:' and path='\\test\\' and FileName='cc' and Extension='cmd'" call copy "e:\aa.bat"
+
+            ::改名c:\hello.txt为c:\test.txt
+            wmic datafile "c:\\hello.txt" call rename c:\test.txt
+
+            ::查找h盘下目录含有test,文件名含有perl,后缀为txt的文件
+            wmic datafile where "drive='h:' and extension='txt' and path like '%\\test\\%' and filename like '%perl%'" get name
+
+        DESKTOPMONITOR - 监视器管理
+
+            ::获取屏幕分辨率
+            wmic DESKTOPMONITOR where Status='ok' get ScreenHeight,ScreenWidth
+
+        DISKDRIVE - 物理磁盘驱动器管理
+
+            ::获取物理磁盘型号大小等
+            wmic DISKDRIVE get Caption,size,InterfaceType
+
+        ENVIRONMENT - 系统环境设置管理
+
+            ::获取temp环境变量
+            wmic ENVIRONMENT where "name='temp'" get UserName,VariableValue
+
+            ::更改path环境变量值,新增e:\tools
+            wmic ENVIRONMENT where "name='path' and username='<system>'" set VariableValue="%path%;e:\tools"
+
+            ::新增系统环境变量home,值为%HOMEDRIVE%%HOMEPATH%
+            wmic ENVIRONMENT create name="home",username="<system>",VariableValue="%HOMEDRIVE%%HOMEPATH%"
+
+            ::删除home环境变量
+            wmic ENVIRONMENT where "name='home'" delete
+
+        FSDIR - 文件目录系统项目管理
+
+            ::查找e盘下名为test的目录
+            wmic FSDIR where "drive='e:' and filename='test'" list
+
+            ::删除e:\test目录下除过目录abc的所有目录
+            wmic FSDIR where "drive='e:' and path='\\test\\' and filename<>'abc'" call delete
+
+            ::删除c:\good文件夹
+            wmic fsdir "c:\\good" call delete
+
+            ::重命名c:\good文件夹为abb
+            wmic fsdir "c:\\good" rename "c:\abb"
+
+        LOGICALDISK - 本地储存设备管理
+
+            ::获取硬盘系统格式、总大小、可用空间等
+            wmic LOGICALDISK get name,Description,filesystem,size,freespace
+
+        NIC - 网络界面控制器 (NIC) 管理
+
+        OS - 已安装的操作系统管理
+
+            ::设置系统时间
+            wmic os where(primary=1) call setdatetime 20070731144642.555555+480
+
+        PAGEFILESET - 页面文件设置管理
+
+            ::更改当前页面文件初始大小和最大值
+            wmic PAGEFILESET set InitialSize="512",MaximumSize="512"
+
+            ::页面文件设置到d:\下,执行下面两条命令
+            wmic pagefileset create name='d:\pagefile.sys',initialsize=512,maximumsize=1024
+            wmic pagefileset where"name='c:\\pagefile.sys'" delete
+
+
+        PRODUCT - 安装包任务管理
+
+            ::安装包在C:\WINDOWS\Installer目录下
+
+            ::卸载.msi安装包
+            wmic PRODUCT where "name='Microsoft .NET Framework 1.1' and Version='1.1.4322'" call Uninstall
+
+            ::修复.msi安装包
+            wmic PRODUCT where "name='Microsoft .NET Framework 1.1' and Version='1.1.4322'" call Reinstall
+
+        SERVICE - 服务程序管理
+
+            ::运行spooler服务
+            wmic SERVICE where name="Spooler" call startservice
+
+            ::停止spooler服务
+            wmic SERVICE where name="Spooler" call stopservice
+
+            ::暂停spooler服务
+            wmic SERVICE where name="Spooler" call PauseService
+
+            ::更改spooler服务启动类型[auto|Disabled|Manual] 释[自动|禁用|手动]
+            wmic SERVICE where name="Spooler" set StartMode="auto"
+
+            ::删除服务
+            wmic SERVICE where name="test123" call delete
+
+        SHARE - 共享资源管理
+
+            ::删除共享
+            wmic SHARE where name="e$" call delete
+
+            ::添加共享
+            WMIC SHARE CALL Create "","test","3","TestShareName","","c:\test",0
+
+        SOUNDDEV - 声音设备管理
+            wmic SOUNDDEV list
+
+        STARTUP - 用户登录到计算机系统时自动运行命令的管理
+
+            ::查看msconfig中的启动选项
+            wmic STARTUP list
+
+        SYSDRIVER - 基本服务的系统驱动程序管理
+            wmic SYSDRIVER list
+
+        USERACCOUNT - 用户帐户管理
+
+            ::更改用户administrator全名为admin
+            wmic USERACCOUNT where name="Administrator" set FullName="admin"
+
+            ::更改用户名admin为admin00
+            wmic useraccount where "name='admin" call Rename admin00
+}}}

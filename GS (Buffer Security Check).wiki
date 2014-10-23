@@ -1,0 +1,122 @@
+%toc
+== Buffer Overrun ==
+buffer是程序用来存储数据的连续内存区域，一旦分配完成，其起始地址和大小便
+固定下来。程序运行过程中，如果使用了超出buffer的区域，那么就发生了buffer
+overflow（缓冲区溢出）或者buffer overrun(缓冲区越界）。如果该缓冲区分配在
+stack上，就称之为stack buffer overrun;如果分配在heap，就称为heap overflow。
+
+stack buffer overrun会冲毁thread自身及其父线程的栈信息，我们知道在当前stack
+frame中，EBP+4为函数返回地址，EBP+8为最后一个参数，EBP+C：倒数第二个参数...。
+如果EBP+4处的内容被写入一个非法地址，那么函数调用退出的时候就会跳转到一个非
+法地址，转而执行非法程序。这就是利用stack buffer overrun进行恶意攻击的基本原理。
+
+    local 2         ebp-8      Low 
+    local 1         ebp-4
+    caller ebp      ebp
+    return address  ebp+4
+    para 1          ebp+8
+    para 2          ebp+C
+    para 3          ebp+10
+    para 4          ebp+14      High
+
+在vc6.0中，如果程序为debug 版本，by default会启用stack buffer overrun的检测。
+而在release版本中，则关闭了对其的检测。而在vc8以上版本编译器中，则采用了基于
+Cookie的stack buffer安全检查机制, 这时的Stack frame如下所示：
+
+    local 2         ebp-C      Low 
+    local 1         ebp-8
+    *cookie          ebp-4*    ebp XOR cookie
+    caller ebp      ebp
+    return address  ebp+4
+    para 1          ebp+8
+    para 2          ebp+C
+    para 3          ebp+10
+    para 4          ebp+14      High
+
+== 防止Buffer overrun的措施 ==
+首先简要介绍在Debug版本下的stack orverrun(VC8及以上）的检测机制：
+*   1. VC8在紧邻栈指针的位置分配4个字节用于存放安全Cookie。安全Cookie就像一个安全护栏， 用于保护其下的栈指针和函数返回地址，他位于局部变量和重要的栈帧信息（栈帧指针及函数 返回地址）。这样，如果Cookie之上的局部变量发生溢出，在漫延到栈帧信息前会覆盖Cookie, 因此检查Cookie的完整性便可以探测到可能危及栈信息的溢出情况。
+
+*   2. 在给每个局部变量分配空间时，除了补齐内存空间所需的零头部分，编译器还会给每个变 量多分配8个字节，分别放置于变量的前后各4个字节，并将其初始化为0xcccccccc。这样，每个变量 相当于有了前后2个屏障。一旦这2道屏障受损，则会产生中断（正是cc编码）。
+
+*   以上开销较大，通常只用于调试版本
+
+== 基于Cookie的Stack Buffer安全检测 ==
+VS8及以上编译器(VS2005及以上)Release版本中采用Cookie机制来防止stack overrun, /GS选项用于控制该功能， 默认打开
+*   1. 编译器在编译可能发生stack buffer orverrun的函数时，会定义一个特别的局部变量，该局 部变量被分配在栈帧中所有其他局部变量和栈帧与函数返回之间，这个变量专门用来保存Cookie, 我们将其称为Cookie变量。Cookie变量是一个32位的整数，他的值从全局变量_security_cookie中得到。 （该全局变量是定义在C运行库中，我们可以看到默认安装路径下的源代码：c:\program...\visu..8\VC\crt\src\gs_cookie.c可以看到其定义：
+
+    #define DEFAULT_SECURITY_COOKIE 0xBB40E64E
+    DECLSPEC_SELECTRANY UINT_PRT  _security_cookie=DEFAULT_SECURITY_COOKIE;
+
+*   2. 在VC8编译器启动的启动函数中（如WinMainCRTStartup)还会调用_security_init_cookie函数对该变量进行正式的初始化。在crt0.c中，可以看到启动函数的源码如下：
+
+    int _tmainCRTStartup(void)
+    {
+    _security_init_cookie();//初始化cookie
+
+    ......
+
+    }
+因为是在启动函数中初始化全局变量_security_cookie，所以在该process以后的运行过程中，Cookie值是保持不变的。
+
+*   3. 编译器在为一个函数插入安全Cookie时，他还会与当时的EBP做一次xor,然后将其保存到Cookie变量中，这些指令通常出现在函数的序言(prolog)之后，其典型过程如下：
+
+    push ebp                                    //将caller的ebp压入栈中
+    mov ebp,esp                                 //更新ebp基址， 指向caller的ebp
+    sub esp,0x18                                //为局部变量分配栈空间
+    mov eax,[applica!_security_Cookie]          //将_security_cookie存入eax
+    xor eax,ebp                                 //与ebp xor
+    mov [ebp-0x4],eax                           //存入cookie变量
+
+与EBP xor的两个好处：
+<br>1. 提高安全cookie的随机性，尽可能使每个函数的_security_cookie都不同。
+<br>2. 检查EBP值是否被破坏。因为在检查Cookie变量时，会再与EBP再进行一次xor,如果EBP没有发生变化，那么两次xor后Cookie变量的值就应该成全局安全变量_security_cookie的值。
+其典型的代码如下：
+
+    mov ecx, [ebp-0x4]
+    pop edi
+    xor ecx,ebp                                 //再xor 一次
+    pop esi
+    call applica!_security_check_cookie(0x***) //开始检查_security_cookie
+    mov esp,ebp
+    pop ebp
+    ret
+
+*   4. 安全检查失败处理
+因为stack buffer overrun可能覆盖掉函数的本来返回地址，使函数返回到未知的地方，从而使程序出现不可预期的后果。因此这种exception被看作是fatal error,一旦遇到这种错误，程序就会马上终止。但为了debug,在terminate process之前，_report_gsfailure函数会记录下错误发生时的重要信息，并提供JIT调试机会。
+
+== More ==
+*   在Windbg中可以看到某个程序或Driver的Cookie值
+
+    >x RtkBtfilter!_security_cookie
+        8b493d14          RtkBtfilter!__security_cookie = 0xf114302c
+        
+*   可以用uf命令查看几个与Cookie相关的函数
+    
+    >u RtkBtfilter!__security_cookie
+    >u RtkBtfilter!__security_check_cookie
+    
+*   并不是每个函数调用时都会加Cookie保护， 由编译器判断有可能发生overrun的时候才会加， 这取决于函数中是否有GS Buffer
+GS Buffers定义：
+    *   A buffer overrun security check is performed on a GS buffer. A GS buffer can be one of these:
+    *   An array that is larger than 4 bytes, has more than two elements, and has an element type that is not a pointer type.
+    *   A data structure whose size is more than 8 bytes and contains no pointers.
+    *   A buffer allocated by using the _alloca function.
+    *   Any class or structure that contains a GS buffer.
+    
+函数定义如下变量时， 它就是包含了GS Buffers 
+
+    char buffer[20];
+    int buffer[20];
+    struct { int a; int b; int c; int d; } myStruct;
+    struct { int a; char buf[20]; };
+    
+而如下变量就不是
+
+    char *pBuf[20];
+    void *pv[20];
+    char buf[4];
+    int buf[2];
+    struct { int a; int b; };
+    
+Reference:   http://msdn.microsoft.com/en-us/library/8dbf701c.aspx 

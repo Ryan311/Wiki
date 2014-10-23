@@ -1,0 +1,19 @@
+{{{class = "brush: python"
+from win32api import GetFileVersionInfo, LOWORD, HIWORD   
+   
+def get_version_number (filename):   
+    try:   
+        info = GetFileVersionInfo(filename, "\\")
+        print info
+        ms = info['FileVersionMS']   
+        ls = info['FileVersionLS']   
+        return HIWORD (ms), LOWORD (ms), HIWORD (ls), LOWORD (ls)   
+    except:
+        print "Read file error"
+        return 0,0,0,0   
+   
+if __name__ == '__main__':   
+  filename = "J:\\pdb\\0829\\RtkBtfilter.sys"  
+  print get_version_number (filename)  
+  print ".".join ([str (i) for i in get_version_number (filename)])  
+}}}

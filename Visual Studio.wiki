@@ -1,0 +1,130 @@
+%toc
+
+== VC ==
+*   [[Query Register and Convert 64 int to String]]
+*   [[file operation in kernal mode]]
+*   [[http://msdn.microsoft.com/en-us/library/aa363765(v=vs.85).aspx|file operation in user mode]]
+*   VS2012 Config
+    *   Turn off Unicode in VC++ Project
+        *   Project Properties -> General -> Project Defaults -> *Character Set*
+    *   .sdf and ipch
+        *   Visual Studio用来保存预编译的头文件和Intellisense用的
+        *   不在当前工程中生成这些文件, VS用临时文件夹保存这些文件
+        {{{
+        Tools->Options  Text Editor -> C/C++ -> Advanced
+        Fallback Location:  Always use Fallback Location -> Set True
+                            Do Not Warn if Fallback Location Used  -> Set True
+        }}}
+*   [[https://github.com/jaredpar/VsVim|VsVim]] vim extension in VS2012
+    *   Tools -> Extensions and Updates -> Search VsVim and Install -> Restart VS2012
+    *   Config Key mappings
+    *   :set vimrc          -> Show the vimrc which VsVim read
+*   VS2012 静态编译c c++运行库
+    *   Win8上编译的程序在Win7上有可能不能运行，原因是它们使用的C运行库不一样，好的解决方法是在编译时将运行库编译进程序，随程序一起发布
+    *   在VS2012中修改设置：Project Property->Configuration Properties->C/C++->Code Generation->Runtime Library->修改选项为"Mutiple-threaded(/MT)"
+*   VS里面非常好用的功能，在build之前或之后可以完成一些动作，比如文件Copy，但是在Copy时注意命令的写法：(nonpnp sample in e:\work\sampledriver)
+{{{//不能想当然的写相对路径，要使用VS定义的宏来指明路径，在调用该cmd时会解析成完整路径
+Error   copy "..\..\wdf\x86\WdfCoInstaller01011.dll" ".\bin"
+Right   copy "$(SolutionDir)..\..\wdf\x86\WdfCoInstaller01011.dll" "$(SolutionDir)bin\"
+}}}
+*   Dump中可以看到完整的Driver信息
+    *   在Win7上编译代码时，在sources文件中添加 LINKER_FLAGS=$(LINKER_FLAGS) /SECTION:.rsrc,!D
+    *   在Win8 VS2012中, 在Project->Property Pages->Links->All Options->Specify Section Attributes：  .rsrc,!D
+    *   在Dump中的对比效果如下, 可以看到更多的信息，主要是FileVersion
+    {{{
+        0: kd> lmvm RtkBtfilter
+        start    end        module name
+        bacb1000 bad3e000   RtkBtfilter   (private pdb symbols)  E:\SVNWorkspace\trunk\HostSW\win7-inbox-driver\RtkFilter\generic\RtDFilter_Win8\Win8Release\x86\RtkBtfilter.pdb
+            Loaded symbol image file: RtkBtfilter.sys
+            Image path: \SystemRoot\system32\DRIVERS\RtkBtfilter.sys
+            Image name: RtkBtfilter.sys
+            Timestamp:        Wed Apr 09 18:43:55 2014 (5345246B)
+            CheckSum:         00078075
+            ImageSize:        0008D000
+            File version:     1.3.814.0
+            Product version:  1.3.814.0
+            File flags:       8 (Mask 3F) Private
+            File OS:          40004 NT Win32
+            File type:        3.7 Driver
+            File date:        00000000.00000000
+            Translations:     0000.04b0
+            CompanyName:      Realtek Semiconductor Corporation
+            ProductName:      Bluetooth Software
+            InternalName:     RtkBtfilter.sys
+            OriginalFilename: RtkBtfilter.sys
+            ProductVersion:   1.3.814.0
+            FileVersion:      1.3.814.0
+            FileDescription:  Realtek Bluetooth Filter Driver
+            LegalCopyright:   Realtek All Rights Reserved
+
+
+
+        0: kd> lmvm RtkBtfilter
+        Browse full module list
+        start             end                 module name
+        fffff880`0a4fc000 fffff880`0a598000   RtkBtfilter   (no symbols)           
+            Loaded symbol image file: RtkBtfilter.sys
+            Image path: \SystemRoot\system32\DRIVERS\RtkBtfilter.sys
+            Image name: RtkBtfilter.sys
+            Browse all global symbols  functions  data
+            Timestamp:        Tue Apr 01 14:05:52 2014 (533A5740)
+            CheckSum:         000897C8
+            ImageSize:        0009C000
+            Translations:     0000.04b0 0000.04e4 0409.04b0 0409.04e4
+    }}}
+    *   右键点击sys档->属性->Details，可以看到一些Descriptions, 说明在image中有一个properly-formatted VERSIONINFO
+section, 在img被装载到内存时，该section不一定会存在（被paged out或被discarded），所以lmvm不能显示出完整的信息
+    *   如果在link时指明.rsrc section为non-discarded, 则该resource section就会被认为是non-paged, 我们在dump中就可以看到与Details中显示的一样的信息
+    *   http://microsoft.public.windbg.narkive.com/2L9U1zB7/driver-version-w-lm-v
+*   [[http://vld.codeplex.com/|Visual Leak Detector]]
+    *   下载安装程序安装
+    *   在程序中的.c文件包含#include "vld"
+    *   编译Debug版并运行，如果有Memory Leak则会自动检测出来且还有内存分配时的栈信息   
+    *   没有试过Driver中是否有用
+*   VS2012 输出目录
+    *   Property Pages->Configuration Properties->General: Output Directory //这里可以指定一个全局变量OutDir, 后面在指定输出时可直接引用$(OutDir)
+    *   Property Pages->Configuration Properties->General: Intermediate Directory //中间目录， Build时产生的临时文件， 没什么用
+    *   Property Pages->Configuration Properties->Linker->General: Output File ==> $(OutDir)rtsocket.dll    //指定要生成文件的名字及存放的目录
+    *   Property Pages->Configuration Properties->Linker->Debugging: Generate Program Database File ==> $(OutDir)rtsocket.pdb   //指定PDB文件名字及存放目录， 一般要与上面的相同
+    *   Property Pages->Configuration Properties->Linker->Advanced: Import Library ==> $(OutDir)rtsocket.lib    //指定导入库文件的名字及目录， 一般要上面相同
+
+
+=== VS2012 写DLL ===
+*   File->New->Project  ==> 
+    *   New Project:    Win32 -> Win32 Project -> Name & Location   ==> Next 
+    *   Win32 Application Wizard:   DLL -> Empty Project    创建空项目
+    *   手动创建.c和.h文件，并添加到项目中(刚开始要有dllmain.c)
+    *   在Resource Files中右键： Add -> Resource    添加rc文件，file version
+    *   PROJECT-> Property Pages-> c/c++-> Preprocessor-> Preprocessor Definitions ==>
+        *   Add "*****_EXPORTS"   
+{{{
+Note:   这里之所以创建空的项目，是因为我想用.c文件而不是.cpp文件
+        因为在cpp中使用wpp输出log总是编译不过, 原因还不太清楚！！！
+}}}
+*   在项目中使用WPP
+    *   增加trace.h文件到项目中，内容见模板，GUID要重新生成
+    *   增加RunTraceWpp.bat， CleanTmh.bat到项目目录下
+    *   在每个.c文件头部添加  #include "trace.h" \  #include "文件名.tmh"
+    *   PROJECT -> Property Pages -> Build Events ==>
+        *   Pre-Build Event:    Command Line -> "RunTraceWpp"
+        *   Post-Build Event:   Command Line -> "CleanTmh"
+    *   在dllmain.c中加入：
+        *   DLL_PROCESS_ATTACH:     WPP_INIT_TRACING(L"LEGap.dll")
+        *   DLL_PROCESS_DETACH:     WPP_CLEANUP():w
+*   如何在Dll中导出API
+    *   定义宏    LEGAP_API
+    *   将想要导出的函数之前加入宏LEGAP_API即可
+    *   在Preprocessor Definitions中加入LEGAP_EXPORTS
+    {{{
+    #ifdef LEGAP_EXPORTS    // 导出函数
+        #define LEGAP_API __declspec(dllexport)
+    #else                   // 导入函数
+        #define LEGAP_API __declspec(dllimport)
+    #endif
+    }}}
+*   dll是用C来写，如果Test函数用C++来写的话，会有编译错误，用C来写Test函数就OK
+    *   原因是C和C++编译出的函数名称不同，要用extern "C"来告诉编译器按照C的方式来使用函数，这是一种约定！
+    *   可参考http://www.cnblogs.com/skynet/archive/2010/07/10/1774964.html
+    *   可能用工具dumpbin.exe(VS自带,分析PE文件格式)来调试这种链接错误
+    *   dumpbin.exe -exports LEGap.dll      //查看dll的导出函数
+    *   dumpbin.exe -imports LEGapTest.exe  //查看exe中导入的函数

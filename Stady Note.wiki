@@ -1,0 +1,640 @@
+= Bluetooth Handy Note ==
+-------------------------------------------------------------------------------------------------------------------------------
+//2013-06-27
+1.  Data Signing
+    The data signing is used for transferring authenticated data between two devices in an unencrypted connection
+-------------------------------------------------------------------------------------------------------------------------------
+//2013-06-26
+1.  GATT Features
+    There are 11 features defined in the GATT Profile:
+
+    Feature:                                        Sub-procedure:
+    1. Server Configuration                         Exchange MTU
+
+    2. Primary Service Discovery                    Discover all primary services
+                                                    Discover primary service by service UUID
+
+    3. Relationship Discovery                       Find included services
+
+    4. Characteristic Discovery                     Discover all characteristics of a service
+                                                    Discover Characteristic by UUID
+
+    5. Characteristic Descriptor Discovery          Discover all characteristic descriptors
+
+    6. Reading a Characteristic Value               Read Characteristic value
+                                                    Read using Characteristic UUID
+                                                    Read long Characteristic Values
+                                                    Read multiple Characteristic Values
+
+    7. Writing a Characteristic Value               Write without response
+                                                    Singled Write without response
+                                                    Write Characteristic value
+                                                    Write long Characteristic values
+                                                    Characteristic Value Reliable Writes
+
+    8. Notification of a Characteristic Value       Notifications
+
+    9. Indication of a Characteristic Value         Indications
+
+    10.Reading a Characteristic Descriptor          Read Characteristic Descriptors
+                                                    Read long Characteristic Descriptors
+
+    11.Writing a Characteristic Descriptor          Write Characteristic Descriptors
+                                                    Write long Characteristic Descriptors
+
+    Each of the features is mapped to procedures and sub-procedures. 
+
+2.  Client Characteristic Configuration     GATT 3.3.3.3
+    Client Characteristic Configuration declaration is an optional characteristic descriptor that defines how the characteristic
+    may be configured by a specific client.
+    Characteristic Configuration Bits
+        Notification    0x0001      The Characteristic Value shall be notified.
+        Indication      0x0002      The Characteristic Value shall be indicated.
+
+    Notifications
+        This sub-procedure is used when a server is configured to notify a Characteristic Value to a client 
+        without expecting any Attribute Protocol layer acknowledgement that the notification was successfully received.
+    Indications
+        This sub-procedure is used when a server is configured to indicate a Characteristic Value to a client 
+        and expects an Attribute Protocol layer acknowledgement that the indication was successfully received.
+
+
+3.  L2cap interoperability requirement
+    1) Over BR/EDR      ATT bearer --> L2cap connection-oriented channels with fixed PSM(0x0007) and the channel shall be encryped
+                        ATT_MTU     minimum of the negotiated MTU   (minimum is 48 octets for BR/EDR channel)
+    2) Over LE          ATT bearer --> L2cap fixed channel (0x0004)     fast to use as long as physical link is established
+                        ATT_MTU     minimum is 23 octets
+                        Flush Timeout   0xffff(infinite)
+                        QoS             Best Effort
+                        Mode            Basic Mode
+        
+4.  Control-point attribute
+    <<Service Changed>> characteristic is a control-point attribute that shall be used to indicate to connected devices
+    that services have changed(ie. added, removed or modified).
+
+5.  GATT Security   ???
+    1)  Authentication  the GATT Profile is applied to each characteristic independently
+    1)  Authorization   the GATT Profile is applied to each characteristic independently
+    
+-------------------------------------------------------------------------------------------------------------------------------
+//2013-06-25
+1.  GATT 
+    The GATT profile is designed to be used by an application or another profile, so that a client 
+    can communicate with a server. The server contains a number of attributes, and the GATT Profile 
+    defines how to use the Attribute Protocol to discover, read, write and obtain indications of these 
+    attributes, as well as configuring broadcast of attributes.
+
+    GATT Client --  This is the device that initiates commands and requests towards the server and can
+                    receive responses, indications and notifications sent by the server.
+
+    GATT Server --  This is the device that accepts incoming commands and requests from the client and 
+                    sends responses, indications and notifications to a client
+
+    Scenarios covered:
+    1) Exchanging configuration
+    2) Discovery of services and characteristics on a device
+    3) Reading a characteristic value
+    4) Writing a characteristic value
+    5) Notification of a characteristic value
+    6) Indication of a characteristic value
+
+
+    Profile fundamentals:
+    1)  The profile roles are not tied to the controller master/slave roles.
+    2)  On an LE Physical link, use of security features such as authorization, authentication and encryption are optional.
+    3)  On a BR/EDR physical link encryption is mandatory.
+
+
+2.  Attribute protocol
+    An Attribute is composed of four parts:
+    1) Attribute Handle     --- an index corresponding to a specific Attribute
+    2) Attribute Type       --- a UUID that descributes the Attribute Value
+    3) Attribute Value      --- data described by the Attribute Type and indexed by the Attribute Handle
+    4) Attribute Permission --- is part of Attribute that cannot be read from or written to using the ATT Protocol.
+                                It is used by the server to determine whether read or write access is permitted for 
+                                a given attribute. Attribute Permissions are established by the GATT profile, a higher
+                                layer profile or are implementation specific if not specified.
+    
+    Attribute Caching   !!!
+    ---GATT 2.5.2
+
+3.  GATT Hierachy       --- all of the elements are contained by Attributes
+    Profile                             is composed of one or more services necessary to fulfill a use case
+        --  Service                     is composed of characteristics or references to other services
+            --  Characteristic          each contains a value and may contain optional information about the value
+
+    1)  Service      is defined by its service definition which may contain referenced services , mandatory characteristics 
+                    and optional characteristics
+        There are two types of services:
+        1> Primary service
+        2> Secondary service
+
+    
+4.  1)  Service definition
+    A service definition shall contain a service declaration and may contain include definitions and characteristic definitions.
+    The service definition ends before the next service declaration or after the maximum Attribute Handle is reached. Service 
+    definitions appear on the server in an order based on Attribute Handle.
+    
+    A service declaration is an Attribute with the Attribute Type set to the UUID for <<Primary Service>>--0x2800 or 
+    <<Secondary Service>>--0x2801. The Attribute Value shall be the 16-bit Bluetooth UUID or 128-bit UUID for the service,
+    known as the service UUID. 
+
+    2)  Include definition
+    An include definition shall contain only one include declaration. 
+    The include declaration is an Attribute with the Attribute Type set to the UUID for <<Include>>--0x2802
+
+    3)  Characteristic definition
+    A characteristic definition shall contain a characteristic declaration, a Characteristic Value declaration and may contain 
+    characteristic descriptor declarations(option).
+
+        Characteristic Declaration:
+            A characteristic declaration is an Attribute with the Attribute Type set to the UUID for <<Characteristic>>--0x2803
+            and Attribute Value set to the Characteristic Properties, Characteristic Value Attribute Handle and Characteristic UUID. 
+            The Attribute Permissions shall be readable and not require authentication or authorization.
+        Characteristic Value declaration:
+            The Characteristic Value declaration contains the value of the characteristic. It is the first Attribute after the 
+            characteristic declaration. All characteristic definitions shall have a Characteristic Value declaration.
+        Characteristic Descriptor Declarations:
+            Characteristic descriptors are used to contain related information about the Characteristic Value.
+
+
+    GATT Profile Attribute Types:
+    Attribute Type                                  UUID                Description
+    ?Primary Service?                               0x2800              Primary Service Declaration
+    ?Secondary Service?                             0x2801              Secondary Service Declaration
+    ?Include?                                       0x2802              Include Declaration
+    ?Characteristic?                                0x2803              Characteristic Declaration
+    ?Characteristic Extended Properties?            0x2900              Characteristic Extended Properties
+    ?Characteristic User Description?               0x2901              Characteristic User Description Descriptor
+    ?Client Characteristic Configuration?           0x2902              Client Characteristic Configuration Descriptor
+    ?Server Characteristic Configuration?           0x2903              Server Characteristic Configuration Descriptor
+    ?Characteristic Format?                         0x2904              Characteristic Format Descriptor
+    ?Characteristic Aggregate Format?               0x2905              Characteristic Aggregate Format Descriptor
+
+-------------------------------------------------------------------------------------------------------------------------------
+//2013-06-21
+1.  Non-connected states
+1) Standby state
+    The Standby State is the default state in the Link Layer. The Link Layer shall 
+not send or receive packets in the Standby State. The Link Layer may leave the 
+Standby State to enter the Advertising State, Scanning State or Initiator State.
+
+2) Advertising State
+    The Link Layer shall enter the Advertising State when directed by the Host. 
+When placed in the Advertising State, the Link Layer shall send advertising 
+PDUs (see Section 2.3.1) in advertising events on advertising channel.
+    An advertising event can be one of the following types:
+     advertising event type                     PDU                     response PDU
+     a connectable undirected event             ADV_IND                 SCAN_REQ & CONNECTED_REQ
+     a connectable directed event               ADV_DIRECT_IND          CONNECTED_REQ        only used in fast connection setup
+     a non-connectable undirected event         ADV_NONCONN_IND         NON
+     a scannable undirected event               ADV_SCAN_IND            SCAN_REQ
+For each advertising event type, a corresponding Advertising Channel PDU is used.
+Advertising Channel:
+    Advertising events use three predefined advertising channels.    
+Advertising Interval:
+    For all undirected advertising events, the time between the start of two consecutive advertising events
+    T_advEvent = advInterval + advDelay
+
+
+2) Scanning State
+    The Link Layer shall enter the Scanning State when directed by the Host. 
+When scanning, the Link Layer shall listen on the advertising channel indices. 
+There are two types of scanning, determined by the Host: passive and active.
+When in active type, can send SCAN_REQ to request more information from advertiser
+When in passive type, only receive packets and cannot send any packets
+
+3) Initiator State
+    The Link Layer shall enter the Initiating State when directed by the Host. When 
+initiating, the Link Layer shall listen on the advertising channel indices.
+    Same to the Scanning state, but use initiator filter policy and send CONNECT_REQ PDU
+    
+
+2.  Connected State 
+    The Link Layer enters the Connection State when an initiator sends a CONNECT_REQ PDU to an advertiser or 
+    an advertiser receives a CONNECT_REQ PDU from an initiator. 
+
+    After entering the Connection State, the connection is considered to be created. The connection is not considered 
+to be established at this point. A connection is only considered to be established once a data channel packet has 
+been received from the peer device. The only difference between a connection that is created and a connection that is 
+established is the Link Layer connection supervision timeout value that is used.
+
+    When two devices are in a connection, the two devices act in different roles. A Link Layer in the Master Role is 
+called a master. A Link Layer in the Slave Role is called a slave. The master controls the timing of a connection event. 
+A connection event is a point of synchronization between the master and the slave. 
+
+1) Connection events
+    The Link Layer in the Connection State shall only transmit Data Channel PDUs 
+(see Section 2.4) in connection events. The master and slave shall determine 
+the data channel index for each connection event as defined in Section 4.5.8. 
+The same data channel index shall be used for all packets in the connection 
+event. Each connection event contains at least one packet sent by the master. 
+    In a single connection event, the data channel index is not changed
+
+The start of a connection event is called an anchor point. At the anchor point, a 
+master shall start to transmit a Data Channel PDU to the slave. The start of 
+connection events are spaced regularly with an interval of connInterval and 
+shall not overlap. The master shall ensure that a connection event closes at 
+least T_IFS before the anchor point of the next connection event. The slave lis-
+tens for the packet sent by its master at the anchor point. 
+    在每个connection event的开始，总是master先Send data，slave listen for the packet
+
+connInterval:
+    The connInterval shall be a multiple of 1.25 ms in the range of 7.5 ms to 4.0 s. 
+The connInterval is set by the Initiator’s Link Layer in the CONNNECT_REQ 
+PDU from the range given by the Host.
+
+Slave latency:
+    Slave latency allows a slave to use a reduced number of connection events. 
+The connSlaveLatency parameter defines the number of consecutive connec-
+tion events that the slave device is not required to listen for the master.
+    When connSlaveLatency is set to zero the slave device shall listen at 
+every anchor point. If the slave does not receive a packet from the master after 
+applying slave latency, it should listen at each anchor point and not apply slave 
+latency until it receives a packet from the master.
+
+connEventCounter:
+    Both the master and the slave shall have a 16-bit connection event counter 
+(connEventCounter) for each Link Layer connection. It shall be set to zero on 
+the first connection event sent by the master of the connection. It shall be incre-
+mented by one for each new connection event sent by the master; the 
+connEventCounter shall wrap from 0xFFFF to 0x0000. This counter is used to 
+synchronize Link Layer control procedures.
+
+2) Supervision Timeout
+    To be able to detect link loss, both the master and the slave shall use a Link 
+Layer connection supervision timer, TLLconnSupervision. Upon reception of a valid 
+packet, the timer shall be reset. 
+    每收到一个有效的包，该Timer都会被Reset
+
+    If at any time in Connection State after the connection has been established 
+and the timer reaches the connSupervisionTimeout value, the connection shall 
+be considered lost.
+
+3) Connection Event Transmit Window     ???
+    The CONNECT_REQ PDU includes parameters to determine when the master can 
+send its first packet in the Connection State to set the anchor point and when 
+the slave must listen.
+    两个参数：
+    transmitWindowOffset：  告诉slave，master的transmit window开始的时间，在这段时间master会发数据，slave要一直处于listen
+    transmitWindowSize:     告诉slave, master的transmit windowr的大小
+    当slave收到第一个master pdu时，anchor point就确定了，以后的event的anchor point都由此处开始计算!!!
+    master发送第一个packet时，第一个connection event也就开始，以后的connection event也由此处开始计算!!!
+
+4) Closing Connection Events
+    MD bit, both 0, slave close the event
+    either or both set 1, ......
+
+5)  Acknowledgement and Flow Control
+    The Link Layer acknowledgement and flow control scheme shall be used in all 
+Link Layer connections.
+    For each connection the Link Layer has two parameters, transmitSeqNum and 
+nextExpectedSeqNum, each one bit in size. transmitSeqNum is used to iden-
+tify packets sent by the Link Layer. nextExpectedSeqNum is used by the peer 
+to either acknowledge the last Data Channel PDU sent, or to request resending 
+of the last Data Channel PDU sent. 
+    transmitSeqNum and nextExpectedSeqNum shall be set to zero upon entering 
+the Connection State.
+    SN, NESN and MD bits shall be used from every received Data Channel PDU 
+which has passed the CRC check.
+
+
+
+
+3.  LINK LAYER DEVICE FILTERING
+    A Link Layer shall support Link Layer Device Filtering unless it only supports 
+non-connectable advertising.
+The filter policies for the Advertising State, Scanning State and Initiating State 
+are independent of each other. When the Link Layer is in the Advertising State, 
+the advertising filter policy shall be used. When the Link Layer is in the Scan-
+ning State, the scanning filter policy shall be used. When the Link Layer is in 
+the Initiating State, the initiator filter policy shall be used. If the Link Layer does 
+not support the Advertising State, Scanning State, or Initiating State, the corre-
+sponding filter policy is not required to be supported.
+
+LinkLay State                       filter policy
+Advertising                         advertising filter policy
+Scanning                            scanning filter policy
+Initiating                          initiator filter policy
+
+White List
+    A White List contains a set of White List Records used for Link Layer Device 
+Filtering. A White List Record contains both the device address and the device 
+address type (public or random). All Link Layers supporting Link Layer Device 
+Filtering shall support a White List capable of storing at least one White List 
+Record.
+    On reset, the White List shall be empty.
+    The White List is configured by the Host and is used by the Link Layer to filter 
+advertisers, scanners or initiators
+    All the device filter policies shall use the same White List        ???
+
+1) Advertising filter policy
+    The advertising filter policy determines how the advertiser’s Link Layer processes scan and/or connection requests
+    There are four advertising filter policy modes which are configured by the Host     !!!
+    Only one advertising filter policy mode shall be supported at a time.
+2) Scanner Filter Policy
+    The scanner filter policy determines how the scanner’s Link Layer processes advertising packets.
+    The Link Layer shall use one of the two following scanner filter policy modes which are configured by the Host  !!!
+3) Initiator filter policy
+    The initiator filter policy determines how an initiator’s Link Layer processes advertising packets.
+    The Link Layer shall use one of the two following initiator filter policy modes which are configured by the Host  !!!
+
+4. LE physical channel
+    The LE system operates in the 2.4 GHz ISM band at 2400-2483.5 MHz. The 
+LE system uses 40 RF channels. These RF channels have center frequencies 
+2402 + k * 2 MHz, where k = 0, ..., 39
+    These RF Channels are allocated into two LE physical channels: 
+    three advertising channels: for discovering devices, initiating a connection and broadcasting data.
+    37 data channels:   for communication between connected devices
+
+    channel index:  is not equal to RF channel map          ie.  RF channel 0 --> LE channel index 37
+
+5. Air Interface Packet
+    1)  Preamble    The preamble is used in the receiver to perform frequency synchronization, symbol timing estimation, and 
+Automatic Gain Control (AGC) training.
+    advertising     0xaa
+    data            0xaa or 0x55
+
+    2)  Access Address
+    advertising channel packets:    10001110100010011011111011010110b (0x8E89BED6)
+    data channel packets:   be different for each Link Layer connection
+    
+    3)  PDU
+    Advertising channel PDU
+        Header(2 bytes) + Payload(6+N bytes)
+            Header: PDU Type + TxAdd + RxAdd + Length
+    Data channel PDU
+        Header(2 bytes) + Payload(N bytes) + MIC(Option, 32bits)
+            Header: LLID + NESN + SN + MD + RFU + Length(5 bits) + RFU
+                LLID -> 00  reserved
+                        01  continuation fragment of L2cap message or an Empty PDU
+                        10  start of an L2cap message or a complete l2cap message with no fragmentation
+                        11  LL Control PDU  --- have fixed length accordind to Opcode
+    4) CRC  24-bit
+
+5.  AD and EIR           defined in GAP
+    AD      advertising and scan response data format       LE advertising              31 octs
+    EIR     extended inquiry response data format           BREDR inquiry response      240 octs
+    data format is same, AD type and EIR data type is same
+
+6.  LE Security
+    Two Security Mode:  Mode 1 and Mode 2
+    Mode 1:     has three security level
+        1) no security (no authenticatioin and no encryption)
+        2) unauthenticated pairing with encryption
+        3) Authenticated pairing with encryption
+    Mode 2:     has two security level  
+        1) Unauthenticated pairing with data signing
+        2) authenticated pairing with data signing
+        LE security mode 2 shall only be used for connection based data signing.
+    
+    There are two types of pairing: authenticated pairing or unauthenticated pairing
+        authenticated pairing -->   SMP     with MITM protection in pairing request
+
+-------------------------------------------------------------------------------------------------------------------------------
+//2013-04-08
+1. Core Sepc BaseBand
+1)  蓝牙网络可以分为两种
+    Piconet：   只有一个Master, 只有一个physical channel, 所有的设备共用同一个physical channel
+            a single slave piconet
+            a multi-slave piconet
+    Scatternet：由多个Piconet组成，有多个Master，每个Piconet使用不同的physical channel
+
+2)  Devices in Piconet
+    Master  只有一个
+    Slaves  多个（最多7个）， 可以有多个已经连接的slave处于Parked State
+            Active State
+            Parked State
+
+    Parked State: remain synchronized to the master and can become active without using the connection procedure
+
+3)  Data transfer over BREDR
+    Symbol rate for all modulation mode is 1Ms/s  符号传输速率都是1MSymbol/s
+    Basic Rate： gross air data rate 1Mbps 每个符号承载1bit     GFSK
+    Enhanced Data Rate:     access code and packet header是用Basic Rate GFSK来传输， synchronization sequence、payload、trailer sequence用PSK传输 
+        Primary modulation mode:    gross air data rate 2Mbps   每个符号承载2bit        pai/4-DQPSK
+        Secondary modulation mode:  gross air data rate 3Mbps   每个符号承载3bit        8DPSK
+
+4)  Bluetooth Clock
+    28-bit counter is required
+    the clock determines critical periods and triggers the events in the device
+    Four periods are important in the Bluetooth system: 312.5us, 625us, 1.25ms, 1.28s
+    a time slot: 625us
+
+5)  Bluetooth Device addressing
+    BD_ADDR     48 bits
+        company_assigned    24bits
+        company_id          24bits
+
+6)  Access Code
+    all transmissions over the physical channel begin with an access code
+    > device access code (DAC)
+        used during page, page scan and page response substates.
+        derived from the paged device's BD_ADDR
+    > channel access code (CAC)
+        used in the CONNECTION state and forms the beginning of all packets exchanged on the piconet physical channel.
+        derived rom the LAP of the master's BD_ADDR
+    > inquiry access code (IAC)
+        used in INQUIRY substate
+        One GIAC for general inquiry operation
+        63 DIACs for dedicated inquiry operation
+
+    the access code also indicates to the receiver the arrival of a packet
+    it is used for timing synchronization and offset compensation
+
+7)  Physical Channel    the lowest architectural layer in the Bluetooth system
+    defined by  a pseudo-random RF channel hopping sequence       
+                the slot timing
+                an access code
+    All physical channels are subdivided into time slots whose length is different depending on the physical channel,
+    Within the physical channel, each reception or transmission event is associated with a time slot or time slots.
+
+    The maximum hop rate is 1600 hops/s in the CONNECTION state
+    The maximum hop rate is 3200 hops/s in the inquiry and page substat
+
+    Four bluetooth physical channels are defined:
+    the basic piconet channel and adapted piconet channel
+        used for communication between connected devices and are associated with a specific piconet
+    the inquiry scan channel
+        used for discovering
+    the page scan channel 
+        used for connecting
+
+    A Bluetooth device can only use one of these physical channels at any given time
+    In order to support multiple concurrent operations the device uses time-division multiplexing between the channels
+    在特定的时间一个BT设备只能使用一种channel，但为了同时支持多个操作，使用时分复用的方式来操作不同的channel。
+
+8)  Basic Piconet channel
+    hopping characteristics
+        be characterized by a pseudo-random hopping through all 79 RF channels
+
+    time slots
+        be divided into time slots, each 625us in length
+        the time slots are numbered according to the most significant 27 bits of the bluetooth clock, range from 0 - 2^27-1 and then cycle back
+        Master and Slave 时分复用Physical channel, 交替使用slot，例如： f(k), f(k+2), f(k+4) ... f(k+2n) for Master
+                                                                        f(k+1), f(k+3), f(k+5) ... f(k+2n+1) for Slave 
+        一次传输并不一定只用一个slot，最多可以用5个连续的slots，但必定是交叉使用的。
+
+    Transmit/receive timing
+        The master transmission shall always start at even numbered time slots and the slave transmission shall always start at odd numbered time slots
+        
+9)  Adapted piconet channel
+    只使用79个跳频序列的子集
+
+10) Page Scan Physical channel
+    
+
+//2013-04-09
+1.  hop rate in CONNECTED state is 1600 hops/s
+    hop rate in Page/Inquire state is 3200 hops/s
+
+    1600 hops/s  <-->   625us
+    在连接状态，每个Tx/Rx时隙（slot）对应的一个跳频频带
+    Master在做Tx时，一笔数据在一个时隙内要发出去，且用一个频段
+    当一笔数据过大，则要占用多个时隙，要在不同的频带上发数据了
+
+    3200 hops/s  <-->   312.5us
+    在做Scan或Inquire时，一个Tx/Rx时隙仍然是625us
+    但是一个时隙内做了一次跳频。
+    由于Scan，inquire的包比较小，一个Tx时隙可以发两笔包，
+    所以仍然是一个频带上一笔包。
+
+2.  Page Scan Physical Channel
+    在该Channel上，Tx/Rx的时隙也是625us，但是跳频更快一些，3200 hops/s
+    即在一个时隙上会发生一次跳频，一个时隙被分成两个不同的频段
+    在一个时隙，会发送两笔包，一个频段一笔包
+    在Tx时隙，在f(k),f(k+1)两个频段发送paging message
+
+//2013-04-15
+1. 8761是BT Only的Chip，它可以搭配不同的Wifi Module
+case1： 8761AU+8812AE       usb + PCIE
+case2： 8761AU+92EE         usb + PCIE
+case3:  8761AW+92EU         UART1 + USB
+case4： 8761AU only         USB
+=>  Support不同Case的Chip通过PID来区分
+
+
+//2013-04-16
+1. BT　efuse设定
+需要安装wifi protocal driver
+打开rtldbg.exe
+RTL_DBG>show bt coexinfo -m
+显示bt not exist    表示BT efuse没有设对
+
+修正方法：
+1) RTL_DBG>efuse read map
+    显示efuse map, 看到0xc0显示为00， 需要修改成20
+2）RTL_DBG>efuse write map c1 20
+3) RTL_DBG>efuse update
+4) RTL_DBG>efuse read map
+可以看到0xC0处显示20，这样就可以了
+重新拔插卡片再运行show bt coexinfo -m就可以看到BT信息了
+
+2. BT efuse设定，使卡片吐FW log
+RTL_DBG>efuse write map 09 20
+RTL_DBG>efuse update
+在0x09处的字节设置为0x20即可
+重新拔插卡片就可以看到FW log了
+
+
+//2013-04-18
+1.  插入Dongle时，蓝牙Stack要走一个初始化流程（MS Stack来做），主要是两个动作：
+1) Read     读Bluetooth Chip的参数信息，比如BT_ADDR，Buffer Size， Version, OOB， 支持的Feature，支持的Command等等
+2) Write    写配置信息，比如SSP Enable, Authentication Enable, Page Scan Parameter等等
+具体的Command流程如下：
+C03         HCI_OP_RESET
+1009        HCI_OP_READ_BD_ADDR
+1002        HCI_OP_READ_LOCAL_COMMANDS
+1005        HCI_OP_READ_BUFFER_SIZE                                 flow control from host to controller
+1001        HCI_OP_READ_LOCAL_VERSION
+1003        HCI_OP_READ_LOCAL_FEATURES
+C56         HCI_OP_WRITE_SSP_MODE
+C57         HCI_OP_READ_LOCAL_OOB_DATA                              C and R used in SSP OOB Mechanism
+1804        HCI_OP_WRITE_SIMPLE_PAIRING_DEBUG_MODE
+C20         HCI_OP_WRITE_AUTH_ENABLE
+C01         HCI_OP_SET_EVENT_MASK
+C58         HCI_OP_READ_INQUIRY_RESPONSE_TRANSMIT_POWER_LEVEL       reads the inquiry Transmit Power level used to transmit the FHS and EIR data packets
+C18         HCI_OP_WRITE_PG_TIMEOUT
+C1C         HCI_OP_WRITE_PAGE_SCAN_ACTIVITY
+C47         HCI_OP_WRITE_PAGE_SCAN_TYPE
+C1E         HCI_OP_WRITE_INQUIRY_SCAN_ACTIVITY
+C43         HCI_OP_WRITE_INQUIRY_SCAN_TYPE
+C45         HCI_OP_WRITE_INQUIRY_MODE
+C24         HCI_OP_WRITE_CLASS_OF_DEV
+C52         HCI_OP_WRITE_EXT_INQUIRY_RESP
+C33         HCI_OP_HOST_BUFFER_SIZE                                 flow control from controller to host
+C13         HCI_OP_WRITE_LOCAL_NAME
+C1A         HCI_OP_WRITE_SCAN_ENABLE
+C24         HCI_OP_WRITE_CLASS_OF_DEV
+C24         HCI_OP_WRITE_CLASS_OF_DEV
+C24         HCI_OP_WRITE_CLASS_OF_DEV
+C24         HCI_OP_WRITE_CLASS_OF_DEV
+
+2. Inquire  用来搜索附近的蓝牙设备
+Command & Event flow：
+Command：
+C59         HCI_Write_Inquiry_Transmit_Power_Level
+401         HCI_OP_INQUIRY
+200b        HCI_OP_LE_SET_SCAN_PARA
+200c        HCI_OP_LE_SET_SCAN_ENABLE
+
+                                                            Event：     0x22    Inquiry Result with RSSI
+                                                                        0x2f    Extended Inquiry Result     with EIR data
+
+3. Discovery    Allow Bluetooth devices to find this computer
+Enable：
+    C13     HCI_OP_WRITE_LOCAL_NAME
+    C1A     HCI_OP_WRITE_SCAN_ENABLE
+
+Disable
+    C1A     HCI_OP_WRITE_SCAN_ENABLE    *****
+
+
+4. Page &  SSP
+
+
+
+
+//2013-04-18
+1. FHS packet,  EIR packet
+FHS    
+
+2. Page Scan    Inquire Scan
+
+
+//2013-05-09
+1. Win8 LE HID Pair
+C59         HCI_Write_Inquiry_Transmit_Power_Level
+401         Inquiry Command
+200b        HCI_LE_Set_Scan_Parameters
+200c        HCI_LE_Set_Scan_Enable
+                                                            Event:      3e      RTK_HCI_LE_EVENT_ADVERTISING_REPORT
+402         HCI_OP_INQUIRY_CANCEL
+200c        HCI_LE_Set_Scan_Enable
+200b        HCI_LE_Set_Scan_Parameters
+200b        HCI_LE_Set_Scan_Parameters
+200d        HCI_LE_Create_Connection
+2015        HCI_LE_Read_Channel_Map
+2019        HCI_LE_Start_Encryption
+200b
+200c
+200c
+2011        HCI_LE_Add_Device_To_White_List
+200b
+200c
+2013        HCI_LE_Connection_Update
+
+
+2. Win7 LE HID Pair
+C59
+401
+201c
+200b
+200c
+402
+200c
+419
+405 ---->  200d
+2016
+
+

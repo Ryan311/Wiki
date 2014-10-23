@@ -1,0 +1,60 @@
+== Web.py ==
+http://webpy.org/ ::
+"Django lets you write web apps in Django. TurboGears lets you write web apps in TurboGears. Web.py lets you write web apps in Python."
+
+A Complete web.py application
+{{{class = "brash: python"
+import web
+urls = (
+        '/(.*)', 'hello'
+)
+app = web.application(urls, globals())
+
+class hello:
+    def GET(self, name):
+        if not name:
+           name = 'World'
+           return 'Hello, ' + name + '!'
+
+if __name__ == "__main__":
+    app.run()
+}}}
+
+Start the server::
+    $python code.py
+    <br>$python code.py 1234
+
+== Django ==
+*   *Install*
+*   *Command*
+Create Project::
+{{{class="brush: bash"
+    >django-admin.py startproject mysite    #Creating a project    
+}}}
+
+Run Development Server::
+{{{class="brush: bash"
+    >python manage.py runserver
+}}}
+
+Create App::
+{{{class="brush: bash"
+    >python manage.py startapp wiki 
+}}}
+Add mysite.wiki in the INSTALLED_APPS in settings.py
+
+Config Database::
+    settings.py:
+        DATABASE_ENGINE = "sqlite3"
+        DATABASE_NAME = "django.db"
+{{{class="brush: bash"
+    >python manage.py syncdb    #create list in database
+}}}
+
+    [[https://docs.djangoproject.com/en/1.5/ref/django-admin/#django-admin-runserver|more command...]]
+    
+Other::
+    Django－Python 解释器
+    manage.py shell它能进行一些必要的Django环境设置
+    如果安装ipython，manage.py shell会默认使用它。
+* [[http://showmedo.com/videotutorials/video?name=1100000&fromSeriesID=110|Wiki over Django]]

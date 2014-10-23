@@ -1,0 +1,18 @@
+%toc
+== virtualenv ==
+=== Introduction ===
+VirtualEnv用于在一台机器上创建多个独立的python运行环境，类似于一个个沙盒环境。
+<br>virtualenv只能隔离第三方依赖库，不能在多个python版本之间切换。pythonbrew可以满足这个需求
+=== Install ===
+*   sudo easy_install virtualenv
+*   sudo apt-get install python-virtualenv
+*   sudo pip install virtualenv
+
+=== Create an enviroment and start ===
+*   >virtualenv env_name            #create virtual env
+*   >source env_path/bin/activate   #start virtual env
+*   (env_name)>pip install PIL      #install PIL in env
+*   (env_name)>deactivate           #exit virtual env
+
+-------------------------------------------------------------------------------
+== pythonbrew ==

@@ -1,0 +1,62 @@
+= MT -- Multithread =
+*   Python代码的执行由Python虚拟机（也叫解释器主循环）来控制，在主循环中，同时只有一个线程在执行，像单CPU系统.
+*   对Python访问由全局解释器锁(GIL)来控制，正是这个锁保证同一时刻只有一个线程在运行!
+
+= Python Thread Library =
+== thread ==
+*   主线程退出时，所有其它线程不会被清除就退出
+*   提供基本的线程和锁, 用锁来实现线程的同步
+{{{class = "brush: python"
+thread.start_new_thread(function, args[, kwargs])
+thread.exit()
+thread.allocate_lock()
+lock.acquire([waitflag])
+lock.release()
+lock.locked()
+}}}
+
+== threading ==
+*   确保所有“重要的”子线程都退出后，进程才会结束
+*   提供更高级别的功能更强的线程管理功能, 同步机制更好用
+*   主线程等待其它子线程完成可用join函数，还可设置超时时间
+{{{class = "brush: python"
+Thread               表示一个线程的执行的对象 
+Lock                 锁原语对象（跟 thread 模块里的锁对象相同） 
+RLock                可重入锁对象。使单线程可以再次获得已经获得了的锁（递归锁定）。 
+Condition            条件变量对象能让一个线程停下来，等待其它线程满足了某个“条件”。 如，状态的改变或值的改变。 
+Event                通用的条件变量。多个线程可以等待某个事件的发生，在事件发生后， 所有的线程都会被激活。 
+Semaphore            为等待锁的线程提供一个类似“等候室”的结构 
+BoundedSemaphore     与 Semaphore 类似，只是它不允许超过初始值 
+Timer                与 Thread 相似，只是，它要等待一段时间后才开始运行。 
+activeCount()        当前活动的线程对象的数量 
+currentThread()      返回当前线程对象 
+enumerate()          返回当前活动线程的列表 
+settrace(func)       为所有线程设置一个跟踪函数 
+setprofile(func)     为所有线程设置一个 profile 函数 
+
+Thread对象的函数：
+start()             开始线程的执行 
+run()               定义线程的功能的函数（一般会被子类重写） 
+join(timeout=None)  程序挂起，直到线程结束；如果给了 timeout，则最多阻塞 timeout 秒 
+getName()           返回线程的名字 
+setName(name)       设置线程的名字 
+isAlive()           布尔标志，表示这个线程是否还在运行中 
+isDaemon()          返回线程的 daemon 标志 
+setDaemon(daemonic) 把线程的 daemon 标志设为 daemonic（一定要在调用 start()函数前调用）
+}}}
+
+== Queue ==
+*   允许用户创建一个可以用于多个线程之间共享数据的队列数据结构
+*   支持守护线程，如网络服务器线程
+*   用于解决如生产者-消费者的问题
+{{{class = "brush: python"
+Queue 模块函数 
+queue(size)    创建一个大小为 size 的 Queue 对象 
+
+Queue 对象函数 
+qsize()         返回队列的大小（由于在返回的时候，队列可能会被其它线程修改，所以这个值是近似值） 
+empty()         如果队列为空返回 True，否则返回 False 
+full()          如果队列已满返回 True，否则返回 False 
+put(item,  block=0)  把 item 放到队列中，如果给了 block（不为 0），函数会一直阻塞到队列中有空间为止 
+get(block=0)         从队列中取一个对象，如果给了 block（不为 0），函数会一直阻塞到队列中有对象为止 
+}}}

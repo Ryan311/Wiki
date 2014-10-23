@@ -1,0 +1,107 @@
+%toc
+= Wrinte VIM Plugin =
+---------------------------------------------------------------------------------------------------------------------------------
+== Basics ==
+*   Enviroment Path
+    *   $VIM            C:\Program Files\VIM
+    *   $HOME           C:\Users\rui_huang
+    *   $VIMRUNTIME     C:\Program Files\Vim\vim74
+
+*   Configuration Path
+{{{
+    * 	A list of directories which will be searched for runtime files:
+        *   filetype.vim	filetypes by file name |new-filetype|
+        *   scripts.vim	    filetypes by file contents |new-filetype-scripts|
+        *   autoload/	    automatically loaded scripts |autoload-functions|
+        *   colors/	        color scheme files |:colorscheme|
+        *   compiler/	    compiler files |:compiler|
+        *   doc/		    documentation |write-local-help|
+        *   ftplugin/	    filetype plugins |write-filetype-plugin|
+        *   indent/	        indent scripts |indent-expression|
+        *   keymap/	        key mapping files |mbyte-keymap|
+        *   lang/		    menu translations |:menutrans|
+        *   menu.vim	    GUI menus |menu.vim|
+        *   plugin/	        plugin scripts |write-plugin|
+        *   print/	        files for printing |postscript-print-encoding|
+        *   spell/	        spell checking files |spell|
+        *   syntax/	        syntax files |mysyntaxfile|
+        *   tutor/	        files for vimtutor |tutor|
+    *   after               This is for personal preferences to overrule or add to the distributed defaults or system-wide settings
+    *   autoload            :call filename#funcname     When such a function is called, and it is not defined yet, Vim will search the
+                            "autoload" directories in 'runtimepath' for a script file called "filename.vim"
+}}}
+
+*   [[http://stackoverflow.com/questions/102384/using-vims-tabs-like-buffers|tabs vs buffers]]
+    *   A buffer is the in-memory text of a file
+    *   A window is a viewport on a buffer
+    *   A tab page is a collection of windows
+    {{{
+    Opening multiple files is achieved in vim with buffers. In other editors (e.g. notepad++) this is done with tabs, so the name tab
+    in vim maybe misleading. Windows are for the purpose of splitting the workspace and displaying multiple files (buffers) together 
+    on one screen. In other editors this could be achieved by opening multiple GUI windows and rearranging them on the desktop. Finally
+    in this analogy vim's tabs would correspond to multiple desktops, that is different rearrangements of windows.
+
+    As vim help explains a tab can be used, when one wants to temporary edit a file, but does not want to change anything in the current
+    layout of windows and buffers. In such a case another tab can be used just for the purpose of editing that particular file.
+    }}}
+
+*   Eval functions
+    *   :echo bufwinnr(1)               return the number of the first window accociated with buffer 1
+    *   :echo bufwinnr("filepath")      return the number of the first window associated with buffer which file name is "filepath"
+    *   :echo bufname(3)                file name in buffer 3
+    *   :echo bufname("%")              file name in current buffer
+    *   :[count]winc[md] {arg}          like CRTL-W j  <==> :wincmd j
+    *   :exec N . "wincmd w"            move cursor to N window     :wincmd equal to CTRL-W
+    *   :echo winnr()                   current window number
+    *   :echo winnr('$')                window count
+    *   :echo tabpagenr()               current tab number
+    *   :echo tabpagenr('$')            tab count
+    *   :echo tabpagewinnr(2, '$')      number of windows in tag page 2
+    *   :echo tabpagewinnr(N)            equal to winnr(N)
+
+*   Variable type in VIM
+    *   Number      32 or 64 bit signed number
+    *   Float       floating point number
+    *   String      NUL terminated string of 8-bit unsigned characters
+    *   Funcref     a reference of a function Funcref
+    *   List        an ordered sequence of items List
+    *   Dictionary  an associative, unordered array, Key:Value pair entry
+    *   Convert Function:  str2nr(), str2float(), float2nr()...
+
+*   Internal variable
+    *   :let    Create
+    *   :unlet  explicitly destroyed
+    *   name spaces for variables   
+        *   b   local to the current buffer 
+        *   w   local to the current window
+        *   t   local to the current tab page
+        *   g   Global
+        *   l   local to a function
+        *   s   local to a :source'ed Vim script
+        *   a   Function argument(only inside a function)
+        *   v   Global, predefined by VIM
+
+*   Buildin Functions
+
+*   :exe[cute] {expr1} ..       executes the string that result from the evaluation of {expr1} as an Ex command
+    *   :execute "buffer" 2     go to buffer 2
+
+*   Work Modes
+*   Name	Description	help page
+    *   normal	For navigation and manipulation of text. This is the mode that vim will usually start in, which you can usually get back to with ESC
+    *   insert	For inserting new text. 
+    *   visual	For navigation and manipulation of text selections
+    *   select	Similar to visual but with a more MS-Window like behavior
+    *   command-line	For entering editor commands - like the help command in the 3rd column.  *normal mode type ':'*
+    *   Ex-mode	Similar to the command-line mode but optimized for batch processing.    *normal mode type 'Q'*
+---------------------------------------------------------------------------------------------------------------------------------
+
+== Tutorial ==
+*   http://css.dzone.com/articles/how-write-vim-plugins-python
+
+
+---------------------------------------------------------------------------------------------------------------------------------
+== Examples ==
+*   [[vimmit.vim]]
+    *   :source %
+    *   :call Reddit()

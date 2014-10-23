@@ -1,0 +1,58 @@
+%toc
+
+= Rick's Wiki =
+== 勤勤恳恳，点点滴滴   ...... ==
+
+    I fear not the man who has practiced 10,000 kicks once, but I fear the man who had practiced one kick 10,000 times
+    <br>                                                                                                    _Bruce Lee_
+
+=== WHO AM I ===
+
+    My name is Rick, I am a programmer. I like opensource very much. 
+    <br>This is my personal wiki web site. Write my diary and study note here
+
+=== Learning road ===
+*   [[Windows]] [[Visual Studio]] [[Windbg]]
+*   [[Linux]]
+*   [[OpenStack]]
+*   [[Wiki]] [[Jekyll]] [[BootStrap]] [[DISQUS]]
+*   [[Programming]] [[Python]] [[Python3]] [[Erlang]] [[JavaScript]] [[Object-C]]
+*   GCC MSVC [[Clang]]
+*   [[DataBase]]
+*   [[Vim]] [[Eclipse]] [[VS]] [[Vimer]]
+*   [[Bluetooth]] [[USB]]
+*   [[HTML]] [[JavaScript]] [[CSS]] [[LAMP]]
+*   [[VirsualBox]]
+*   [[http://www.ruanyifeng.com/blog/2011/12/ssh_remote_login.html|SSH]]
+*   [[OpenGL]] [[WebGL]] [[Blender]] [[GIMP]]
+*   [[CUDA]] [[OpenCL]]
+*   [[git  github]] [[bitbucket]] [[google code]]
+*   [[Cloud Compute]]  [[OpenStack]]
+*   [[Security]]
+
+
+=== As a programmer ===
+*   [[http://www.linuxeden.com/html/news/20130819/142662.html|程序员的困境]]
+*   [[https://github.com/trending?l=python|Project Trending]]
+*   [[REST]]
+*   Interesting WebSet
+    *   [[http://www.pythonchallenge.com/|Learn Python]]
+    *   [[http://projecteuler.net/|Solve Problem in least code]]
+    *   [[http://www.topcoder.com/]]
+
+=== New Tech ===
+*   [[http://www.tidesdk.org/|TideSDK]]   
+    *   Create multi-platform desktop apps with HTML5, CSS3 and JavaScript
+
+=== Book Read ===
+*   HTML&CSS    
+    *   作者:   Jon Duckell: 
+    *   2013/10/28 - 2013/11/5
+    *   非常适合向我这样零基础的人学习HTML&CSS
+*   HTML、XHTML、CSS与JavaScript入门经典
+    *   作者:   Jon Duckell
+    *   2013/11/06
+    *   看了第11和12章，了解了JavaScript的语法及基本应用
+    *   DOM使用一系列对象表示加载到浏览器中的网页，主要是document对象及子对象,JavaScript使用这些对象来操控HTML文档
+    *   JavaScript基本语法: 变量，运算符，函数，条件语句，循环，内置对象
+

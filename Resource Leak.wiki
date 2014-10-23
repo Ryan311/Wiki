@@ -1,0 +1,64 @@
+%toc
+== WDF Handle Leak ==
+WDFVerifier也会检查内存泄露，当Driver卸载后，如果有Handle的Reference不为0，就会检测出来并走到DebugBreak，要求连接调试器，否则蓝屏。
+*检测方法*::
+    *   WDFVerifier.exe选择Trace Reference to中的ALL WDF HANDLES
+    *   也可以在Driver的Parameter\Wdf选项下加入TrackHandles（REG_MULTI_SZ）并设为*
+*如果出现这个问题的BSOD，打如下命令*::
+	    _!wdfkd.wdfdriverinfo RtkBtfilter 0xfff_
+       <br>会看到是哪个Handle的Reference不为0，再按提示操作就可以找出目标
+
+http://blogs.msdn.com/b/doronh/archive/2006/05/19/601286.aspx
+_How do I track leaked references on KMDF handles?_
+    In addition to the standard KMDFDV behavior, you can enable further verification on handles by their type. 
+    <br>By enabling per handle type verification, you get a history of handle references/dereferences and tag
+    <br>tracking on those references. The KMDF tag tracking behaves just like the WDM IO remove lock tracking:
+    <br>you provide a PVOID tag when you call WdfObjectReference and then you must provide the same tag when you ,
+    <br>call WdfObjectDereference. All outstanding references keep track of their tag, so you do not need to release
+    <br>the tag before referencing with a different one. If the tag provided to the dereference call does not exist
+    <br>in any previously tracked references, KMDF will break into the debugger to allow you to debug this mismatch. 
+    <br>This tracking facility also keeps a history of the last 25 reference/dereferences. 
+    <br>To view the history, you use !wdfkd.wdftagtracker. To get the wdftagtracker parameter you need to use !wdfhandle and !wdfobject:
+
+{{{
+kd> !wdfhandle 0x7dfa26d9
+
+handle 0x7dfa26d9, type is WDFREQUEST
+[...]
+
+!wdfobject 0x8205d8b0
+kd> !wdfobject 0x8205d8b0
+
+The type for object 0x8205d8b0 is FxRequest
+[...]
+
+Object debug extension 8205d898
+   !wdftagtracker 0x82115c98
+   Verifier lock 0x81991d08
+
+   State history:
+    [0] FxObjectStateCreated (0x1)
+
+kd>  !wdftagtracker 0x82115c98
+[...]
+To enable this feature, you can add the following value under the same key as where you added the "VerifierOn" value:
+"TrackHandles" : REG_MULTI_SZ
+}}}
+
+You will then specify each type name that you want to verify as a string in the multi sz. 
+<br>For instance, if you want to verify devices and requests, the contents would be "WDFDEVICE"
+<br>"WDFREQUEST" (without the quotes). If you want to specify all handle types specify "*" as 
+<br>the only string for the value. !wdfdriverinfo will also tell you which handle types are being
+<br>verified (where in this case I have enabled checking on WDFREQUEST and WDFDEVICE):
+{{{
+1: kd> !wdfdriverinfo wdfrawbusenumtest fff
+[...]
+----------------------------------
+WDF Verifier settings for wdfrawbusenumtest.sys is ON
+  Pool tracking is ON
+  Handle verification is ON
+  IO verification is ON
+  Lock verification is ON
+  Handle reference tracking is ON for the following types:
+    WDFDEVICE WDFREQUEST
+}}}

@@ -1,0 +1,134 @@
+%toc
+== Python的数据类型/变量类型 ==
+
+数据类型也就是变量类型，一般编程语言的变量类型可以分成下面两类。
+
+* 静态类型与动态类型
+
+    # 静态类型语言：一种在编译期间就确定数据类型的语言。大多数静态类型语言是通过要求在使用任一变量之前声明其数据类型来保证这一点的。
+                    <br>    Java 和 C 是静态类型语言。
+    # 动态类型语言：一种在运行期间才去确定数据类型的语言，与静态类型相反。VBScript 和 Python 是动态类型的，因为它们确定一个变量的类
+                    <br>    型是在你第一次给它赋值的时候。
+
+* 强类型与弱类型
+
+    # 强类型语言：一种总是强制类型定义的语言。Java 和 Python 是强制类型定义的。您有一个整数，如果不明确地进行转换 ，不能将把它当成一个字符串。
+    # 弱类型语言：一种类型可以被忽略的语言，与强类型相反。VBScript 是弱类型的。在 VBScript 中，您可以将字符串 '12' 和整数 3 进行连接得到字符
+                  <br>串'123'，然后可以把它看成整数 123 ，所有这些都不需要任何的显示转换。
+
+*所以，Python 既是动态类型语言 （因为它不使用显示数据类型声明），又是强类型语言（因为只要一个变量获得了一个数据类型，它实际上就一直是这个类型了）。*
+*Python 是有变量类型的，而且会强制检查变量类型：*
+{{{class = "brush: python"
+    a=5
+    b='magic'
+    print 'a*2'    #echo:10
+    print 'b*3'    #echo:magicmagicmagic
+    print 'a+b'    #error:unsupported operand type(s) for +: 'int' and 'str'
+    print 'b[0]'   #echo:m 
+    #return HttpResponse(b[0])
+}}}
+
+你可以自己执行下，体会 Python 的变量类型。
+http://www.nowamagic.net/academy/category/13
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+*   Formatted string and Formatted print
+{{{class = "brush: python"
+x = "There are %d types of people." % 10
+binary = "binary"
+do_not = "don't"
+y = Those who know %s and those who %s." % (binary, do_not)
+
+print x
+print y
+print "." * 10
+print "I said: %r." % x
+print "I also said: '%s'." %y
+
+formatter = "%r %r %r %r"
+print formatter % (1,2,3,4)
+print formatter % ("one", "two", "three", "four")
+print formatter % (
+    "I had this thing.",
+    "That you could type up right.",
+    "But it didn't sing."
+    "So I said goodnight."
+)
+}}}
+
+
+*   Input
+{{{class = "brush: python"
+print "How old are you?",
+age = raw_input()
+
+age = raw_input("How old are you?")
+}}}
+
+
+*   Parameter Unpacking
+{{{class = "brush: python"
+from sys import argv
+script, first, second, third = argv
+
+print "The script is called:", script
+print "Your first variable is:", first
+print "Your second variable is:", second
+print "Your third variable is:", third
+}}}
+*   Files
+{{{class = "brush: python"
+    from sys import argv
+    from os.path import exists
+
+    script, from_file, to_file = argv
+    print "Copying from %s to %s" % (from_file, to_file)
+
+    # we could do these two on one line too, how?
+    in_file = open(from_file)
+    indata = in_file.read()
+
+    print "The input file is %d bytes long" % len(indata)
+    print "Does the output file exist? %r" % exists(to_file)
+    print "Ready, hit RETURN to continue, CTRL-C to abort."
+    raw_input()
+    out_file = open(to_file, 'w')
+    out_file.write(indata)
+
+    print "Alright, all done."
+
+    out_file.close()
+    in_file.close()
+}}}
+*   [[http://stackoverflow.com/questions/100003/what-is-a-metaclass-in-python|Metaclasses]]
+    *   Metaclasses are used to implement Python class objects. They are the type of types. So type(type) is type.
+    *   A metaclass is the class of a class. A class is an instance of a metaclass
+    *   *type* is the built-in metaclass Python uses
+    {{{
+    type is a metaclass in python to create all classes, like int to create integer objects, str to create string object.
+    type(name of the lcass,
+         tuple of the parent class
+         dictionary containing attributes names and values)
+    
+    class MyShinyClass(object):
+        pass
+    <==>
+    MyShinyClass = type('MyShinyClass', (),{})
+    
+    class FooChild(Foo):
+        pass
+    <==>
+    FooChild = type('FooChild', (Foo,), {})
+    }}}
+    *   create our own metaclass
+    {{{
+    
+    }}}
+*   split string
+    {{{
+    str="helloworld"
+    str[-4:0]   // error, NULL string
+    str[-4:]    // show the last four letters
+    }}}
+

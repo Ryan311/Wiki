@@ -1,0 +1,65 @@
+%toc
+== Windbg Command ==
+*   !pnptriage   列出所有Pnp相关的信息
+*   !locks [-v]  列出所有的锁资源
+*   !poaction    列出执行中的电源IRP
+*   .prefer_dml [0|1]   关闭or开启DML
+    *   DML is primarily intended to address two issues:
+        *   Linking of related information
+        *   Discoverability of debugger and extension functionality
+*   !drvobj RtkBtfilter 2     显示Driver Object信息， 主要是Dispatch routines
+*   Windbg 显示 Dbgprint信息
+    *   在windows 7/vista/2008用WinDBG调试时显示KdPrint信息收藏在注册表 HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager 新建一项Debug Print Filter， 新建一个DWORD值，名称为DEFAULT，(注意：必须全部是大写) 值为8。重启即可。
+    {{{
+    [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Debug Print Filter]
+    "DEFAULT"=dword:00000008
+    }}}
+*   u, uf   反汇编
+    {{{
+    0: kd> u RtkBtfilter!LeBuildEIR
+    RtkBtfilter!LeBuildEIR [e:\svnworkspace\trunk\hostsw\win7-inbox-driver\rtkfilter\generic\filter_le_process.c @ 3631]:
+    8b47e852 8bff            mov     edi,edi
+    8b47e854 55              push    ebp
+    8b47e855 8bec            mov     ebp,esp
+    8b47e857 81ecb0030000    sub     esp,3B0h       ->函数LeBuildEIR分配了0x3B0的栈空间
+    8b47e85d a1143d498b      mov     eax,dword ptr [RtkBtfilter!__security_cookie (8b493d14)]
+    }}}
+*   k, kv, kp  显示当前栈信息
+    {{{
+    0: kd> kv
+        ChildEBP RetAddr  Args to Child              
+        8d89f858 8b4839af 000000f7 4d09fc36 f114302c nt!KeBugCheckEx+0x1e
+        8d89f878 8b47ec61 00000001 883b290c 86583c08 RtkBtfilter!__report_gsfailure+0x25 (FPO: [Non-Fpo]) 
+        8d89fc30 8b47e626 78cceff8 86583c08 883b290c RtkBtfilter!LeBuildEIR+0x40f (FPO: [Non-Fpo]) (CONV: 
+        8d89fcb0 8b47d430 78cceff8 003b2908 0000002b RtkBtfilter!LeAdvReportToMsEIR+0x150 (FPO: [Non-Fpo])
+        (Inline) -------- -------- -------- -------- RtkBtfilter!LePostProcessAdvReport+0x1e (Inline Funct
+        8d89fcd0 8b464315 78cceff8 883b2908 0000002b RtkBtfilter!FilterLePostProcessHciEvent+0x10e (FPO: [
+        8d89fd0c 8b46715c 78cceff8 883b2908 0000002b RtkBtfilter!FilterProcessEvent+0xd05 (FPO: [Non-Fpo])
+        8d89fd30 8b468d70 87331180 0000002b 00000000 RtkBtfilter!BluetoothAnalyzeEvent+0x40 (FPO: [Non-Fpo
+        8d89fd50 84627141 87331180 abd9b26f 00000000 RtkBtfilter!BluetoothEventThread+0x1e0 (FPO: [Non-Fpo
+        8d89fd90 844ce559 8b468b90 87331180 00000000 nt!PspSystemThreadStartup+0x9e
+        00000000 00000000 00000000 00000000 00000000 nt!KiThreadStartup+0x19
+    }}}
+ChildEBP        表示函数的EBP指针位置
+
+                8d89fc30表示函数LeBuildEIR的EBP基址指针，它指向的位置保存了caller的基础指针 
+                0: kd> dd 8d89fc30 
+                8d89fc30 ==> 8d89fcb0 8b47e626 78cceff8 86583c08
+                8d89fcb0指向它的调用函数LeAdvReportToMsEIR的基址
+                
+                8d89fc30 - 8d89f878 = 3B8   表示函数LeBuildEIR为局部变量保留了0x3B8 Bytes的栈空间
+
+RetAddr         表示函数的返回地址， caller的下一个执行地址
+
+                0: kd> ln 8b47e626 
+                e:\svnworkspace\trunk\hostsw\win7-inbox-driver\rtkfilter\generic\filter_le_process.c(3847)+0xb
+                (8b47e4d6)   RtkBtfilter!LeAdvReportToMsEIR+0x150   |  (8b47e74e)   RtkBtfilter!LeAdvReportToRtk
+                LeAdvReportToMsEIR的起始地址是8b47e4d6, 加上0x150为8B47E626, 再用uf RtkBtfilter!LeAdvReportToMsEIR
+                看该地址正好是调用LeBuildEIR的下一条指令的地址
+                3847 8b47e621 e82c020000      call    RtkBtfilter!LeBuildEIR (8b47e852)
+                
+Args            表示调用参数
+
+== Command On Line ==
+*   http://windbg.info/doc/1-common-cmds.html
+*   http://blog.csdn.net/blog_index/article/details/10817437

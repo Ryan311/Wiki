@@ -1,0 +1,85 @@
+%toc
+== 遍历文件夹下的文件 ==
+===   只遍历当前文件夹下的文件（不进入目录） ===
+*   os.listdir  列出当前文件夹下的所有文件及目录
+{{{class = "brush: python"
+import os
+for filename in os.listdir(r'e:\HRDoc')
+    if os.path.isfile(filename):
+        print "*file: %s" % filename
+    else if os.path.isdir(filename):
+        print "#dir: %s" % filename
+    else
+        print "$other: %s" % filename
+}}}
+
+*   [[http://docs.python.org/2/library/glob.html|glob]]    The glob module finds all the pathnames matching a specified pattern according to the rules used by the Unix shell
+{{{class = "brush: python"
+import glob
+for filename in glob.glob(r'e:\HRDoc\*.etl')
+    print filename
+glob.glob('./[0-9].*')
+}}}
+
+=== 遍历文件夹下的所有文件包含子目录下的文件 ===
+*   os.path.walk(top, func, arg)
+{{{
+1>参数top表示需要遍历的目录树的路径
+2>参数func表示回调函数，对遍历路径进行处理.所谓回调函数，是作为某个函数的参数使用，
+  当某个时间触发时，程序将调用定义好的回调函数处理某个任务.回调函数必须提供3个参数
+  第1个参数为walk()的参数tag，第2个参数表示目录列表，第3个参数表示文件列表
+  注意：os.path.walk的回调函数中的文件列表不和os.walk()那样将子目录和文件分开，
+        而是混为了一摊，需要在回调函数中判断是文件还是子目录。
+
+3>参数arg是传递给回调参数func的元组.回调函数的一个参数必须是arg，为回调函数提供处理参数.参数arg可以为空
+
+过程：以top 为根的目录树中的每一个目录 (包含 top 自身，如果它是一个目录)，以参数 (arg, dirname, names)调用回调函数 funct。
+      参数 dirname 指定访问的目录，参数 names 列出在目录中的文件(从 os.listdir(dirname)中得到)。回调函数可以修改 names 
+      改变 dirname 下面访问的目录的设置，例如，避免访问树的某一部分。(由 names 关连的对象必须在合适的位置被修改，使用 del
+      或 slice 指派。) 注意：符号连接到目录不被作为一个子目录处理，并且因此 walk()将不访问它们。访问连接的目录你必须以
+      os.path.islink(file) 和 os.path.isdir(file)标识它们，并且必须调用walk() 
+}}}
+{{{class = "brush: python"
+import os.path
+def processDir(args, dirname, filenames):
+    print 'Directory: %s' % dirname
+    for filename in filenames:
+        print 'File: %s' % filename
+
+os.path.walk(r"e:\HRDir", processDir, ())
+}}}
+
+*   os.walk(top, topdown=True, onerror=None)
+{{{
+1>参数top表示需要遍历的目录树的路径
+2>参数topdown的默认值是"True",表示首先返回目录树下的文件，然后在遍历目录树的子目录.
+  参数topdown的值为"False"时，则表示先遍历目录树的子目录，返回子目录下的文件，最后返回根目录下的文件
+3>参数onerror的默认值是"None",表示忽略文件遍历时产生的错误.如果不为空，则提供一个自定义函数提示错误信息后继续遍历或抛出异常中止遍历
+4>该函数返回一个元组，该元组有3个元素，这3个元素分别表示每次遍历的路径名，目录列表和文件列表
+}}}
+
+{{{class = "brush: python"
+import os
+
+def Remove_dir(top_dir):
+    if os.path.exists(top_dir)==False:
+        print "not exists"
+        return
+    if os.path.isdir(top_dir)==False:
+        print "not a dir"
+        return
+    for dir_path,subpaths,files in os.walk(top_dir,False):
+        for file in files:
+            file_path=os.path.join(dir_path,file)
+            print "delete file:%s"  %file_path
+            os.remove(file_path)
+        print "delete dir:%s" %dir_path
+        os.rmdir(dir_path)
+#delete one directory
+Remove_dir(r"e:\etldir")
+}}}
+
+*Note*::
+os.path.walk()与os.walk()产生的文件名列表并不相同:
+<br>os.path.walk()产生目录树下的目录路径和文件路径(文件列表和子目录列表)
+<br>而os.walk()只产生文件路径(子目录与文件的混合列表)

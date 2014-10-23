@@ -1,0 +1,99 @@
+%toc
+== Iterator ==
+An iterable object is an object that implements __iter__. 
+<br>__iter__ is expected to return an iterator object.
+<br>An iterator is an object that implements __next__. 
+<br>__next__ is expected to return the next element of 
+<br>the iterable object that returned it, and raise a 
+<br>StopIteration exception when no more elements are available
+
+{{{class = "brush: python"
+>>>mylist = [1,2,3]
+>>>for i in mylist:
+    print i
+>>>mylist2 = [x*x for x in range(3)]
+>>>for i in mylist2
+    print i
+    
+#Mylist is an iterable. When you use a list comprehension, you create a list, and so an iterable:
+#Everything you can use "for... in..." on is an iterable: lists, strings, files...
+}}}
+
+{{{class = "brush: python"
+import random
+
+class RandomIterable:
+    def __iter__(self):
+        return self
+    def next(self):
+        if random.choice(["go", "go", "stop"]) == "stop":
+            raise StopIteration  # signals "the end"
+        return 1
+        
+for eggs in RandomIterable():
+    print eggs
+    
+print list(RandomIterable())
+}}}
+
+== Generator ==
+*A generator is a function that produces values for use in iteration*
+*Generator allow you to declare a function that behaves like an iterator*, 
+<br>ie. it can be used in a for loop. It looks like a normal function except 
+<br>that it contains _yield_ statements for producing a series a values usable
+<br>in a for-loop or that can be retrieved one at a time with the next() function. 
+<br>Each _yield_ temporarily suspends processing, remembering the location execution 
+<br>state (including local variables and pending try-statements). When the generator
+<br>resumes, it picks-up where it left-off (in contrast to functions which start 
+<br>fresh on every invocation).
+
+{{{class = "brush: python"
+# a generator that yields items instead of returning a list
+def firstn(n):
+    num = 0
+    while num < n:
+        yield num
+        num += 1
+
+first = firstn(5)   #function body does not run
+for i in first:     #begin to run, return a num each time
+    print i
+
+for i in first:     #empty, because it has already run over
+    print i
+}}}
+
+<br>http://stackoverflow.com/questions/231767/the-python-yield-keyword-explained
+<br>http://www.ibm.com/developerworks/cn/opensource/os-cn-python-yield/
+<br>http://wiki.python.org/moin/Generators
+
+== Generator expression ==
+*An expression that returns an iterator*. It looks like a normal expression followed
+<br>by a for expression defining a loop variable, range, and an optional if expression.
+<br>Generators are iterators, but you can only iterate over them once. It's because they
+<br>do not store all the values in memory, they generate the values on the fly
+
+{{{class = "brush: python"
+>>>mygenerator = (x*x for x in range(3))
+>>>for i in mygenerator:
+...    print(i)
+
+#It is just the same except you used () instead of []. BUT, you can not perform 
+#for i in mygenerator a second time since generators can only be used once: they
+#calculate 0, then forget about it and calculate 1, and end calculating 4, one by one
+
+>>>
+>>> sum(i*i for i in range(10))         # sum of squares 0, 1, 4, ... 81
+#These expressions are designed for situations where the generator is used right 
+#away by an enclosing function(like sum, set, dict, max, list...)
+}}}
+
+== Understanding the inner mechanisms of iteration ==
+Iteration is a process implying iterables (implementing the __iter__() method) and iterators (implementing the __next__() method). 
+<br>Iterables are any objects you can get an iterator from. 
+<br>Iterators are objects that let you iterate on iterables.
+
+
+== itertools ==
+[[http://docs.python.org/2/library/itertools.html|Doc]]
+<br>http://www.cnblogs.com/cython/articles/2169009.html

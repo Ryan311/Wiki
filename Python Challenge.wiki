@@ -1,0 +1,39 @@
+%toc
+== [[http://www.pythonchallenge.com/|Python Challenge Forum]] ==
+*   level 0
+    *   2 ** 38
+*   level 1
+    *   with, string.join(), string.isalpha()
+    *   TranslateString("map")
+*   level 2
+    *   string.ascii_letters, chr(), ord(), string.find()
+    *   The source string is in the source page of the HTML page
+    *   get the alpha from the mess content
+*   level 3
+    *   re, re.findall, re.search ...
+    *   the source string is still in the source page of the HTML page
+    *   type the exact answer in the url and get a string, then replace the string in url
+*   level 4
+    *   re, urllib
+    *   hint is in the page source, read href and read nothing=num, then next link
+    *   start to run and then rerun at the end of last run
+*   level 5
+    *   pickle sounds link peak hell   
+    *   unpickle the banner.p
+    *   the result is similar to the command 'banner'
+    *   save the output in a file and open it in vim
+*   level 6
+    *   zipfile
+    *   read the first line of the source page, put the 'zip' in the url and get another hint "yes, find the zip" 
+    *   subscribe the 'html' with 'zip', download file 'channel.zip'
+    *   see readme.txt in channel.zip and follow the hint
+    *   use zipfile.getinfo.comment
+    *   use the letters which assemble the large word
+*   level 7
+    *   PIL or Pillow
+    *   use the image file as source data
+    *   get the pixel (x*7, 45) and find the pixel value that color is gray
+*   level 8
+    *   bz2, gzip, tarfile
+    *   click the bee and see the login window
+    *   decompress the un and pwd

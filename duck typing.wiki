@@ -1,0 +1,22 @@
+%toc
+== Duck Typing ==
+*   [[http://www.voidspace.org.uk/python/articles/duck_typing.shtml|Duck Typing]]
+*   [[http://www.voidspace.org.uk/python/articles/mapping_sequence_ref.shtml|mapping_sequence_type]]
+*   A feature of dynamic languages. It doesn't actually matter what type my data is - just whether or not I can do what I want with it
+{{{class = "brush: python"
+#syntactic sugar
+a = [0,1 2, 3]
+print a[0]
+
+b = {'a': 0, 'b': 1}
+print b['a']
+
+#is exactly the same as :
+a =  [0,1 2, 3]
+print list.__getitem__(a, 0)
+
+b = {'a': 0, 'b': 1}
+print dict._getitem__(b, 'a')
+
+# my class can define __getitem__ and use the python syntax
+}}}

@@ -1,0 +1,35 @@
+= time =
+*   [[http://qinxuye.me/article/details-about-time-module-in-python/]]   
+*   Python中时间的表示方式： 时间戳(timestamp), 格式化时间字符串，元组(struct_time,九个元素)
+*   UTC(Coordinated Universal Time), 世界标准时间， 中国为UTC+8
+*   DST(Daylight Saving Time)，夏令时
+*   时间戳： 表示从1970年1月1日00:00:00开始按秒计算的偏移量(float), 返回时间戳的函数：time(),clock()
+*   元组：struct_time元组共9个元素，返回元组的函数：gmtime(), localtime(), strptime()
+*   常用函数
+    *   time.localtime([secs]) ==> local
+    *   time.gmtime([secs])    ==> UTC=0
+    *   time.time()
+    *   time.mktime(t)
+    *   time.sleep(secs)
+    *   time.clock()
+    *   time.asctime([t])
+    *   time.ctime([secs])
+    *   time.strftime(format[,t])
+    *   time.strptime(string[,format])
+= datetime =
+
+= calendar =
+{{{class = "brush: python"
+import calendar
+
+cal = calendar.month(2008, 1)
+print "Here is the calendar:"
+print cal;
+}}}
+*   calendar.calendar(year, w=2, l=1, c=6)
+*   calendar.firstweekday()
+*   calendar.isleap(year)
+*   calendar.leapdays(y1,y2)
+*   calendar.month(year,month,w=2,l=1)
+*   calendar.weekday(year,month,day)
+

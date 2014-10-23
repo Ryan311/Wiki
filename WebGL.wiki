@@ -1,0 +1,51 @@
+%toc
+== WebGL ==
+*   2009年，Khronos Group把OpenGL技术运用到Web浏览器并制定了WebGL
+*   WebGL是OpenGL和JavaScript之间的结晶.
+*   InternetExplore支持MS独自开发的三维图形API 「DirectX」，但不能跨平台
+*   Canvas是HTML5中新加入的标签，它支持使用JavaScript来绘制2D图形和通过WebGL来绘制3D图形
+*   WebGL非常有名的例子[[http://webglsamples.googlecode.com/hg/aquarium/aquarium.html|Aquarium]]
+*   [[Learning WebGL]] [[https://github.com/gpjt/webgl-lessons|webgl lessons sample code]]
+
+== [[http://glmatrix.net/|glMatrix]] ==
+*   JavaScript已经原生支持3D绘图，通过WebGL和硬件加速
+*   这种类型的应用需要矩阵和向量计算，但JavaScript并没有提供默认的支持
+*   glMatrix is designed to perform vector and matrix operations stupidly fast!
+*   class *mat4*
+    *   4*4 Matrix
+    *   mat4.translate() ==> 坐标系的平移变换，(x,y,x)轴都与原坐标系平行
+    *   mat4.rotate() ==> 坐标系的旋转变换，要指定旋转轴和旋转角度
+    *   mat4.rotateX() ==> 坐标系沿x轴旋转一定角度
+
+== Three.js ==
+*   Three.js的三大组件, 有了这三样东西，才能将物体渲染到网页中去
+    *   场景(scence)    场景是所有物体的容器
+    *   相机(camera)    相机决定了场景中哪个角度的景色会显示出来，相机有多种，常用的是透视相机
+        *   THREE.Camera子类: 正投影相机THREE.OrthographicCamera和透视投影相机THREE.PerspectiveCamera
+    *   渲染器(renderer)    渲染器的作用是将相机拍摄下来的图片放到浏览器中显示
+*   渲染循环
+    *   渲染有两种方式: 实时渲染和离线渲染
+    *   实时渲染：不停的对画面进行渲染，即使画面中什么也没有改变，也需要重新渲染
+    *   离线渲染：事先渲染好一帧一帧的图片，然后再把图片拼接
+*   光源, THREE.Light光源基类
+    *   THREE.AmbientLight  环境光
+    *   THREE.AreaLight 区域光
+    *   THREE.DirectionalLight 方向光
+    *   THREE.SpotLight 聚光灯
+    *   THREE.PointLight 点光源
+*   材质, 物体的质地
+    *   Lambert材质，在灰暗的或不光滑的表面产生均匀散射而形成的材质类型，不会产生镜面效果。
+=== Reference ===
+*   2010 Mr.doob
+*   JavaScript 3D library
+*   http://www.hewebgl.com/
+*   http://mrdoob.github.io/three.js/
+*   https://github.com/mrdoob/three.js/
+
+
+== Terms ==
+*   着色器
+    *   顶点着色器
+    *   片元着色器
+*   模型视图矩阵
+*   投影矩阵

@@ -1,0 +1,84 @@
+== VIM ==
+-------------------------------------------------------------------------------------------------------------------
+*   自定义补完
+    *   vim通过定义快键来实现括号自动补全： 
+        让vim实现输入： [      而在文件中输入:     []      并把光标置于中括号中，方法如下： 
+        :inoremap  [  []<Esc>i  
+-------------------------------------------------------------------------------------------------------------------
+*   Key map
+    *   show mapping relevant to a particular key
+        *   :map <C-J>
+    *   Find mapping interface(and where they come from), this is useful when map confilct
+        *   :verbose nmap <C-J>
+        *   :verbose nmap j
+-------------------------------------------------------------------------------------------------------------------
+*   Comment Out Block
+    {{{May not keep in vimrc, move them to ftplugin
+    "Comment out block for Python, ftplugin/python.vim
+        vnoremap <silent> # :norm 0i#<cr>
+        vnoremap <silent> - :norm 0x<cr>
+    
+    "Comment out block for C++/C, ftplugin/c.vim
+        vnoremap <silent> / :norm 0i//<cr>
+        vnoremap <silent> - :norm 02x<cr>
+    
+    "Comment out block for VIML, ftpugin/vim.vim
+        vnoremap <silent> # :norm 0i"<cr>
+        vnoremap <silent> - :norm 0x<cr>
+    Note: in vim, use '#' instead of '"' as comment symbol, because '"' is used as register pefix
+    }}}
+-------------------------------------------------------------------------------------------------------------------
+*   Windows GVIM中，CTRL-V不能用：将_vimrc中的
+    {{{
+    *   source $VIMRUNTIME/mswin.vim
+    *   behave mswin
+    *   注释掉且不定义CTRL-V, CTRL-C, CTRL-X, 与Linux下一致
+    *   如果想继续使用mswin的其它定义，可只移除CTRL-V，不注释上边两行，只加入"unmap <C-V>"即可
+    }}}
+-------------------------------------------------------------------------------------------------------------------
+*   Registers in vim
+    *   There are nine types of registers  -->  "{a-zA-Z0-9.%#:-"}
+    {{{
+    *   The unnamed register ""
+    *   10 numbered registers "0 to "9
+    *   The small delete register "-
+    *   26 named registers "a to "z or "A to "Z
+    *   four read-only registers ":, "., "% and "#
+        *   ".	Contains the last inserted text
+        *   "%	Contains the name of the current file.
+        *   "#	Contains the name of the alternate file.
+        *   ":	Contains the most recent executed command-line.
+    *   the expression register "=
+    *   The selection and drop registers "*, "+ and "~
+    *   The black hole register "_
+    *   Last search pattern register "/
+    }}}
+-------------------------------------------------------------------------------------------------------------------
+*   Jump
+    {{{
+            A "jump" is one of the following commands: "'", "`", "G", "/", "?", "n",
+        "N", "%", "(", ")", "[[", "]]", "{", "}", ":s", ":tag", "L", "M", "H" and
+        the commands that start editing a new file.  If you make the cursor "jump"
+        with one of these commands, the position of the cursor before the jump is
+        remembered.  You can return to that position with the "''" and "``" command,
+        unless the line containing that position was changed or deleted.
+    }}}
+    *   jumplist    if make a jump(use jump cmd) , the jump will be remembered in a jump list
+    *   :jumps      show jump list
+    *   CTRL-o      goto the last cursor position in jump list
+    *   CRTL-i      goto the next cursor position in jump list
+-------------------------------------------------------------------------------------------------------------------
+*   UndoFile
+    *   设置了UndoFile之后，会在目录下为每个文件创建一个undo history文件，它记录了所有更改，即使保存关闭再打开,'u'也是有效的
+    *   在windows下如果将UndoDir设置为C:\Window\Temp，保存文件时会出现E828错误，权限不够，所以最好设置为用户目录下
+    *   每次保存文件时，也会将所有的undo history保存到指定文件中, 该文件不是文本文件
+    *   :undo   列出undo list
+    {{{
+    if MySys() == "windows"
+      set undofile    " automatically save undo history to an undo file when write a buffer to a file
+    else
+      set undodir=~/.vim_runtime/undodir
+    endif
+
+    set undofile
+    }}}

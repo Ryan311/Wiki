@@ -1,0 +1,179 @@
+%toc
+=== VIM Commands ===
+------------------------------------------------------------------------------------------------------------
+*   在当前行移动:0^$g_fFtT
+    {{{
+    *   0       →  跳到第一列
+    *   ^       →  跳到当前行的第一个字符
+    *   $       →  跳到最后一列
+    *   g_      →  跳到这行的最后一个字符
+    *   fa      →  跳到这行a字母的下一个出现的地方。 ";"会查找下一个（上一个）地方
+    *   t,      →  跳到，字符的前一个字符.
+    *   3fa     →  在这行中查找a出现的第三个位置.
+    *   F和T    →  与f和t相似， 但是方向相反.
+    *   20|     →  move cursor to column 20
+    *   一个有用的提示：dta "→删除所有的直到a"。
+    }}}
+
+------------------------------------------------------------------------------------------------------------
+*   Move cursor over screen
+    {{{
+    *   CTRL-o              jump to last cursor position
+    *   CTRL-i              jump to next cursor position
+     
+    *   [[                  Jump to function start
+    *   [{                  Jump to block start
+    
+    *   H                   move to top of screen
+    *   M                   move to middle of screen
+    *   L                   move to bottom of screen
+    
+    *   %                   查找配对的括号 )  ]  }
+    
+    *   gd                  goto the definition, used in program file
+    
+    *   CTRL-e              moves screen up one line
+    *   CTRL-y              moves screen down one line
+    *   CTRL-u              moves screen up 1/2 page
+    *   CTRL-d              moves screen down 1/2 page
+    *   CTRL-b              moves screen up one page
+    *   CTRL-f              moves screen down one page
+    
+    *   zz                  move current line to the middle of the screen
+    *   zt                  move current line to the top of the screen
+    *   zb                  move current line to the bottom of the screen
+    }}}
+
+------------------------------------------------------------------------------------------------------------
+*   Virsual Mode
+{{{
+    v                       进入可视模式，以字符为单位选择。
+    V                       进入可视模式，以行为单位选择。
+    CTRL-V                  进入列块可视模式。备注: 在 Windows 环境中，CTRL-V 可能被映射为粘贴操作，所以可能无法用来进入列块可视模式
+                            见http://edyfox.codecarver.org/html/vimrc_mswin.html
+
+    对可视区域可以使用的操作符包括:
+    ~       切换大小写                                      |v_~|
+    d       删除                                            |v_d|
+    c       修改                                            |v_c|
+    y       抽出                                            |v_y|
+    >       右移                                            |v_>|
+    <       左移                                            |v_<|
+}}}
+    *   列插入：
+    {{{
+    *   CTRL-V, 选中某一列，要在它之前插入内容
+    *   按下I，进入列插入模式，
+    *   输入所要插入的内容，如<br>
+    *   按Esc，则所选列的前面都插入了<br>
+    }}}
+    *   行尾列模式：
+    {{{
+    *   CTRL-V，进入列选择模式
+    *   按G，选择全文第一列
+    *   按$，进入行尾块模式
+    *   按A，进入插入模式
+    *   输入插入内容， 如///
+    *   按Esc，则所有列的后面都是插入了<br>
+    }}}
+    *   Join lines
+    {{{
+    *   Shift-v or v     选择多行
+    *   J                连接
+    }}}
+    *   Indent
+    {{{
+    *   [count]< >       左、右对齐
+    *   =                自动对齐
+    }}}
+    *   Copy or move block
+    {{{
+    *   shift-v          选择多行
+    *   :co 10           将选择的行Copy在10行下面
+    *   :mv 10           将选择的行Move到第10行下面
+    }}}
+    *   [[https://github.com/vim-scripts/VisIncr|Vislncr]] [[http://www.ibm.com/developerworks/cn/linux/l-cn-vimcolumn/|Example]]
+
+------------------------------------------------------------------------------------------------------------
+*   区域操作：  <命令>a<对象> 或 <命令>i<对象>
+    *   命令        d, y, v
+    *   对象        可以是:  w(一个单词), W(一个单词, 扩展的), s(一个句子), p(一个段落), 而且也可以是普通的字符， 例如"，'，)，}，]
+    *   Examples
+    {{{
+    1.  v， 普通字符
+        假设现在光标在 (map (+) ("foo")) 这个字符串的第一个o上。
+        vi"→ 将会选择 foo
+        va"→ 将会选择 "foo"
+        vi)→ 将会选择 "foo"
+        va)→ 将会选择 ("foo")
+        v2i)→ 将会选择 map (+) ("foo")
+        v2a)→ 将会选择 (map (+) ("foo"))
+
+    2.  v,  单词
+        光标在字符串<head> title </head>的i上。
+        viw ->  将会选择 title
+        viW ->  将会选择 title_(一个空格???,这就是扩展???)
+    }}}
+------------------------------------------------------------------------------------------------------------
+*   Copying and moving text
+    *   Command
+    {{{
+    *   :reg[isters] {arg}  Display the contents of the numbered and named registers that are mentioned in {arg}
+    *   ["x]y{motion}       Yank {motion} text [into register x]
+    *   ["x]d{motion}       Delete {motion} text [into register x]
+    *   ["x]p			    Put the text [from register x] after the cursor times
+    }}}
+    *   vim与系统剪贴板，windows下为"*, Linux???
+    {{{
+    "*yy        复制当前行到系统剪贴板
+    "*y2j       复制当前行及以下两行到剪贴板
+    "*dd        剪切当前行到系统剪贴板
+    "*p         复制系统剪贴板内容在当前cursor之后
+    }}}
+    *   Copy between different files
+    {{{
+    *   use ""  the two files must be all active, so split in two window, yy, CTRL-J, p
+    *   use named register  no need to be both active, use "ay, "ap 
+    }}}
+
+------------------------------------------------------------------------------------------------------------
+*   Useful
+    {{{
+    *   :nohl               Remove highlight
+
+
+    *   J                   Join lines, remove indents and insert up to two spaces
+    *   gJ                  Join lines, Don't insert and remove spaces
+
+    *   ~                   Switch character case
+    *   {Visual}U           Make Highlight text Upercase
+    *   {Visual}u           Make Highlight text Lowercase
+
+    *   [count]CTRL-A       Add [count] to the number or alphabetic character at or after the cursor
+    *   [count]CTRL-X       Subtract [count] to the number or alphabetic character at or after the cursor
+
+    *   gf                  Open file name under cursor
+    *   r infile            Insert the content of infile in the current cursor
+    *   23r infile          Insert the content of infile under line 23
+    *   1, 10 w outfile     Saves lines 1 to 10 in outfile
+    *   1, 10 w >> outfile  Appends lines 1 to 10 to outfile
+     
+    *   Ctrl+n Ctrl+p (insert mode)     Complete word
+    *   Ctrl+x Ctrl+l (insert mode)     Complete line
+    
+    *   %!xxd               hexadecimal digit   % means all the lines
+    *   %!od                octal digit
+    *   %!xxd -r            turn to text
+    }}}
+------------------------------------------------------------------------------------------------------------
+*   Mark
+    {{{
+    *   m[a-z]              set mark [a-z] at current cursor location
+    *   '[a-z]              jump to line of mark[a-z]
+    *   `[a-z]              jump to position of mark[a-z]
+    *   d'[a-z]             delete from current line to line of mark a
+    *   d`[a-z]             delete from current cursor position to position of mark a
+    *   :marks              list all the current marks
+    *   :delmarks [a-z]*    delete certain markers
+    *   :delmarks!          delete all markers
+    }}}

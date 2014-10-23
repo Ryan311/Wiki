@@ -1,0 +1,29 @@
+%toc
+= Python Tricky =
+*   Read file
+{{{class = "brush: python"
+(lambda f: (f.read(), f.close()))(file(filePath))[0]
+}}}
+*   write file
+{{{class = "brush: python"
+(lambda f, d: (fwrite(d), f.close()))(file(r'd:/a.txt', 'w'), 'data write to file')
+}}}
+*   filter files in dir
+{{{class = "brush: python"
+import os, re  
+f1 = lambda dir = os.getcwd() ,p = '': [file for file in os.listdir(dir) if p == '' or re.search(p, file)]  
+#f2 = lambda dir = os.getcwd(), p = '': filter(lambda f: p == '' or re.search(p, f), os.listdir(dir))   
+print f1(p = r'/.py$')  #列出当前目录下所有的py文件  
+#print f2(p = r'/.py$')  
+}}}
+*   reserve list
+{{{class = "brush: python"
+l = [1, 2, 3, 4, 5, 6]
+print l[::-1]
+}}}
+*   将在列表b中且不在列表a中的元素添加到列表a中
+{{{class = "brush: python"
+def appendDiff(alist, blist):
+    return ([item in alist or alist.append(item) for item in blist ] or 1) and alist
+}}}
+

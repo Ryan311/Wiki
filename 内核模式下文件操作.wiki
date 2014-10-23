@@ -1,0 +1,110 @@
+== file operation in kernal mode ==
+*   *Open file*
+{{{class="brush: c"
+            //Read PID/VID List file
+            RtlInitUnicodeString(&PidVidListFile, L"\\SystemRoot\\PidVid_List.txt");
+            RT_DEBUG(TRACE_LEVEL_WARNING,RTK_INIT,("Test Code, read pid vid list file"));
+
+            //
+            // Open file and get the handle
+            //
+            InitializeObjectAttributes(    
+                &obj_attrib,
+                &PidVidListFile,
+                OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE,
+                NULL,
+                NULL);
+
+            status = ZwCreateFile(&hSrcFile,
+                GENERIC_READ,
+                &obj_attrib,
+                &Io_Status_Block,
+                NULL,
+                FILE_ATTRIBUTE_NORMAL,
+                FILE_SHARE_READ,
+                FILE_OPEN,
+                FILE_NON_DIRECTORY_FILE | FILE_SYNCHRONOUS_IO_NONALERT,
+                NULL,
+                0 );
+            if (!NT_SUCCESS(status))
+            {
+                RT_DEBUG(TRACE_LEVEL_ERROR,RTK_INIT,("PATCH:  ZwCreateFile fail with status (0x%x)\n", status));
+            }
+}}}
+
+
+*   *Get file length*
+{{{class = "brush: c"
+                FILE_STANDARD_INFORMATION fsi;
+        		UCHAR* pPidVidListBuf = NULL;
+                RT_U32 FileLen = 0;
+                //read file size
+                status = ZwQueryInformationFile(hSrcFile,
+                          &Io_Status_Block,
+                          &fsi,
+                          sizeof(FILE_STANDARD_INFORMATION),
+                          FileStandardInformation);
+                if (NT_SUCCESS(status))
+                {
+                    RT_DEBUG(TRACE_LEVEL_WARNING,RTK_INIT,("file length:%d\n",(RT_U32)fsi.EndOfFile.QuadPart)); 
+                    FileLen = (RT_U32)fsi.EndOfFile.QuadPart;
+                    pPidVidListBuf = ExAllocatePoolWithTag(NonPagedPool, FileLen, RSTAG);
+                    if(!pPidVidListBuf)
+                    {
+                        RT_DEBUG(TRACE_LEVEL_ERROR,RTK_INIT,("PATCH:  ExAllocatePoolWithTag pidvid list fail"));
+                    }                    
+                    ....
+                }
+}}}
+
+*   *Read from file*
+{{{class = "brush: c"
+                status = ZwReadFile(hSrcFile,
+                                        NULL,
+                                        NULL,
+                                        NULL,
+                                        &Io_Status_Block,
+                                        pPidVidListBuf,
+                                        FileLen,
+                                        NULL,
+                                        NULL);
+                if(NT_SUCCESS(status))
+                {
+                        RT_U32 i;
+                        CHIP_PIDVID_NODE* pPidVidList = (CHIP_PIDVID_NODE*)pPidVidListBuf;
+                        RT_U32 PidVidListLen = FileLen/sizeof(CHIP_PIDVID_NODE);
+                          
+                        RT_DEBUG(TRACE_LEVEL_WARNING,RTK_INIT,("PATCH:  Bytes read from file is %d, PidVidListLen %d", (RT_U32)(Io_Status_Block.Information), PidVidListLen));
+                        ///TODO: Check device name
+                        RT_DEBUG(TRACE_LEVEL_WARNING,RTK_INIT,("********************************************************************************"));                             
+                        for(i = 0; i < PidVidListLen; i++)
+                        {
+                            RT_DEBUG(TRACE_LEVEL_WARNING,RTK_INIT,("###Index(%d), ChipName(%d), HW ID:%ls\n", i, pPidVidList[i].ChipName, pPidVidList[i].VIDPID)); 
+                        }
+                        RT_DEBUG(TRACE_LEVEL_WARNING,RTK_INIT,("********************************************************************************"));                             
+                        for(i = 0; i < PidVidListLen; i++)
+                        {
+                            if(wcsstr(HardwareID, pPidVidList[i].VIDPID))
+                            {
+                                RT_DEBUG(TRACE_LEVEL_WARNING,RTK_INIT,("PATCH:  Find the right PID/VID, Index is %d, Device Name is %s",i,ChipNameStr[pPidVidList[i].ChipName]));
+                                bDownloadPatchCode = TRUE;
+                                DeviceVersion = pPidVidList[i].ChipName;    ///< hr add
+                                break;
+                            }
+                        }
+                }
+                else
+                {
+                    RT_DEBUG(TRACE_LEVEL_ERROR,RTK_INIT,("PATCH:  ZwReadFile fail with status (0x%x)\n", status));
+                }
+}}}
+
+*   *Write to file*
+{{{class = "brush: c"
+
+}}}
+
+*   *Close file handle*
+{{{class = "brush: c"
+    ZwClose(hfile);
+}}}

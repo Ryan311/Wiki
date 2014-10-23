@@ -1,0 +1,35 @@
+%toc
+== Eclipse ==
+*   Plugins
+    *   CDT for C/C++ project
+    *   Pydev for python project
+    *   Erlide for Erlang project
+    *   vrapper for Vimer in eclipse
+*   Show eclipse icon in the Unity launcher
+    <br>*sudo cp ~/Persnail_WorkSpace/eclipse/icon.xpm /usr/share/pixmaps/eclispe.xpm*
+
+==  Shortcut ==
+*   Bind Keys:  Window -> Preferences -> General -> Keys
+    *   Command：命令的名称
+    *   Binding：命令绑定的快捷键
+    *   When：   快捷键执行命令的条件
+    *   Category：命令的类型
+*   Useful Keys
+    {{{
+        Ctrl+1              快速修复(最经典的快捷键)
+        Ctrl+D              删除当前行
+        Ctrl+Q              定位到最后编辑的地方
+        Ctrl+L              定位在某行 (对于程序超过100的人就有福音了)
+        Ctrl+M              最大化当前的Edit或View (再按则反之)
+        Ctrl+/              注释当前行,再按则取消注释
+        Ctrl+O              快速显示 OutLine, 比如一个类，列出其方法和成员变量
+        Ctrl+T              快速显示当前类的继承结构
+        Ctrl+W              关闭当前Editer
+        Ctrl+K              参照选中的Word快速定位到下一个
+        Ctrl+E              快速显示当前Editer的下拉列表(如果当前页面没有显示的用黑体表示)
+        Ctrl+J              正向增量查找(按下Ctrl+J后,你所输入的每个字母编辑器都提供快速匹配定位到某个单词,如果没有,则在stutes line中显示没有找到了,查一个单词时,特别实用,这
+        个功能Idea两年前就有了)
+        CTrl+左键 or F3     跳到光标所在标识符的定义代码，用于查看变量、方法、类的定义
+        Ctrl+Shift+G        在工作空间中查找引用了光标所在标识符的位置（查找所有引用）
+        Ctrl+Shift+L        显示快捷键列表
+    }}}

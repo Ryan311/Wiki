@@ -1,0 +1,66 @@
+%toc
+= Python Cook =
+== 2nd Edition Python2 ==
+=== Text Process ===
+*   processing a string one character at a time
+{{{class="brush: python"
+# do the same thing in different way
+for c in thestring:
+    do_something_with(c)
+
+result = [do_something_with(c) for c in thestring]
+
+result = map(do_somthing_with, thestring)
+}}}
+*   align strings: left, right, center
+{{{class = "brush: python"
+print '|', 'hej'.ljust(20), '|', 'hej'.rjust(20), '|', 'hej'.center(20),'|'
+print 'hej'.center(20,'*')
+}}}
+*   trimming space from the ends of a string: lstrip, rstrip, strip
+{{{class = "brush:python"
+>>> x = '    hej    '
+>>> print '|', x.lstrip(), '|', x.rstrip(), '|', x.strip(), '|'
+>>> y = 'xxx hej zzz'
+>>> print '|', y.strip('xz')
+>>> print '|', y.strip('xz ')
+}}}
+*   combine strings
+{{{class = "brush:python"
+print ' '.join(strpieces)   # join strs with ' ' between each
+print ','.join(strpieces)   # join strs with ',' between each
+#It’s the fastest, neatest, and most elegant and readable way to put a large string together
+}}}
+*   reversing a string by words or characters
+{{{class = "brush:python"
+# reverse a string by characters
+revwords = astring.split()  #string -> list of words
+revwords.reverse()          # reverse the list in place
+revwords = ' '.join(revwords)   # list of strings -> string
+--> revwords = ' '.join(astring.split()[::-1]
+
+import re
+revwords = re.split(r'(\s+)', astring)
+revwords.reverse()
+revwords = ' '.join(revwords)
+--> revwords = ' '.join(astring.split(r'(\s+)')[::-1])
+}}}
+*   String's translate Method  [[http://www.tutorialspoint.com/python/string_translate.html|example]]
+{{{class = "brush:python"
+    import string
+    def translator(frm='', to='', delete='', keep=None):
+        if len(to) == 1:
+            to = to * len(frm)
+        trans = string.maketrans(frm, to)
+        if keep is not None:
+            allchars = string.maketrans('', '') # a reusable string of all characters
+            delete = allchars.translate(allchars, keep.translate(allchars, delete)) # make a string of characters that is not in keep
+        def translate(s):
+            return s.translate(trans, delete)
+        return translate
+}}}
+
+
+
+== 3rd Edition  Python3 ==
+

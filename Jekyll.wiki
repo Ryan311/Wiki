@@ -1,0 +1,11 @@
+%toc
+= [[http://jekyllrb.com/|Jekyll]] =
+*   Jekyll is a blog-aware, static site generator in Ruby 
+== Install ==
+*   sudo apt-get install ruby
+*   sudo apt-get install rubygems
+*   sudo gem install rdoc
+*   sudo gem install jekyll
+*   sudo gem install kramdown
+
+

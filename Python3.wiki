@@ -1,0 +1,129 @@
+%toc
+
+==  The Customization Modules ==
+*   定制Python, 两种方式： sitecustomize and usercustomize
+*   找到工作人员目录：
+    *   >>> import site
+    *   >>> site.getusersitepackages()
+    *   >>> site.getsitepackages()
+*   Now you can create a file named usercustomize.py in that directory and 
+*   put anything you want in it. It will affect every invocation of Python,
+*   unless it is started with the -s option to disable the automatic import.
+*   sitecustomize works in the same way, but is typically created by an 
+*   administrator of the computer in the global site-packages directory, and 
+*   is imported before usercustomize. 
+*   See site module for more details
+
+== Data types ==
+*   Numbers
+    *   int
+    *   float
+    *   Decimal
+    *   Fraction
+    *   Complex number  (3+5j)
+*   Sequence data types:    indexed by a range of numbers
+    *   strings
+    *   lists
+    *   tuples
+*   Sets:           an unordered collection with no duplicate elements
+*   Dictionaries:   indexed by keys
+*   Looping techniques:
+{{{
+1.  looping through dictionaries with key and value retrieved at the same time
+>>> knights = {’gallahad’: ’the pure’, ’robin’: ’the brave’}
+>>> for k, v in knights.items():
+...     print(k, v)
+
+2.  lopping through a sequence with position index and corresponding value retrieved
+>>> for i, v in enumerate([’tic’, ’tac’, ’toe’]):
+...     print(i, v)
+...
+
+3.  loop over a sequence in reverse
+>>> for i in reversed(range(1, 10, 2)):
+...     print(i) 
+
+4.  loop over a sequence in sorted order
+>>> basket = [’apple’, ’orange’, ’apple’, ’pear’, ’orange’, ’banana’]
+>>> for f in sorted(set(basket)):
+...     print(f)
+...
+
+5.   Looping over a sequence does not implicitly make a copy
+>>> words = [’cat’, ’window’, ’defenestrate’]
+>>> for w in words[:]: # Loop over a slice copy of the entire list.
+...     if len(w) > 6:
+...         words.insert(0, w)
+...
+>>> words
+}}}
+
+==  List comprehension  ==
+*   squares = [x**2 for x in range(10)]
+*   [(x, y) for x in [1,2,3] for y in [3,1,4] if x != y]
+*   [[row[i] for row in matrix] for i in range(4)]      //nested list comprehension
+
+==  del statement ==
+*   a = [-1, 1, 66.25, 333, 1234.5]
+*   del a[0]
+*   del a[2:4]
+*   remove an item from a list given its index instead of its value
+
+==  Modules ==
+*   The Module Search Path
+    *   当一个Module加载时， 首先从build-in Module中搜索相同名字的模块，如果没有找到，就会在sys.path指定的路径中找
+    *   该路径包含当前工作目录， PYTHONPATH环境变量指定的目录
+    *   也可以手动将目录加入到sys.path中， 只在当前interpreter环境中有效
+    *   sys.path.append("e:\mymodule")      //临时加入搜索目录
+*   "Compiled" Python files
+    *   为了提高Module的加载速度，Python会将已经编译过的Module放到__pycache__目录中
+    *   每个模块对应的编译文件名是: module.version.pyc      version是python version number
+    *   Python会检查source文件的修改时期和编译文件的修改日期来决定是否需要重新编译
+*   Standard Modules
+    *   Python有一个标准模块库
+    *   Some modules are built into the interpreter; these provide access to operations
+    *   that are not part of the core of the language but are nevertheless built in, either for efficiency or to provide 
+    *   access to operating system primitives such as system calls.
+    *   The set of such modules is a con?guration option which also depends on the underlying platform.
+        *   winreg module is only provied to Windows system
+        *   sys module is built into every Python interpreter
+*   Packages
+    *   Packages are a way of structuring Python’s module namespace by using “dotted module names”.
+    *   The __init__.py files are required to make Python treat the directories as containing packages
+
+=== Input and Output ===
+*   print() --> function instead of print statement
+*   input() --> instead of raw_input()
+*   str.format()  --> powerful, instead of %
+*   str.zfill()   --> pad zeros in the left
+*   file operation --> open, read, write, close
+*   saving structured data with json    --> better than pickle
+    *   The standard module called json can take Python data hierarchies, and convert them to string representations; 
+    *   this process is called serializing. Reconstructing the data from the string representation is called deserializing. 
+    *   dumps, dump, load, loads 
+
+
+=== Decorator ===
+*   在Python2.4中增加的语法糖， 用来修饰函数和方法。 PEP 318
+*   在Python3.0中也可以修饰类， PEP 3129
+
+=== 元类 Metaclass ===
+*   [[http://www.ibm.com/developerworks/cn/linux/l-pymeta/|Python 中的元类编程]]
+*   元类是生成类的模板   
+
+=== 抽象基类 ===
+
+=== 整数支持和语法 ===
+
+=== 抛出和捕获异常 ===
+*   Exceptions:     Errors detected during execution
+    *   built-in exceptions
+    *   user-defined exceptions
+*   try except
+*   try except else
+*   raise
+*   finally
+*   
+
+=== 函数注释 ===
+*   PEP 3107

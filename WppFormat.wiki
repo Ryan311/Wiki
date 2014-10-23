@@ -1,0 +1,27 @@
+*   Bat file, only for convert etl to txt 
+{{{
+@echo off
+ECHO BUILDING PROFILE DRIVER --%date%%time%
+SET PDB_NAME=RtkBtfilter.pdb
+
+IF "%1"=="-path" SET WORK_PATH=%2
+IF "%3"=="-s" SET SOURCE_FILE=%4
+IF "%5"=="-o" SET OUT_FILE=%6
+
+IF "%7"=="-pdb" (
+	set PDBFile=%8\%PDB_NAME%
+) ELSE (
+	set PDBFile=%WORK_PATH%\%PDB_NAME%
+)
+echo %PDBFile%
+
+set InputEtlFile=%WORK_PATH%\%SOURCE_FILE%
+set OutputLogFile=%WORK_PATH%\%OUT_FILE%
+
+::  Set log format:
+::  Time SourceFile_And_LineNumber FunctionName FlagLevel Message
+set TRACE_FORMAT_PREFIX=%%4!s!#%%2!s!#%%!FLAGS!#%%!LEVEL!#%%!FUNC!#
+E:\Program_Test\WDK_programm\VisualDevice\bin\traceview.exe -process %InputEtlFile% -pdb %PDBFile% -o %OutputLogFile%
+
+@echo on
+}}}

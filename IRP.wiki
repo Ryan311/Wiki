@@ -1,0 +1,228 @@
+%toc
+== IRP Tracing ==
+*   Analyze
+{{{
+kd> !analyze -v
+*******************************************************************************
+*                                                                             *
+*                        Bugcheck Analysis                                    *
+*                                                                             *
+*******************************************************************************
+WDF_VIOLATION (10d)
+The Kernel-Mode Driver Framework has detected that Windows detected an error
+in a framework-based driver. In general, the dump file will yield additional
+information about the driver that caused this bug check.
+Arguments:
+Arg1: 00000006, A fatal error was made in handling a WDF request. In this case,
+	Parameter 2 further specifies the type of fatal error that has
+	been made, as defined by the enumeration WDF_REQUEST_FATAL_ERROR.
+Arg2: 00000003, The driver attempted to send a framework request that has
+	already been sent to an I/O target.
+Arg3: 7b5e3648, The WDF request handle value.		知道是这个Request出现的问题
+Arg4: 8684f700, Reserved.
+
+Debugging Details:
+------------------
+
+
+BUGCHECK_STR:  0x10D_6
+
+DEFAULT_BUCKET_ID:  VISTA_DRIVER_FAULT
+
+PROCESS_NAME:  System
+
+CURRENT_IRQL:  2
+
+LAST_CONTROL_TRANSFER:  from 88753f9e to 82b24e34
+
+STACK_TEXT:  
+8ab51be0 88753f9e 0000010d 00000006 00000003 nt!KeBugCheckEx+0x1e
+8ab51bfc 8871cdab 8684f700 00000006 00000003 Wdf01000!FxVerifierBugCheck+0x24
+8ab51c40 8871d2cc 84a1c9b0 00000000 00000000 Wdf01000!FxIoTarget::SubmitLocked+0x70
+8ab51c60 88729144 84a1c9b0 00000000 00000000 Wdf01000!FxIoTarget::Submit+0x23
+8ab51c84 89e60c2f 8684f7c8 84a1c9b0 8690e010 Wdf01000!imp_WdfRequestSend+0x2be
+8ab51cc4 8873d042 7b5e3648 857ee6c0 86974310 RtkBtfilter!BluetoothTxCommandToBredr+0x1bf [f:\btsw\trunk\hostsw\win7-inbox-driver\rtkfilter\generic\ioctl.c @ 2268]
+8ab51ce0 8873d0aa 86d46928 8ab51d00 82c68b9d Wdf01000!FxWorkItem::WorkItemHandler+0xad
+8ab51cec 82c68b9d 86d46928 86974310 848d0a70 Wdf01000!FxWorkItem::WorkItemThunk+0x19
+8ab51d00 82ab608b 857ee6c0 00000000 848d0a70 nt!IopProcessWorkItem+0x23
+8ab51d50 82c56a55 00000001 a287911d 00000000 nt!ExpWorkerThread+0x10d
+8ab51d90 82b08239 82ab5f7e 00000001 00000000 nt!PspSystemThreadStartup+0x9e
+00000000 00000000 00000000 00000000 00000000 nt!KiThreadStartup+0x19
+
+
+STACK_COMMAND:  kb
+
+FOLLOWUP_IP: 
+RtkBtfilter!BluetoothTxCommandToBredr+1bf [f:\btsw\trunk\hostsw\win7-inbox-driver\rtkfilter\generic\ioctl.c @ 2268]
+89e60c2f 84c0            test    al,al
+
+SYMBOL_STACK_INDEX:  5
+
+SYMBOL_NAME:  RtkBtfilter!BluetoothTxCommandToBredr+1bf
+
+FOLLOWUP_NAME:  MachineOwner
+
+MODULE_NAME: RtkBtfilter
+
+IMAGE_NAME:  RtkBtfilter.sys
+
+DEBUG_FLR_IMAGE_TIMESTAMP:  4ea5194a
+
+FAILURE_BUCKET_ID:  0x10D_6_RtkBtfilter!BluetoothTxCommandToBredr+1bf
+
+BUCKET_ID:  0x10D_6_RtkBtfilter!BluetoothTxCommandToBredr+1bf
+
+Followup: MachineOwner
+---------
+}}}
+
+* Check request
+{{{
+kd> !wdfkd.wdfrequest 7b5e3648
+   !IRP 0x85a55008			Request是IRP的封装
+
+   State:  Allocated by driver, IRP allocated by WDF
+   !WDFIOTARGET 0x796f1fe8		
+}}}
+
+* IRP Information
+{{{
+kd> !IRP 0x85a55008
+Irp is active with 4 stacks 4 is current (= 0x85a550e4)
+ No Mdl: No System Buffer: Thread 00000000:  Irp stack trace.  
+     cmd  flg cl Device   File     Completion-Context
+ [  0, 0]   0  0 00000000 00000000 00000000-00000000    
+
+			Args: 00000000 00000000 00000000 00000000
+ [  0, 0]   0  0 00000000 00000000 00000000-00000000    
+
+			Args: 00000000 00000000 00000000 00000000
+ [  0, 0]   0  0 00000000 00000000 00000000-00000000    
+
+			Args: 00000000 00000000 00000000 00000000
+>[  f, 0]   0 e1 865cc028 00000000 82ad1991-8710d1b0 Success Error Cancel pending
+	       \Driver\usbohci	nt!IopUnloadSafeCompletion
+			Args: 85747bfc 00000000 00220003 00000000
+}}}
+
+* More Info
+{{{
+kd> !IRP 0x85a55008 f		
+Irp is active with 4 stacks 4 is current (= 0x85a550e4)
+ No Mdl: No System Buffer: Thread 00000000:  Irp stack trace.  
+Flags = 00000000
+ThreadListEntry.Flink = 85a55018
+ThreadListEntry.Blink = 85a55018
+IoStatus.Status = 00000103
+IoStatus.Information = 00000000
+RequestorMode = 00000000
+Cancel = 00
+CancelIrql = 0
+ApcEnvironment = 00
+UserIosb = 00000000
+UserEvent = 00000000
+Overlay.AsynchronousParameters.UserApcRoutine = 00000000
+Overlay.AsynchronousParameters.UserApcContext = 00000000
+Overlay.AllocationSize = 00000000 - 00000000
+CancelRoutine = 82a55c5c   nt!IopCsqCancelRoutine
+UserBuffer = 00000000
+&Tail.Overlay.DeviceQueueEntry = 85a55048
+Tail.Overlay.Thread = 00000000
+Tail.Overlay.AuxiliaryBuffer = 00000000
+Tail.Overlay.ListEntry.Flink = 00000000
+Tail.Overlay.ListEntry.Blink = 00000000
+Tail.Overlay.CurrentStackLocation = 85a550e4		IRP的数据信息都在这里面
+Tail.Overlay.OriginalFileObject = 00000000
+Tail.Apc = 00000000
+Tail.CompletionKey = 00000000
+     cmd  flg cl Device   File     Completion-Context
+ [  0, 0]   0  0 00000000 00000000 00000000-00000000    
+
+			Args: 00000000 00000000 00000000 00000000
+ [  0, 0]   0  0 00000000 00000000 00000000-00000000    
+
+			Args: 00000000 00000000 00000000 00000000
+ [  0, 0]   0  0 00000000 00000000 00000000-00000000    
+
+			Args: 00000000 00000000 00000000 00000000
+>[  f, 0]   0 e1 865cc028 00000000 82ad1991-8710d1b0 Success Error Cancel pending
+	       \Driver\usbohci	nt!IopUnloadSafeCompletion
+			Args: 85747bfc 00000000 00220003 00000000	向IOTarget传递时参数列表，由不同的target类型解释！！！在
+}}}
+
+* IO_STACK_LOCATION in IRP
+{{{
+kd> dt 85a550e4 _IO_STACK_LOCATION
+hal!_IO_STACK_LOCATION
+   +0x000 MajorFunction    : 0xf ''		IO_INTERNAL_CONTROL
+   +0x001 MinorFunction    : 0 ''		USER_DEFINE
+   +0x002 Flags            : 0 ''
+   +0x003 Control          : 0xe1 ''
+   +0x004 Parameters       : <unnamed-tag>		IRP中包含的数据信息
+   +0x014 DeviceObject     : 0x865cc028 _DEVICE_OBJECT
+   +0x018 FileObject       : (null) 
+   +0x01c CompletionRoutine : 0x82ad1991     long  nt!IopUnloadSafeCompletion+0
+   +0x020 Context          : 0x8710d1b0 
+1: kd> dd 85a550e8		显示Stack->Parameter， 85a550e4+4
+85a550e8  85747bfc 00000000 00220003 00000000
+85a550f8  865cc028 00000000 82ad1991 8710d1b0
+85a55108  04020021 64417a41 00000000 00000000
+85a55118  04080002 52696d57 84877620 866e1458
+85a55128  86844030 00000001 00000005 86844030
+85a55138  00000001 00000000 86844030 8262deb4
+85a55148  86040001 00000000 85a55150 85a55150
+85a55158  040a0008 6d657347 867267a8 85a551b0
+由于下层就是USB bus，应该确定IRP中包含URB结构，从WDF中得到
+#define 	URB_FROM_IRP(Irp)	 ((IoGetCurrentIrpStackLocation(Irp))->Parameters.Others.Argument1)
+所以85747bfc就是URB结构的结针
+1: kd> dt 85747bfc URB		URB是很多结构的union所以要看发的包是哪一种类型
+RtkBtfilter!URB
+   +0x000 UrbHeader        : _URB_HEADER
+   +0x000 UrbSelectInterface : 	_URB_SELECT_INTERFACE
+   +0x000 UrbSelectConfiguration :	_URB_SELECT_CONFIGURATION
+   +0x000 UrbPipeRequest   :	 _URB_PIPE_REQUEST
+   +0x000 UrbFrameLengthControl : _URB_FRAME_LENGTH_CONTROL
+   +0x000 UrbGetFrameLength : _URB_GET_FRAME_LENGTH
+   +0x000 UrbSetFrameLength : _URB_SET_FRAME_LENGTH
+   +0x000 UrbGetCurrentFrameNumber : _URB_GET_CURRENT_FRAME_NUMBER
+   +0x000 UrbControlTransfer : _URB_CONTROL_TRANSFER
+   +0x000 UrbControlTransferEx : _URB_CONTROL_TRANSFER_EX
+   +0x000 UrbBulkOrInterruptTransfer : _URB_BULK_OR_INTERRUPT_TRANSFER
+   +0x000 UrbIsochronousTransfer : _URB_ISOCH_TRANSFER
+   +0x000 UrbControlDescriptorRequest : _URB_CONTROL_DESCRIPTOR_REQUEST
+   +0x000 UrbControlGetStatusRequest : _URB_CONTROL_GET_STATUS_REQUEST
+   +0x000 UrbControlFeatureRequest : _URB_CONTROL_FEATURE_REQUEST
+   +0x000 UrbControlVendorClassRequest : _URB_CONTROL_VENDOR_OR_CLASS_REQUEST
+   +0x000 UrbControlGetInterfaceRequest : _URB_CONTROL_GET_INTERFACE_REQUEST
+   +0x000 UrbControlGetConfigurationRequest : _URB_CONTROL_GET_CONFIGURATION_REQUEST
+   +0x000 UrbOSFeatureDescriptorRequest : _URB_OS_FEATURE_DESCRIPTOR_REQUEST
+}}}
+
+*  User data in IRP
+{{{
+kd> dt 85747bfc _URB_SELECT_INTERFACE			WRONG
+Wdf01000!_URB_SELECT_INTERFACE
+   +0x000 Hdr              : _URB_HEADER
+   +0x010 ConfigurationHandle : 0x84abf2dc 
+   +0x014 Interface        : _USBD_INTERFACE_INFORMATION
+1: kd> dt 85747bfc _URB_CONTROL_TRANSFER		RIGHT	因为我们发的是命令包
+Wdf01000!_URB_CONTROL_TRANSFER
+   +0x000 Hdr              : _URB_HEADER
+   +0x010 PipeHandle       : 0x84abf2dc 
+   +0x014 TransferFlags    : 0xa
+   +0x018 TransferBufferLength : 0
+   +0x01c TransferBuffer   : 0x866f11ec 		URB中包含的数据
+   +0x020 TransferBufferMDL : 0x84a489b8 _MDL
+   +0x024 UrbLink          : (null) 
+   +0x028 hca              : _URB_HCD_AREA
+   +0x048 SetupPacket      : [8]  " "
+1: kd> dd 0x866f11ec
+866f11ec  810d0405 e04c76f0 01cc1800 00000000	05 04 (CmdCode)  0d 81 f0 76 4c e0 (参数BTAddr)
+866f11fc  00000101 08060005 48706657 866fa1d8
+866f120c  84849e58 9e40757e 00000001 0000002c
+866f121c  866f1218 000102a6 00000000 866f1238
+866f122c  866f1228 04050006 53646156 866e61e0
+866f123c  00000000 00000000 00002410 0000244f
+866f124c  84000006 00000000 00000000 04050005
+866f125c  53646156 84a0e690 00000000 00000000
+}}}

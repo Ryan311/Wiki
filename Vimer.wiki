@@ -1,0 +1,27 @@
+%toc
+== Vimium ==
+*   Vimium 和 Vimperator(Firfox) 就是两款参考了 Vim 按键操作方式和理念而来的浏览器插件，可以让你几乎全程使用键盘快捷键来上网，大大提高浏览效率.
+*   http://vimium.github.io/
+*   help tip:   
+    *   shift+/ (chrome) 
+    *   ?
+
+== VsVim ==
+*   [[https://github.com/jaredpar/VsVim|VsVim]] vim extension in VS2012
+    *   Tools -> Extensions and Updates -> Search VsVim and Install -> Restart VS2012
+    *   Config Key mappings
+    *   :set vimrc          -> Show the vimrc which VsVim read
+
+== Vrapper ==
+*   Eclipse下的vim免费插件，安装后在eclipse的工具栏有一个按钮，可以随时选择是否启用vim编辑模式
+*   可以在Eclipse的Help->Install Software...中安装
+
+== Source Insight ==
+*   在Source Insight中使用VIM编缉文件
+ 
+    1.  Source Insight中,Options->Custom Commands...->Add...,New Command name 随便 写,如"Edit with Vim"
+    2.  Run中写入: "C:\Program Files\Vim\vim63\gvim.exe" --remote-silent +%l %f
+        意思是在当前已经打开的gvim窗口里面打开当前的文件,并且跳转到指定行 %l为当前的行号,%f为文件名
+        使用 --remote-silent 的作用是,如果已经打开了对应文件,就不会打开第二次,而是在 已经打开的文件里跳转到对应行
+    3.  还是同一个对话框里面,选择Keys->Assign New Key...->按F2,如果你已经将F2设置 给其他命令,选择其他的按键就行了
+    4.  设置完成

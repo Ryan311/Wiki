@@ -1,0 +1,462 @@
+== SQLite ==
+=== Install on Ubuntu ===
+    *>sudo apt-get install sqlite3*
+    
+*   CLP
+{{{
+$ sqlite3 
+sqlite>.help
+sqlite>.exit
+sqlite>.mode column
+sqlite>.headers on
+sqlite>select * from test;
+sqlite>.tables              list all tables
+sqlite>create index test_idx on test (value);   create an index
+sqlite>.indices test        view index of a table
+sqlite>.schema test         the SQL definition of all database objects
+sqlite>create view schema as select * from sqlite_master;   create view
+sqlite>select type,name,tbl_name, sql from sqlite_master order by type;
+sqlite>create table test2 as select * from test;    backup db
+sqlite>select max(id) from foods;
+sqlite>select rowid,x,typeof(x) from domain
+}}}
+
+
+=== C ===
+*   Create One Table
+{{{
+ex1.sql:
+/* A primary key column has the ability to automatically
+generate values by default.
+CREATE TABLE person(
+    id INTEGER PRIMARY KEY,
+    first_name TEXT,
+    last_name TEXT,
+    age INTEGER
+    );
+    
+$ sqlite3 ex1.db < ex1.sql
+$ ls
+ex1.db  ex1.sql
+}}}
+
+
+*   Creating A Multi-Table Database
+{{{
+ex2.sql
+CREATE TABLE person (
+    id INTEGER PRIMARY KEY,
+    first_name TEXT,
+    last_name TEXT,
+    age INTEGER
+    );
+
+CREATE TABLE pet (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    breed TEXT,
+    age INTEGER,
+    dead INTEGER
+    );
+
+CREATE TABLE person_pet (
+    person_id INTEGER,
+    pet_id INTEGER
+    );
+    
+$sqlite3 ex2.db < ex2.sql
+$sqlite3 ex2.db
+sqlite>.schema
+....dump the create operation
+}}}
+
+*   Inserting Data
+{{{ex3.sql
+INSERT INTO persion(id, first_name, last_name,age)
+    VALUES(0, "Zed", "Shaw", 37);
+INSERT INTO pet(id, name, breed, age, dead)
+    VALUES(0, "Fluffy", "Unicorn", 1000, 0);
+INSERT INTO pet VALUES(1, "Ginantor, "Robot", 1, 1);
+INSERT INTO persion(,first_name, last_name, age)
+    VALUES(, "hr", "rui", 30);
+INSERT INTO person_pet (person_id, pet_id) VALUES(0,0);
+INSERT INTO person_pet VALUES(0,1);
+
+$sqlite3 ex3.db < ex2.sql
+$sqlite3 -echo ex3.db < ex3.sql
+....
+}}}
+There are two different forms of the INSERT command: explicit and implicit
+
+=== R ===
+*   Selecting Data
+{{{
+ex4.sql
+SELECT * FROM person;
+SELECT name, age FROM pet;
+SELECT name, age FROM pet WHERE dead = 0;
+SELECT * FROM person WHERE first_name != "Zed";
+
+ex5.sql:1
+    This says "select all columns from person and return all rows." 
+    The format for SELECT is SELECT what FROM tables(s) WHERE (tests) 
+    and the WHERE clause is optional. The '*' (asterisk) character is 
+    what says you want all columns.
+ex5.sql:3
+    In this one I'm only asking for two columns name and age from the 
+    pet table. It will return all rows.
+ex5.sql:5
+    Now I'm looking for the same columns from the pet table but I'm 
+    asking for only the rows where dead = 0. This gives me all the 
+    pets that are alive.
+ex5.sql:7
+    Finally I'm selecting all columns from person just like in the 
+    first line, but now I'm saying only if they do not equal "Zed". 
+    That WHERE clause is what determines which rows to return or not.
+}}}
+
+*   Select Across Many Tables
+SQL Only Knows Tables
+{{{
+ex5.sql
+What pets Zed owns::
+SELERT pet.id, pet.name, pet.age, pet.dead
+    FROM pet, person_pet, person
+    WHERE
+    pet.id = person_pet.pet_id AND
+    person_pet.person_id = person.id AND
+    person.first_name="Zed";
+    
+ex6.sql:1
+    I only want some columns from pet so I specify them in the select. 
+    In the last exercise you used '*' to say "every column" but that's
+    going to be a bad idea here. Instead, you want to be explicit and 
+    say what column from each table you want, and you do that by using 
+    table.column as in pet.name.
+ex6.sql:2
+    To connect pet to person I need to go through the person_pet relation
+    table. In SQL that means I need to list all three tables after the FROM.
+ex6.sql:3
+    Start the WHERE clause.
+ex6.sql:4
+    First I connect pet to person_pet by the related id columns pet.id and person_pet.id.
+ex6.sql:5
+    AND I need to connect person to person_pet in the same way. Now the 
+    database can search for only the rows where the id columns all match 
+    up, and those are the ones that are connected.
+ex6.sql:6
+    AND I finally ask for only the pets that I own by adding a person.first_name
+    test for my first name.
+
+
+$sqlite3 -column -header ex3.db < ex6.sql
+......
+}}}
+
+=== D ===
+*   Deleting Data
+{{{
+ex6.sql
+
+/* make sure there's dead pets */
+SELECT name, age FROM pet WHERE dead = 1;
+/* aww poor robot */
+DELETE FROM pet WHERE dead = 1;
+/* make sure the robot is gone */
+SELECT * FROM pet;
+/* let's resurrect the robot */
+INSERT INTO pet VALUES (1, "Gigantor", "Robot", 1, 0);
+/* the robot LIVES! */
+SELECT * FROM pet;
+}}}
+
+*   Deleting Using Other Tables
+{{{
+ex7.sql::
+DELETE FROM pet WHERE id IN (
+    SELECT pet.id
+    FROM pet, person_pet, person
+    WHERE
+    person.id = person_pet.person_id AND
+    pet.id = person_pet.pet_id AND
+    person.first_name = "Zed"
+);
+
+SELECT * FROM pet;
+SELECT * FROM person_pet;
+
+DELETE FROM person_pet
+    WHERE pet_id NOT IN (
+        SELECT id FROM pet
+    );
+
+SELECT * FROM person_pet;
+}}}
+
+=== U ===
+* Updating Data
+{{{
+ex8.sql
+UPDATE person SET first_name = "Hilarious Guy"
+    WHERE first_name = "Zed";
+
+UPDATE pet SET name = "Fancy Pants"
+    WHERE id=0;
+
+SELECT * FROM person;
+SELECT * FROM pet;
+
+$ sqlite3 mydata.db < code.sql
+# ... output cut ...
+# $
+# $ sqlite3 -header -column -echo mydata.db < ex9.sql
+......
+}}}
+
+*   Updating complex data
+{{{
+ex9.sql
+/*update one table based on information from another table*/
+SELECT * FROM pet;
+UPDATE pet SET name = "Zed's Pet" WHERE id IN (
+    SELECT pet.id
+    FROM pet, person_pet, person
+    WHERE
+    person.id = person_pet.person_id AND
+    pet.id = person_pet.pet_id AND
+    person.first_name = "Zed"
+    );
+SELECT * FROM pet;
+
+$ sqlite3 mydata.db < code.sql
+# ... output cut ...
+# $ sqlite3 -header -column -echo mydata.db < ex10.sql
+}}}
+
+*   Replacing Data
+{{{
+ex10.sql
+/* This should fail because 0 is already taken. */
+INSERT INTO person (id, first_name, last_name, age)
+    VALUES (0, 'Frank', 'Smith', 100);
+
+/* We can force it by doing an INSERT OR REPLACE. */
+INSERT OR REPLACE INTO person (id, first_name, last_name, age)
+    VALUES (0, 'Frank', 'Smith', 100);
+
+SELECT * FROM person;
+
+/* And shorthand for that is just REPLACE. */
+REPLACE INTO person (id, first_name, last_name, age)
+    VALUES (0, 'Zed', 'Shaw', 37);
+
+/* Now you can see I'm back. */
+SELECT * FROM person;
+}}}
+
+=== Destroying and Altering Tables ===
+{{{
+ex11.sql
+/* Only drop table if it exists. */
+DROP TABLE IF EXISTS person;
+
+/* Create again to work with it. */
+CREATE TABLE person (
+    id INTEGER PRIMARY KEY,
+    first_name TEXT,
+    last_name TEXT,
+    age INTEGER
+    );
+
+/* Rename the table to peoples. */
+ALTER TABLE person RENAME TO peoples;
+
+/* Add a hatred column to peoples. */
+ALTER TABLE peoples ADD COLUMN hatred INTEGER;
+
+/* Rename peoples back to person. */
+ALTER TABLE peoples RENAME TO person;
+
+.schema person
+
+/* We don't need that. */
+DROP TABLE person;
+}}}
+
+=== Transactions ===
+Transactions are issued with three commands: *begin*, *commit*, and *rollback*
+{{{
+What you need to make your script safer is the BEGIN, COMMIT, and ROLLBACK
+commands. These start a transaction, which creates a "boundary" around a
+group of SQL statements so you can abort them if they have an error. You
+start the transaction with BEGIN, do your SQL, and then when everything's
+good end the transaction with COMMIT. If you have an error then you just
+issue ROLLBACK to abort what you did.
+
+Transactions can be started manually using the BEGIN command. Such
+transactions usually persist until the next COMMIT or ROLLBACK command. But
+a transaction will also ROLLBACK if the database is closed or if an error
+occurs and the ROLLBACK conflict resolution algorithm is specified. See the
+documentation on the ON CONFLICT clause for additional information about 
+the ROLLBACK conflict resolution algorithm.
+END TRANSACTION is an alias for COMMIT.
+}}}
+
+=== Exporting Data from CIP ===
+Export database objects to SQL format using the .dump command
+{{{
+sqlite> .output file.sql            Redirect all output to the file
+sqlite> .dump                       Export objects
+sqlite> .output stdout              redirect back to screen,default
+}}}
+
+=== Importing Data from outside file ===
+{{{
+sqlite> drop table test;
+sqlite> drop view schema;
+sqlite> .read file.sql
+
+sqlite> .import [file][table]   file that is not sql
+}}}
+=== Index ===
+*   Indexes are a construct designed to speed up queries under certain conditions. Using B-tree indexes, but also increase the size of the database.
+{{{
+    create index [unique] index_name on table_name (columns)
+}}}
+
+=== View ===
+*   *Views are virtual tables*, their contents are derived from the results of queries on other tables.
+{{{
+    create view name as select-stmt
+}}}
+
+=== Triggers ===
+Triggers execute specific SQL commands when specific database events transpire on specific tables
+{{{
+trigger.sql
+create temp table log(x);
+create temp trigger foods_update_log update of name on foods
+begin
+    insert into log values('updated foods: new name=' || new.name);
+end;
+
+begin;
+update foods set name='JUJYFRUIT' where name='JujyFruit';
+select * from log;
+rollback;
+
+#sqlite3 foods.db < trigger.sql
+}}} 
+
+
+*   *Getting Database File Information*
+{{{
+The sqlite_master view, which provides detailed information about all
+objects contained in a given database
+
+Other tools:
+    sqlite3_analyzer
+    SQLite Database Browser
+    SQLiteman
+    Navicat
+    
+    > sudo apt-get install sqlitebrowser
+    > sudo apt-get install sqliteman
+}}}
+
+=== patterm match ===
+*   like    used for matching string values against patterns
+*   %   matches any sequence of zero or more characters in the string
+*   _   matches any single character in the string
+{{{
+sqlite> select id, name from foods where name like %ac%P%';
+id  name
+--  -----
+127 Guacamole Dip
+168 Peach
+...
+}}}
+
+=== Limiting and Ordering ===
+*   limit  specifies the maximum number of records to return
+*   offset specifies the number of records to skip
+{{{
+sqlite> select * from foods where name like 'B%'
+order by type_id desc, name limit 10;
+}}}
+
+=== Grouping ===
+{{{
+/* 用于统计 */
+sqlite> select type_id from foods group by type_id;
+}}}
+
+=== Joining Tables ===
+{{{
+sqlite> select foods.name, food_types.name
+            from foods, food_types
+            where foods.type_id=food_types.id limit 10;
+}}}
+*   Inner Joins     求交集
+*   Cross Joins     简单组合两个Table，没有任何联系的
+*   Outer Joins    
+*   Natural Joins
+
+=== Getting Database information ===
+You can obtain database information using the database schema pragmas, defined as follows:
+*   database_list: Lists information about all attached databases.
+*   index_info: Lists information about the columns within an index. It takes an index name as an argument.
+*   index_list: Lists information about the indexes in a table. It takes a table name as an argument.
+*   table_info: Lists information about all columns in a table.
+{{{
+sqlite> pragma database_list;
+sqlite> create index foods_name_type_idx on foods(name,type_id);
+sqlite> pragma index_info(foods_name_type_idx);
+sqlite> pragma index_list(foods);
+sqlite> pragma table_info(foods);
+}}}
+
+
+=== [[http://docs.python.org/2/library/sqlite3.html|Python Lib: sqlite3 DB API 2.0 Interface for SQLite]] ===
+*   Module functions and constants
+    *   sqlite3
+    *   connection
+    *   cursor
+
+{{{class = "brush: python"
+# A minimal SQLite shell for experiments
+ import sqlite3
+ con = sqlite3.connect(":memory:")
+ con.isolation_level = None
+ cur = con.cursor()
+
+ buffer = ""
+ print "Enter your SQL commands to execute in sqlite3."
+ print "Enter a blank line to exit."
+
+ while True:
+     line = raw_input()
+     if line == "":
+         break
+     buffer += line
+     # return true if the string sql contains one or more complete SQL statements
+     if sqlite3.complete_statement(buffer):
+         try:
+             buffer = buffer.strip()
+             cur.execute(buffer)
+             if buffer.lstrip().upper().startswith("SELECT"):
+                 print cur.fetchall()
+         except sqlite3.Error as e:
+             print "An error occurred:", e.args[0]
+         buffer = ""
+     con.close()
+}}}
+
+=== VDBE ===
+{{{
+$ sqlite3 test_database_1
+sqlite> CREATE TABLE examp(one text, two int);
+sqlite> .explain
+sqlite> EXPLAIN INSERT INTO examp VALUES('Hello, World!',99);
+......
+}}}

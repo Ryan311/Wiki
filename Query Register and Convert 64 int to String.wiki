@@ -1,0 +1,76 @@
+%toc
+=   Test Project    = 
+
+该测试程序是为了测试在Register中读取BtWorkMode值，为GattExport的代码做测试。
+<br>BtWorkMode由filter driver来写入，le dll可以访问它来决定LE Profile是使用
+LE Link连接还是BR/EDR连接。
+
+
+*要点*
+*   安全字符串操作   
+    [[http://msdn.microsoft.com/en-us/library/windows/desktop/ms647527(v=vs.85).aspx|StringCchCopy]]
+    [[http://msdn.microsoft.com/en-us/library/windows/desktop/ms647518(v=vs.85).aspx|StringCchCat]]
+*   将64位整数转换为字符串
+    [[http://msdn.microsoft.com/zh-cn/library/ce3zzk1k(v=vs.80).aspx|sprintf_s]]
+*   注册表操作
+    [[http://msdn.microsoft.com/en-us/library/windows/desktop/ms724897(v=vs.85).aspx|RegOpenKeyEx]]
+    [[http://msdn.microsoft.com/en-us/library/windows/desktop/ms724911(v=vs.85).aspx|RegQueryValueEx]]
+
+*Code* 
+{{{class="brush: c++"
+#include "stdafx.h"
+#include <windows.h>
+#include <malloc.h>
+#include <stdio.h>
+#include <Strsafe.h>
+
+#define TOTALBYTES    8192
+#define BYTEINCREMENT 4096
+
+void main()
+{
+	HKEY hKey; 
+	DWORD dwType = REG_SZ; 
+	DWORD dwSize; 
+	DWORD Value;
+	long ret;
+	long long  RemoteBtAddr = 0x116701177d;
+	TCHAR	swPath[256];
+	char	Address[16] = {};
+	TCHAR	AddressW[32]={};
+
+	#define	LEDATABASE_REG	TEXT("SYSTEM\\CurrentControlSet\\services\\RtkBtFilter\\LeDatabase\\")
+	StringCchCopy (swPath, 256, LEDATABASE_REG);
+
+	sprintf_s(Address, 16, "%I64x", RemoteBtAddr);
+	printf("%s\n",Address);
+	size_t cn = 0;
+	if (!mbstowcs_s(&cn, AddressW, 32, Address, strlen(Address)))
+		printf("Convert OK\n");
+	else
+		printf("Conver Error\n");
+
+	StringCchCat(swPath,256, AddressW);
+	printf("%ws, %d\n",swPath, sizeof(swPath));
+
+	ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE, swPath, 0, KEY_QUERY_VALUE, &hKey);
+	if(ret!=ERROR_SUCCESS) 
+	{ 
+		printf("Query Value Error, %x\n", ret);
+		return;
+	} 
+	ret = RegQueryValueEx(hKey,(LPCTSTR)TEXT("BtWorkMode"),
+		NULL, 
+		NULL, 
+		(BYTE*)&Value, 
+		&dwSize);
+
+	if(ret!=ERROR_SUCCESS) 
+	{ 
+		printf("Query Value Error");
+		RegCloseKey(hKey);
+	} 
+
+	printf("\n BtWorkMode is %d, dwSize(%d), ret(%x), lasterror(%x)\n",Value,dwSize, ret, GetLastError());
+}
+}}}

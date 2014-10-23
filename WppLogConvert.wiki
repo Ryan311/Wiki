@@ -1,0 +1,326 @@
+*   Readme.txt
+{{{
+Introduction
+    Windows下，filter driver的开发用wpp来获得log（logman or autolog），
+log以.etl的格式保存（二进制），看log时需要用TraceView工具打开比较麻烦。
+也可以用TraceView直接转换成.txt格式文件，但生成的文件格式太乱，看起来很
+痛苦，所以写了该工具。它用TraceView先将.etl格式文件转换成文本，再重新对
+文本文件格式化，并生成便于阅读的.txt文件
+
+Install
+1. Run Cmd as Administrator
+2. Install.bat
+
+Usage:
+1. 用Autolog工具抓到的log，使用WppLogConvert.exe -m参数
+2. 单个etl文件，使用WppLogConvert.exe -s参数
+3. 控制显示flag的Level级别，使用-l参数
+3. Help:    WppLogConvert.exe -h
+            WppLogConvert.exe -e
+}}}
+
+
+*   Py2exe setup.py
+{{{class = "brush: python"
+from distutils.core import setup
+import py2exe
+setup(console=['WppLogConvert.py'])
+}}}
+
+*   distribute as exe
+    <br>*>python setup.py py2exe*
+
+*   WppLogConvert.py
+{{{class = "brush: python"
+import os
+import argparse
+
+FileNameConvertTable = {
+	'aes_encrypt' :  'aes_en',
+	'agent' : 'agent',
+	'amp_manager' : 'amp_ma' ,
+	'bqb_gap' :  'bqb_ga',
+	'bqb_smp' :  'bqb_sm',
+	'bqb_test' :  'bqb_te',
+	'bt_debug' :  'bt_dbg',
+	'bt_list' :  'bt_lst',
+	'bt_skbuff' :  'bt_skb',
+	'command' :  'commnd',
+	'crypto' :  'crypto',
+	'data' :  'data',
+	'event' :  'event',
+	'fake_firmware' : 'fakefw',
+	'filter' : 'filter',
+	'filter_helper' : 'flhelp',
+	'filter_le_ioctl' : 'flLEIO',
+	'filter_le_process' : 'flLEPR',
+	'filter_vendor_ioctl' : 'flVNIO',
+	'fwpatch' : 'fwptch',
+	'hci_event_hs' : 'evths',
+	'hci_event_le' : 'evtle',
+	'hci_hs' : 'hcihs',
+	'hci_le' :  'hcile',
+	'hci_patch' : 'hcipt',
+	'ioctl' :  'ioctl',
+	'l2cap' :  'l2cap',
+	'l2cap_sock' : 'l2Sock',
+	'le_for_win8' : 'leWin8',
+	'os_windows' : 'os_win',
+	'pan_hs_patch' : 'pan_hs',
+	'pm' :  'pm',
+	'profile_info' : 'pfInfo',
+	'reg' : 'reg',
+	'rtk4mp' : 'rtk4mp',
+	'rtk_crc16' : 'rtkcrc',
+	'smp' : 'smp',
+	'sock' : 'sock',
+	'socketcontrol' : 'sckctl',
+	'vendor_command' : 'vndCmd'
+    }
+
+FlagConvertTable = {
+        'RTK_OS': 'OS',
+        'RTK_L2CAP_SEQ' : 'L2SEQ',
+        'RTK_L2CAP_SEQ_TX_RX' : 'SEQTRX',
+        'RTK_HCI_COMMAND' : 'HCICMD',
+        'RTK_HCI_EVENT' : 'HCIEVT',
+        'RTK_HCI_DATA' : 'HCIDAT',
+        'RTK_HCI' : 'HCI',
+        'RTK_SOCK' : 'SOCK',
+        'RTK_VENDER_CMD' : 'VENCMD',
+        'RTK_HS_HCI' : 'HSHCI',
+        'RTK_A2MP' : 'A2MP',
+        'RTK_AGENT' : 'AGENT',
+        'RTK_TESTMODE' : 'TSTMOD',
+        'RTK_HAL' : 'HAL',
+        'RTK_REG' : 'REG',
+        'RTK_L2CAP' : 'L2CAP',
+        'RTK_ACL_DEBUG' : 'ACLDBG',
+        'RTK_LE_DEBUG' : 'LEDBG',
+        'RTK_LE_EVENT' : 'LEEVT',
+        'RTK_LE_SMP' : 'LESMP',
+        'RTK_LE_IOCTL' : 'LEIOTL',
+        'RTK_WIFI_DEBUG_INFO' : 'WIFDBG',
+        'RTK_PAN_HS' : 'PANHS',
+        'RTK_FAKE' : 'FAKE',
+        'RTK_MAILBOX' : 'MILBOX',
+        'RTK_PATCH' : 'PATCH',
+        'RTK_INIT' : 'INIT',
+        'RTK_EXIT' : 'EXIT',
+        'RTK_ERROR' : 'ERROR'
+        }
+
+LevelConvertTable = {
+        'TRACE_LEVEL_NONE' : 'NONE',
+        'TRACE_LEVEL_CRITICAL' : 'CRTI',
+        'TRACE_LEVEL_FATAL' : 'FATA',
+        'TRACE_LEVEL_ERROR' : 'ERRO',
+        'TRACE_LEVEL_WARNING' : 'WARN',
+        'TRACE_LEVEL_INFORMATION' : 'INFO',
+        'TRACE_LEVEL_VERBOSE' : 'VERB',
+        'TRACE_LEVEL_RESERVED6' : 'RES6',
+        'TRACE_LEVEL_RESERVED7' : 'RES7',
+        'TRACE_LEVEL_RESERVED8' : 'RES8',
+        'TRACE_LEVEL_RESERVED9' : 'RES9'
+        }
+
+LevelNumTable = {
+        'TRACE_LEVEL_NONE' : 0,
+        'TRACE_LEVEL_CRITICAL' : 1,
+        'TRACE_LEVEL_FATAL' : 2,
+        'TRACE_LEVEL_ERROR' : 3,
+        'TRACE_LEVEL_WARNING' : 4,
+        'TRACE_LEVEL_INFORMATION' : 5,
+        'TRACE_LEVEL_VERBOSE' : 6,
+        'TRACE_LEVEL_RESERVED6' : 7,
+        'TRACE_LEVEL_RESERVED7' : 8,
+        'TRACE_LEVEL_RESERVED8' : 9,
+        'TRACE_LEVEL_RESERVED9' : 10
+        }
+
+LevelNum = 10
+
+def reFormatTime(strTime):
+    date, time = strTime.split('-')
+    NewTimeStr = date[0:5] + '-' + time
+    return "%-19s" % NewTimeStr
+
+def reFormatFileAndLineNum(strFileLine):
+    #print strFileLine
+    r1=strFileLine.rfind('_')
+    FileName = strFileLine[0:r1]
+    LineNum = strFileLine[r1+2:]
+    NewLineNum = "%-5d" % int(LineNum)
+    NewFileAndLineNum = FileNameConvertTable[FileName] + '_' + NewLineNum
+    return "%-12s" % NewFileAndLineNum
+
+def reFormatFlag(strFlag):
+    return "%-7s" % FlagConvertTable[strFlag]
+
+def reFormatLevel(strLevel):
+    return "%-5s" % LevelConvertTable[strLevel]
+
+def reFormatFuncName(strFuncName):
+    if len(strFuncName) > 25:
+        newFuncName = strFuncName[-25:]
+    else:
+        newFuncName = strFuncName
+    return "%-26s" % newFuncName
+
+def ReFormatLogFile(logfile):
+    #print "Reformat logfile %s" % logfile
+    name, ext = os.path.splitext(logfile)
+    Newlogfile = name + ".txt"
+    log_obj = open(logfile)
+    txt_obj = open(Newlogfile, 'w')    
+
+    for eachline in log_obj:
+        strlist = eachline.split('#')
+        if len(strlist) == 6:
+            if LevelNum >= LevelNumTable[strlist[3]]:
+                str1 = reFormatTime(strlist[0])
+                str2 = reFormatFileAndLineNum(strlist[1])
+                str3 = reFormatFlag(strlist[2])
+                str4 = reFormatLevel(strlist[3])
+                str5 = reFormatFuncName(strlist[4])
+#                NewLine = str1 + str2 + str3 + str4 + str5 + strlist[5]
+                NewLine = str3 + str4 + str2 + str5 + str1 + strlist[5]
+                txt_obj.write(NewLine)
+
+    log_obj.close()
+    txt_obj.close()
+    os.remove(logfile)
+    return Newlogfile
+
+
+def EtlToText(etlfile, pdbfile, DestDir):
+    #convert
+    traceview = 'traceview.exe' #must add the traceview path to PATH
+    filename, ext = os.path.splitext(etlfile)
+    Outputlogfile = DestDir + "\\" + filename + ".log"
+    FormatPrefix = 'set TRACE_FORMAT_PREFIX=%4!s!#%2!s!#%!FLAGS!#%!LEVEL!#%!FUNC!#'
+    cmdlist = FormatPrefix + " & " + traceview + " -process " + etlfile + " -pdb " + pdbfile + " -o " + Outputlogfile + " -nosummary"
+    print cmdlist
+    os.system(cmdlist)
+
+    #Reformat file
+    return ReFormatLogFile(Outputlogfile)
+
+def NumEtlToText(etlfile, pdbfile, DestDir):
+    #convert
+    traceview = 'traceview.exe' #must add the traceview path to PATH
+    realfilename, numext = os.path.splitext(etlfile)
+    filename, ext = os.path.splitext(realfilename)
+    Outputlogfile = DestDir + "\\" + filename + numext[1:] + ".log"
+    FormatPrefix = 'set TRACE_FORMAT_PREFIX=%4!s!#%2!s!#%!FLAGS!#%!LEVEL!#%!FUNC!#'
+    cmdlist = FormatPrefix + " & " + traceview + " -process " + etlfile + " -pdb " + pdbfile + " -o " + Outputlogfile + " -nosummary"
+    print cmdlist
+    os.system(cmdlist)
+
+    #Reformat file
+    ReFormatLogFile(Outputlogfile)
+
+
+def DealOneFile(etlfile, pdbfile, logViewer=None):
+    print etlfile, pdbfile
+    CurDir = os.getcwd()
+    print "Current Work Dir is %s" % CurDir
+    DestDir = CurDir + '\\Convert'
+    print DestDir
+    if os.path.exists(DestDir) != True:
+        os.mkdir(DestDir)
+    Outputlogfile = EtlToText(etlfile, pdbfile, DestDir)
+
+    if logViewer is not None:
+        cmdstr = logViewer + (" %s" % Outputlogfile)
+        print cmdstr
+        os.system(cmdstr)
+
+
+def DealMultipleFiles(etlDir, pdbfile):
+    print etlDir, pdbfile
+    DestDir = etlDir + '\\Convert'
+    CurDir = os.getcwd()
+    os.chdir(etlDir)
+    print os.getcwd()
+    if os.path.exists(DestDir) != True:
+        os.mkdir(DestDir)
+    #check files in dir
+    for etlfilename in os.listdir(etlDir):
+        if os.path.isfile(etlfilename):
+            realfilename, numext = os.path.splitext(etlfilename)
+            filename, ext = os.path.splitext(realfilename)
+            print filename, ext
+            if cmp(ext, '.etl') == 0:
+                NumEtlToText(etlfilename, pdbfile, DestDir)
+    os.chdir(CurDir)
+    print os.getcwd()
+
+def Showhelp():
+    print """
+    Log Level:
+        0   TRACE_LEVEL_NONE
+        1   TRACE_LEVEL_CRITICAL
+        2   TRACE_LEVEL_FATAL
+        3   TRACE_LEVEL_ERROR
+        4   TRACE_LEVEL_WARNING
+        5   TRACE_LEVEL_INFORMATION
+        6   TRACE_LEVEL_VERBOSE
+        7   TRACE_LEVEL_RESERVED6
+        8   TRACE_LEVEL_RESERVED7
+        9   TRACE_LEVEL_RESERVED8
+        10   TRACE_LEVEL_RESERVED9
+
+    Examples:
+    1. WpplogConvert -s rtkfiltertrace_14-12-58_000001.etl RtkBtfilter.pdb
+    2. WpplogConvert -m C:\Users\\rui_huang\Desktop\TraceFormat\Autolog RtkBtfilter.pdb
+
+    #show log level >= 5(TRACE_LEVEL_INFORMATION)
+    3. WpplogConvert -s rtkfiltertrace_14-12-58_000001.etl RtkBtfilter.pdb -l 5
+
+    #open log file after convert over
+    4. WpplogConvert -s rtkfiltertrace_14-12-58_000001.etl RtkBtfilter.pdb -v gvim
+    """
+
+if __name__=="__main__":
+    parser = argparse.ArgumentParser()
+    # -s, -m are optional parameters
+    # nargs: each optional parameter must have two arguments
+    parser.add_argument("-e", "--examples", help="show examples", action='store_true')
+    parser.add_argument("-s", "--single", nargs=2, help="Only convert one etl file to text")
+    parser.add_argument("-m", "--multiple", nargs=2, help="Convert more than one etl files to text")
+    parser.add_argument("-l", "--level", type=int, nargs=1, help="Select level when convert")
+    parser.add_argument("-v", "--view", nargs=1, help="Open the log file after convert")
+    args = parser.parse_args()
+    if args.examples:
+        Showhelp()
+    if args.level is not None:
+        print "log level is %d" % args.level[0]
+        LevelNum = int(args.level[0])
+
+    if args.single is not None: 
+        print args.single
+        # check the file ext
+        filename1, ext1 = os.path.splitext(args.single[0]) 
+        filename2, ext2 = os.path.splitext(args.single[1]) 
+        if cmp(ext1,'.etl') == 0 and cmp(ext2, '.pdb') == 0:
+            #Deal the case
+            if args.view is not None:
+                DealOneFile(args.single[0], args.single[1], args.view[0])
+            else:
+                DealOneFile(args.single[0], args.single[1])
+        else:
+            #print help
+            print Showhelp() 
+
+    if args.multiple is not None:
+        print args.multiple
+        # check the dir and the file ext
+        filename2, ext3 = os.path.splitext(args.multiple[1]);
+        if os.path.isdir(args.multiple[0]) and cmp(ext3, '.pdb') == 0:
+            #Deal the case
+            DealMultipleFiles(args.multiple[0], args.multiple[1])
+        else:
+            #print help
+            print Showhelp()
+}}}

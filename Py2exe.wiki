@@ -1,0 +1,46 @@
+%toc
+== Py2exe ==
+http://www.py2exe.org/
+<br>
+<br>py2exe is a Python Distutils extension which converts Python scripts into executable 
+<br>Windows programs, able to run without requiring a Python installation.
+<br>
+=== Install Package ===
+http://sourceforge.net/projects/py2exe/files/py2exe/0.6.9/
+
+=== Tutorial ===
+http://www.py2exe.org/index.cgi/Tutorial
+<br>http://justcoding.iteye.com/blog/900993
+
+*   Prepare your python module(hello.py)
+{{{class = "brush: python"
+import os
+print "Hello World"
+print "Current Path is %s" % os.getcwd()
+}}}
+
+*   Create setup script(setup.py)
+{{{class = "brush: python"
+from distutils.core import setup
+import py2exe
+
+setup(console=['hello.py])
+}}}
+
+*   Run the setup script
+    <br>*>python setup.py py2exe*
+    <br>......
+    <br>
+    <br>Two directories will be created, build and dist
+    <br>files in dist directory are the ones needed to run your application
+    <br>the need file is: python27.dll, library.zip, hello.exe
+
+*   Test it
+    <br>>cd dist
+    <br>>hello.exe
+    <br>...
+
+=== Build an installer if applicable ===
+py2exe is not an installer builder - it merely assembles the files needed 
+                                     to run your Python program.
+    

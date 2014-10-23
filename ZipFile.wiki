@@ -1,0 +1,86 @@
+== ZipFile ==
+*   class zipfile.ZipFile   => class for reading and writing ZIP file
+*   class zipfile.ZipInfo   => class used to represent information about a member of an archive
+*   zipfile.is_zipfile(filename)    => return ture if filename is a valid ZIP file based on its magic number
+*   ZipFile Objects  => return by zipfile.ZipFile()
+    *   ZipFile.close()
+    *   ZipFile.getinfo(name)
+    *   ZipFile.infolist()
+    *   ZipFile.namelist()
+    *   ZipFile.open(name[, mode[, pwd]])
+    *   ZipFile.extract(member[, path[, pwd]])
+    *   ZipFile.extractall([path[, members[, pwd]]])
+    *   ZipFile.setpassword(pwd)
+    *   ZipFile.read(name[, pwd])
+    *   ZipFile.write(filename[, arcname[, compress_type]])
+*   ZipInfo Objects     => returned by getinfo() and infolist() methods of ZipFile objects
+    *   ZipInfo.filename： 获取文件名称。
+    *   ZipInfo.date_time： 获取文件最后修改时间。返回一个包含6个元素的元组：(年, 月, 日, 时, 分, 秒)
+    *   ZipInfo.compress_type： 压缩类型。
+    *   ZipInfo.comment： 文档说明。
+    *   ZipInfo.extr： 扩展项数据。
+    *   ZipInfo.create_system： 获取创建该zip文档的系统。
+    *   ZipInfo.create_version： 获取 创建zip文档的PKZIP版本。
+    *   ZipInfo.extract_version： 获取 解压zip文档所需的PKZIP版本。
+    *   ZipInfo.reserved： 预留字段，当前实现总是返回0。
+    *   ZipInfo.flag_bits： zip标志位。
+    *   ZipInfo.volume： 文件头的卷标。
+    *   ZipInfo.internal_attr： 内部属性。
+    *   ZipInfo.external_attr： 外部属性。
+    *   ZipInfo.header_offset： 文件头偏移位。
+    *   ZipInfo.CRC： 未压缩文件的CRC-32。
+    *   ZipInfo.compress_size： 获取压缩后的大小。
+    *   ZipInfo.file_size： 获取未压缩的文件大小。
+*   Examples
+{{{class = "brush: python"
+#1  创建一个zip，并将eggs.txt放入包中
+with ZipFile('spam.zip', 'w') as myzip:
+    myzip.write('eggs.txt')
+
+#2  将zip中的txt.txt文件导出，使用了read方法
+import zipfile, os  
+zipFile = zipfile.ZipFile(os.path.join(os.getcwd(), 'txt.zip'))  
+data = zipFile.read('txt.txt')  
+(lambda f, d: (f.write(d), f.close()))(open(r'd:/txt.txt', 'wb'), data)  #一行语句就完成了写文件操作。仔细琢磨哦~_~  
+zipFile.close()  
+
+#3  解压txt.zip中所有文件到d:/Work目录下
+import zipfile, os
+zipFile = zipfile.ZipFile(os.path.join(os.getcwd(), 'txt.zip'))
+for file in zipFile.namelist():
+    zipFile.extract(file, r'd:/Work')
+zipFile.close()
+
+#4  完整应用，可以继续完善
+#!/usr/bin/env python 
+# -*- coding: utf-8 -*- 
+from zipfile import * 
+import zipfile 
+ 
+#解压zip文件 
+def unzip(): 
+    source_zip="c:\\update\\SW_Servers_20120815.zip" 
+    target_dir="c:\\update\\" 
+    myzip=ZipFile(source_zip) 
+    myfilelist=myzip.namelist() 
+    for name in myfilelist: 
+        f_handle=open(target_dir+name,"wb") 
+        f_handle.write(myzip.read(name))       
+        f_handle.close() 
+    myzip.close() 
+ 
+#添加文件到已有的zip包中 
+def addzip(): 
+    f = zipfile.ZipFile('archive.zip','w',zipfile.ZIP_DEFLATED) 
+    f.write('file_to_add.py') 
+    f.close() 
+ 
+#把整个文件夹内的文件打包 
+def adddirfile(): 
+    f = zipfile.ZipFile('archive.zip','w',zipfile.ZIP_DEFLATED) 
+    startdir = "c:\\mydirectory" 
+    for dirpath, dirnames, filenames in os.walk(startdir): 
+        for filename in filenames: 
+            f.write(os.path.join(dirpath,filename)) 
+    f.close() 
+}}}

@@ -1,0 +1,34 @@
+== Lesson One ==
+*   定义顶点着色器和片元着色器，代码放到HTML的<script>标签中，使用的类型是“x-shader/x-vertex”和“x-shader/x-fragment”；
+*   在initGL函数中初始化WebGL上下文（WebGL Context）；
+*   使用getShader和initShaders函数将着色器载入到WebGL的program对象中；
+*   定义模型视图矩阵（mvMatrix）和投影矩阵（pMatrix），并使用setMatrixUniforms函数将他们从Javascript推送的WebGL中，也就是显卡段，使得着色器可以调用它们；
+*   使用initBuffers函数载入含有场景内物体信息的数组对象；
+*   使用名如其义的函数drawScene函数来绘制场景；
+*   建立一个webGLStart函数，在页面加载时被调用，完成上述的一切；
+*   最后，在HTML代码中加入一段canvas标签的内容，来显示绘制的场景。
+
+== Lesson Two ==
+*   为每个顶点指定颜色，是用颜色矩阵实现的，和位置矩阵类似
+
+== Lesson Three ==
+*   3D场景中移动物体：　先在Ｘ点绘制一个方块，下次在Ｙ点绘制该方块，再下次在Ｚ点...
+*   函数requestAnimFrame()，指定下次重绘时调用的函数
+*   mvPushMatrix, mvPopMatrix用于保存和恢复绘图的起始点
+
+== Lesson Four ==
+*   在绘制立方体时，把它实现为绘制６个正方形，每个正方形又由两个三角形组成，三角形的顶点由正文形顶点采用数组索引方式指定，并用drawElements函数来绘制该立方体. 
+*  图像的运动实际是由坐标系变换，然后再重绘图形来实现的！！！ 坐标系变换是通过矩阵变换实现，mat4.translate()实现坐标系平移，mat4.rotate()实现坐标系的旋转  
+
+== Lesson Five ==
+*   Texture: 纹理
+*   载入一个独立的图片文件来覆盖3D物体，我们需要将图片及使用纹理的位置信息传递给片元着色器。
+*   gl.createTexture用来创建纹理对象，再创建一个JavaScript的图片对象并作为一个属性加入到纹理对象中，并设置一个回调函数,　在载入时要将图片先做个垂直翻转，因为Canvas使用的坐标系与图片的坐标系不同，图片的y轴是向下为正。
+*   纹理对象也需要与WebGL上下文绑定
+
+== Lesson Six ==
+*   键盘输入: 向键盘事件传递回调函数
+*   纹理过滤方式
+    *   Nearest　最近点采样过滤
+    *   Linear  线性过滤
+    *   Mipmaps　多级渐进纹理过滤

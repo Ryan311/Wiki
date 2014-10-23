@@ -1,0 +1,54 @@
+%toc
+== 开源的跨平台全能三维动画制作软件 ==
+*   http://www.blendercn.org/
+*   http://www.youku.com/playlist_show/id_6221725.html
+
+=== Install ===
+*   sudo add-apt-repository ppa:irie/blender
+*   sudo apt-get update
+*   sudo apt-get install blender
+
+=== 启动 ===
+*   直接启动user perference会打不开，程序直接崩溃，需要运行optirun blender才行，可能需要高版本的OpenGL支持
+*   在命令行下这样运行太麻烦了，如果可以在Launchpad上点击就执行上面的命令就好了，方法如下
+    *   sudo vim blender
+        *   #!/bin/bash
+        *   exec optirun /usr/bin/blender
+    *   sudo chmod +x blender
+    *   sudo mv blender usr/local/bin
+*   其它需要在启动时添加参数的程序也可以用该方法！！！ 
+
+=== 界面 ===
+*   定义自己的视图界面[[http://v.youku.com/v_show/id_XMzMzMzQyOTMy.html]]
+*   CTRL+U  保存当前的视图界面
+*   0   摄像机方框
+*   1,3,7   前、右、顶视图
+*   5   正视图(Ortho)与透视视图切换(Persp)
+*   t   Object Tools
+*   n   Translation Window
+*   拖拽来增加窗口
+*   CTRL+Up/Down/Left/Right , Shift+Space
+*   选单列，每一块都可以切换成其它选项，非常灵活
+*   物体的移动、旋转、缩放, 有快捷键方式(g, r, s [x, y, z]), 在选单列中也可以选择工具图标来实现该操作
+*   图层操作，m可将物体在图层间移动
+*   物体的圈选，b方块形圈选，CTRL+RMB任意曲线圈选
+*   CTRL+Tab    切换点、线、面，　在Edit Mode中
+*   Tab     Edit Mode 与 Object Mode之间切换
+*   Ctrl+R  切割物体成很多份, PgUp/PgDown持续切割/合并, Viewport Shading最好处于Wireframe模式
+*   SHIFT+A　添加物件
+*   Shift+C 还原3D Cursor到原点, or Shift+S 调出Snap,然后选择Cursor to centor
+*   界面移动
+    *   Shift+中键+鼠标滑动  界面平移
+    *   中键+鼠标滑动        界面旋转
+    *   滑轮滚动             界面放大or缩小
+*   F12 开始算图
+*   Alt+R   将骨架旋转后归为原位(0度)
+*   反向关节(KI)添加Shift+I, 移除Ctrl+Shift+I
+*   在Object-Mode, Z可以切换透明和非透明
+*   Ctrl+P 建立父子关系
+*   Ctrl+Shift+C    Add Constraint
+
+===　建模 ===
+*   Extrude     从现有表面长出新的表面
+    *   Mesh Object工具栏，Add: Extrude
+    *   x    删除Object

@@ -1,0 +1,244 @@
+= re -- Regular expression operations =
+== Special character ==
+*   special character in match pattern
+{{{
+.   matches any charcter except a newline
+^   matches the start of the string
+$   matches the end of the string or just before the newline at the end of the string
+*   cause the resulting RE to match 0 or more repetitions of the preceding RE
++   cause the resulting RE to match 1 or more repetitions of the preceding RE
+?   cause the resulting RE to match 0 or 1 repetitions of the preceding RE
+*?, +?, ??  matches as few characters as possible  
+{m}         matches exactly m copies of the previous RE
+{m,n}       matehces from m to n repetitions of the preceding RE
+{m,n}?      matehces from m to n repetitions of the preceding RE, as few as possible
+\           escapes special characters
+[]          indicate a set of characters,[a-z], [abc], [1-9], [(*&^)]
+A|B         matches either A or B
+
+(...)       matches whatever regular expression is inside the parentheses and group the matched content.
+(?...)      
+(?iLmsux)   为正则表达式指定编译选项, i(ignorecase), L(Local), m(Multiline), s(Dotall), u(Unicode), x(Verbose)
+(?P<name>...)   为一个匹配的组起一个名字
+(?P=name)       调用已匹配的命名组
+
+(?#...)     A comment, ignore the content in the parentheses， 正则表达式中的注释，不进行匹配
+(?=...)     matches if ... matches next, Issac(?=Asimov) --match--> IsaacAsimov
+(?!...)     matches if ... doesn't match next, issac(?!Asimov) --not match--> isaacAsimov
+(?<=...)    matches if ... matches before, (?<=abc)def --match--> abcdef, match string is def
+(?<!...)    matches if ... doesn't match before
+(?(id/name)yes-pattern|no-pattern)
+}}}
+{{{ class = "brush: python"
+1. 
+>>> s=r’/* comment 1 */  code  /* comment 2 */’
+>>> re.findall( r’(?<=/\*).+?(?=\*/)’ , s )
+[' comment 1 ', ' comment 2 ']
+
+2. 
+>>> re.findall( r’\d+(?!\w+)’ , s )
+['222']
+
+3.
+>>> s='aaa111aaa,bbb222,333ccc,444ddd444,555eee666,fff777ggg'
+>>> re.findall( r'([a-z]+)\d+([a-z]+)' , s )        #找出中间夹有数字的字母
+[('aaa', 'aaa'), ('fff', 'ggg')]
+
+>>> re.findall( r '(?P<g1>[a-z]+)\d+(?P=g1)' , s )  #找出被中间夹有数字的前后同样的字母
+['aaa']
+
+>>> re.findall(r'([a-z]+)\d+\1',s )                 #匿名组, 通过序号调用已匹配的组
+['aaa']
+
+4. 
+}}}
+*   special sequences consist of \
+{{{
+\number matches the contents of the group of the same number. (.+) \1 -match-> 'the the' or '55 55'
+\A  matches only at the start of the string, 和'^'不同之处是它只匹配整个字符串的开头，而不是行开头
+\Z  matches only at the end of the string, 和'$'不同之处是它只匹配整个字符串的尾部，而不是行尾
+\b  matches the empty string, but only at the beginning or end of a word, boundary(nonalpah) of a word
+    r'\bfoo\b'  -match-> 'foo', 'foo.', '(foo)'
+                -not match ->   'foobar'
+\B  matches the empty string, but only when it is not at the beginning or end of a word
+    r'\Bfoo\B'  -match-> 'foobar', 'wufoobar'
+                -not match -> 'foo.', '(foo)'
+\d  [0-9]
+\D  [^0-9]
+\s  matches any whitespace character, [\t\n\r\f\v]
+\S  matches any non-whitespace character, [^\t\n\r\f\v]
+\w  [a-zA-Z0-9]
+\W  [^a-zA-Z0-9]
+}}}
+== Module contents ==
+*   re.compile(parttern)
+{{{class = "brush:python"
+#   编译正则表达式，可以提高匹配速度，返回一个编译对象
+prog = re.compile(pattern)
+result = prog.match(string) 
+}}}
+*   re.search(pattern, string, flags=0)
+{{{class = "brush:python"
+#   在字符串中查找匹配的正则表达式模式，返回MatchObject or None
+}}}
+*   re.match
+{{{class = "brush:python"
+#   在字符串开头位置匹配, 返回MatchObejct or None
+}}}
+*   re.split
+{{{class = "brush:python"
+#   将字符串匹配正则表达式的部分割开并返回一个列表
+>>>re.split(r'\W+', 'word, word, word.')
+['word', 'word', 'word', '']
+
+>>> re.split(r'(\W+)', 'word, word, word.')
+['word', ', ', 'word', ', ', 'word', '.', '']
+
+>>> re.split(r'\W+', 'word, word, word.', 1)
+['word', 'word, word.']
+}}}
+*   re.findall
+{{{class = "brush:python"
+#   在字符串中查找所有匹配的子串并组成列表返回
+>>> re.findall(r'\w+', 'word, word, word.')
+['word', 'word', 'word']
+}}}
+*   re.finditer
+{{{class = "brush:python"
+#   同上，但返回迭代器, 可一个一个处理匹配对象
+>>> for item in re.finditer(r'\w+', 'word, word, word.'):
+	print item.group(), item.span()
+
+word (0, 4)
+word (6, 10)
+word (12, 16)
+}}}
+*   re.sub(rule, replace, target [,count])
+    <br>re.subn(rule, replace, target [,count])
+{{{class = "brush:python"
+#   字符串替换和修改
+>>> str = "hello world, hello world, hello world"
+>>> re.sub(r'world', 'earth', str)
+'hello earth, hello earth, hello earth'
+
+# 可以指明替换个数
+>>> re.sub(r'world', 'earth', str, 2)
+'hello earth, hello earth, hello world'
+
+# subn返回一个元组，第一个元素为被替换的字符串，第二个元素是一个数字表明产生了多少次替换
+>>> re.subn(r'world', 'earth', str)
+('hello earth, hello earth, hello earth', 3)
+}}}
+*   re.escape
+{{{class = "brush:python"
+# 将字符串的的非字母数字的字符以backslashed的形式显示出来
+>>> str = "(12*43+1)/5"
+>>> re.escape(str)
+'\\(12\\*43\\+1\\)\\/5'
+}}}
+*   re.purge
+{{{class = "brush:python"
+#clear the regular expression cache
+}}}
+== Regular Expression Objects ==
+*   re.RegexObject  正则表达式编译后的对象, 匹配更快
+*   prog.search
+*   prog.match
+*   prog.split
+*   prog.findall
+*   prog.finditer
+*   prog.sub
+*   prog.subn
+*   prog.flags
+*   prog.groups
+*   prog.groupindex
+*   prog.pattern
+== Match Object ==
+*   由re.match(...) and re.search(...)返回的对象
+{{{class = "brush:python"
+#
+}}}
+*   m.expand
+{{{class = "brush:python"
+#
+}}}
+*   m.group
+{{{class = "brush:python"
+#  
+>>> m = re.match(r"(\w+) (\w+)", "Isaac Newton, physicist")
+>>> m.group(0)       # The entire match
+'Isaac Newton'
+>>> m.group(1)       # The first parenthesized subgroup.
+'Isaac'
+>>> m.group(2)       # The second parenthesized subgroup.
+'Newton'
+>>> m.group(1, 2)    # Multiple arguments give us a tuple.
+('Isaac', 'Newton')
+
+#   named groups
+>>> m = re.match(r"(?P<first_name>\w+) (?P<last_name>\w+)", "Malcolm Reynolds")
+>>> m.group('first_name')
+'Malcolm'
+>>> m.group('last_name')
+'Reynolds'
+}}}
+*   m.groups
+{{{class = "brush:python"
+#   返回元组，包含所有匹配的元素
+>>> m = re.match(r"(\d+)\.(\d+)", "24.1632")
+>>> m.groups()
+('24', '1632')
+}}}
+*   m.groupdict
+{{{class = "brush:python"
+#   返回dictionary包含所有的named subgroups
+>>> m = re.match(r"(?P<first_name>\w+) (?P<last_name>\w+)", "Malcolm Reynolds")
+>>> m.groupdict()
+{'first_name': 'Malcolm', 'last_name': 'Reynolds'}
+}}}
+*   m.start, m.end
+{{{class = "brush:python"
+#   返回匹配字符串在字符串中的位置
+>>> email = "tony@tiremove_thisger.net"
+>>> m = re.search("remove_this", email)
+>>> email[:m.start()] + email[m.end():]
+'tony@tiger.net'
+}}}
+*   m.span
+{{{class = "brush:python"
+#   return the 2-tuple (m.start(group), m.end(group))
+}}}
+*   m.pos
+{{{class = "brush:python"
+#
+}}}
+*   m.endpos
+{{{class = "brush:python"
+#
+}}}
+*   m.lastindex
+{{{class = "brush:python"
+#
+}}}
+*   m.lastgroup
+{{{class = "brush:python"
+#
+}}}
+*   m.re
+{{{class = "brush:python"
+#
+}}}
+*   m.string
+{{{class = "brush:python"
+#
+}}}
+== Examples ==
+*   finding all adverbs and their positions
+{{{class = "brush:python"
+>>> text = "He was carefully disguised but captured quickly by police."
+>>> for m in re.finditer(r"\w+ly", text):
+...     print '%02d-%02d: %s' % (m.start(), m.end(), m.group(0))
+07-16: carefully
+40-47: quickly
+}}}
+*   [[http://www.tutorialspoint.com/python/python_reg_expressions.htm]]

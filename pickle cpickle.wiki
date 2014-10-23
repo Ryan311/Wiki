@@ -1,0 +1,38 @@
+= [[http://docs.python.org/2/library/pickle.html|Pickle]] =
+*   'Pickling' is the process where a Python object hierarchy is converted into a byte stream, and 'unpickling' is the inverse operation.
+*   cPickle can be up to 1000 times faster than pickle
+*   Pickle
+{{{class = "brush: python"
+import pickle
+
+data1 = {'a': [1, 2.0, 3, 4+6j],
+         'b': ('string', u'Unicode string'),
+         'c': None}
+
+selfref_list = [1, 2, 3]
+selfref_list.append(selfref_list)
+
+output = open('data.pkl', 'wb')
+
+# Pickle dictionary using protocol 0.
+pickle.dump(data1, output)
+
+# Pickle the list using the highest protocol available.
+pickle.dump(selfref_list, output, -1)
+
+output.close()
+}}}
+*   UnPickle
+{{{class = "brush: python"
+import pprint, pickle
+
+pkl_file = open('data.pkl', 'rb')
+
+data1 = pickle.load(pkl_file)
+pprint.pprint(data1)
+
+data2 = pickle.load(pkl_file)
+pprint.pprint(data2)
+
+pkl_file.close()
+}}}

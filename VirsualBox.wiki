@@ -1,0 +1,14 @@
+%toc
+= Virsual Machime =
+== Virsual Box ==
+
+=== Introduction ===
+=== Install ===
+[[https://www.virtualbox.org/wiki/Downloads|Download]]
+=== Share fold with Host ===
+# In Host, add /usr/share/virsualbox/VBoxGuestAdditions.iso to Settings->Storage->CD/DVD
+# In Guest(Ubuntu12.04 Server), need to install build-essential and dkms first.<br> sudo apt-get update <br> sudo apt-get install build-essential
+# In Guest, mount CD. <br> cd /media <br> sudo mkdir vbox <br> sudo mount /dev/sr0 vbox/  <br> cd vbox/
+# In Guest  <br> sudo ./VBoxLinuxAdditions.run
+# Add Share Folder in Settings->Shared Folders->Add
+# Restart Guest, then <br> sudo mount -t vboxsf Host /mnt

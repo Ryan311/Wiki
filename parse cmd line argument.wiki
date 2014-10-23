@@ -1,0 +1,138 @@
+%toc
+= Cmd line argument =
+
+== sys ==
+*   sys.argv
+{{{class = "brush: python"
+if __name__ == '__main__':
+    import sys
+    print len(sys.argv)
+    print sys.argv[0]   #command itself
+    print sys.argv[1]   #the first parameter
+}}}
+
+== argparse == 
+*   [[http://docs.python.org/2/howto/argparse.html|Tutorial]]
+*   [[http://docs.python.org/2/library/argparse.html#nargs|Docs]]
+
+
+== Usage ==
+*   Positional arguments
+*Running program always need an argument*
+
+{{{class = "brush: python"
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("echo", help="echo the string you use here")
+parser.add_argument("square", help="display a square of a given number", type=int)
+args = parser.parse_args()
+print args.square**2
+print args.echo
+}}}
+
+Running:
+{{{
+    $ python prog.py -h
+    usage: prog.py [-h] echo
+
+    positional arguments:
+      echo        echo the string you use here
+      square      display a square of a given number
+
+    optional arguments:
+      -h, --help  show this help message and exit
+
+    $ python prog.py foo 4
+    16
+    foo
+}}}
+
+*   Optional arguments
+*arguments are optional*
+{{{class = "brush: python"
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("-v","--verbose", help="increase output verbosity",
+                    action="store_true")
+args = parser.parse_args()
+if args.verbose:
+   print "verbosity turned on"
+}}}
+
+Running:
+{{{
+    $ python prog.py --verbose
+    verbosity turned on
+    $ python prog.py --verbose 1
+    usage: prog.py [-h] [--verbose]
+    prog.py: error: unrecognized arguments: 1
+    $ python prog.py --help
+    usage: prog.py [-h] [--verbose]
+
+    optional arguments:
+      -h, --help  show this help message and exit
+      -v, --verbose   increase output verbosity
+}}}
+
+*Note*::
+We now specify a new keyword, __action__, and give it the value "store_true". 
+<br>This means that, if the option is specified, assign the value True to args.verbose. 
+<br>Not specifying it implies False
+
+*   The add_argument() method
+*ArgumentParser.add_argument(name or flags...[, action][, nargs][, const][, default][, type][, choices][, required][, help][, metavar][, dest])*
+{{{
+    name or flags - Either a name or a list of option strings, e.g. foo or -f, --foo.
+    action - The basic type of action to be taken when this argument is encountered at the command line.
+    nargs - The number of command-line arguments that should be consumed.
+    const - A constant value required by some action and nargs selections.
+    default - The value produced if the argument is absent from the command line.
+    type - The type to which the command-line argument should be converted.
+    choices - A container of the allowable values for the argument.
+    required - Whether or not the command-line option may be omitted (optionals only).
+    help - A brief description of what the argument does.
+    metavar - A name for the argument in usage messages.
+    dest - The name of the attribute to be added to the object returned by parse_args().
+}}}
+
+== Examples ==
+{{{class = "brush: python"
+import argparse
+    parser.add_argument("-e", "--examples", help="show examples", action='store_true')
+    parser.add_argument("-s", "--single", nargs=2, help="Only convert one etl file to text")
+    parser.add_argument("-m", "--multiple", nargs=2, help="Convert more than one etl files to text")
+    parser.add_argument("-l", "--level", type=int, nargs=1, help="Select level when convert")
+    parser.add_argument("-v", "--view", nargs=1, help="Open the log file after convert")
+    args = parser.parse_args()
+    if args.examples:
+        Showhelp()
+    if args.level is not None:
+        print "log level is %d" % args.level[0]
+        LevelNum = int(args.level[0])
+
+    if args.single is not None: 
+        print args.single
+        # check the file ext
+        filename1, ext1 = os.path.splitext(args.single[0]) 
+        filename2, ext2 = os.path.splitext(args.single[1]) 
+        if cmp(ext1,'.etl') == 0 and cmp(ext2, '.pdb') == 0:
+            #Deal the case
+            if args.view is not None:
+                DealOneFile(args.single[0], args.single[1], args.view[0])
+            else:
+                DealOneFile(args.single[0], args.single[1])
+        else:
+            #print help
+            print Showhelp() 
+
+    if args.multiple is not None:
+        print args.multiple
+        # check the dir and the file ext
+        filename2, ext3 = os.path.splitext(args.multiple[1]);
+        if os.path.isdir(args.multiple[0]) and cmp(ext3, '.pdb') == 0:
+            #Deal the case
+            DealMultipleFiles(args.multiple[0], args.multiple[1])
+        else:
+            #print help
+            print Showhelp()
+}}}

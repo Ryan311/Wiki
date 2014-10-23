@@ -1,0 +1,9 @@
+%toc
+= Cloud Compute =
+== Terms ==
+*   云计算的三大服务模式:
+    *   IaaS(Infrastructure as a Service)   基础设置即服务, IaaS注重计算资源的共享,用户可通过因特网可以获得虚拟的服务器,存储和网络
+    *   PaaS(Platform as a Service)     　  平台即服务, PaaS侧重于服务,以应用服务器平台或者开发环境提供服务.
+    *   SaaS(Software as a Service）        软件即服务, SaaS侧重于服务,以软件程序提供服务.如CRM,ERP,OA等.
+*   私有云: 主要为local应用，　主要是针对企业的应用
+*   公有云: 主要是像电信这种计费，租用模式(可按小时，分，年等时间收费)

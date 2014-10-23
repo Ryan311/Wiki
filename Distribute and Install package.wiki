@@ -1,0 +1,63 @@
+%toc
+== Lib: distutils ==
+=== Distribution ===
+*   Pure Python distribution (by module)
+如果只是想发布几个modules，并不在同一个package中，可以分别把他们指定在
+py_modules选项中
+{{{
+    <root>/
+        setup.py
+        foo.py
+        bar.py
+}}}
+
+       *the setup script might be*
+{{{class = "brush: python"
+from distutils.core import setup
+setup(name = 'foobar',
+      version = '1.0',
+      py_modules = ['foo', 'bar'],
+      )
+}}}
+
+
+*   Pure Python distribution (by package)
+如果想发布多个module，尤其是在同多个package中，指定整个package比指定多个module更简单
+上面的例子可以写成
+{{{class = "brush: python"
+from distutils.core import setup
+setup(name = 'foobar',
+    verson = '1.0',
+    packages = ['']
+    #the empty string stands for root
+}}}
+
+*如果是将两个文件放在一个子目录下，该子目录仍在root packet中*
+{{{
+<root>/
+    setup.py
+    src/    foo.py
+            bar.py
+}}}
+
+仍然要指明root package===>
+
+{{{class = "brush: python"
+from distutils.core import setup
+setup(name = 'foobar',
+    version = '1.0',
+    package_dir = {'':'src'},
+    packages = [''],
+    )
+}}}
+
+*   make the installation tarball
+       <br> python setup.py sdist
+
+References::
+http://docs.python.org/2/distutils/examples.html
+<br>https://learn-python-the-hard-way-zh_cn-translation.readthedocs.org/en/latest/ex46.html
+
+
+=== Install Package ===
+python setup.py install

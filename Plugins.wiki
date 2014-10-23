@@ -1,0 +1,6 @@
+%toc
+== [[https://github.com/gmarik/vundle/wiki/Vundle-for-Windows|Vundle]] ==
+== [[https://github.com/klen/python-modepython-mode]] ==
+== [[https://github.com/fholgado/minibufexpl.vim|New minibuf]] ==
+== SnipMate ==
+*   In c and c++        when insert 'for' or 'if', then type 'tab', auto insert for expression

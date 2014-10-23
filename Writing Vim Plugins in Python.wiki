@@ -1,0 +1,14 @@
+== Writing Vim Plugins in Python ==
+=== The Python Interfaces to VIM ===
+*   see :h python in Vim
+*   "vim" moudle
+The vim module implements two methods, three constants, and one error object.
+    *   vim.command(str)
+    *   vim.eval(str)
+    *   vim.error
+    *   vim.buffers
+    *   vim.windows
+    *   vim.current
+
+=== [[http://www.terminally-incoherent.com/blog/2013/05/06/vriting-vim-plugins-in-python/|Tutural]] ===
+

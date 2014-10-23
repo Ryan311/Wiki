@@ -1,0 +1,50 @@
+%toc
+= Python Library =
+==  Build-in Types ==
+*   The principal built-in types are __numerics, sequences, mappings, files, classes, instances and exceptions__
+*   
+== Build-in functions ==
+*   str() repr() `` eval()   
+*   isinstance()    -> isinstance(anobj, basestring) 
+*   range, xrange   -> range产生一个list， xrange产生一个xrange object， 功能相同，
+*                      但如果数据很大， xrange效率会更高， 因为他不会维护一个大的列表， 测试：
+*                      %timeit random.shuffle(range(10000), 10)
+*                      %timeit random.shuffle(xrange(1000), 10)
+== os ==
+*   This module provides a portable way of using operating system dependent functionality.
+*   提供与系统相关的功能， 在各平台通用可移植的能力
+*   os.name -> 平台名字
+*   os.chdir, os.getcwd()   -> 路径操作
+*   If you just want to read or write a file see open(), if you want to manipulate paths, 
+*       see the os.path module, and if you want to read all the lines in all the files on the 
+*       command line see the fileinput module. For creating temporary files and directories see
+*       the tempfile module, and for high-level file and directory handling see the shutil module.
+== sys ==
+*   This module provides access to some variables used or maintained by the interpreter and 
+*   to functions that interact strongly with the interpreter. It is always available.
+*   该模块提供访问解释器中使用的参数与函数的功能
+*   sys.argv    -> 表示一个列表， 包含命令行参数， argv[0]是脚本名称
+*   sys.exit    -> 退出Python
+*   sys.getwindowsversion()     -> 获得当前Windows Version
+== sets ==
+== json ==
+== string ==
+=== translate ===
+*   table = string.maketrans(from, to)
+*   string.translate(table, delete)
+*   allchar = string.maketrans('','')
+=== case ===
+*   string.upper()
+*   string.lower()
+*   string.capitalize()
+*   string.title()
+== struct ==
+== random ==
+*   random.getstate   random.setstate   -> 可以保存产生随机数的状态， 产生相同的随机数
+*   random.seed([x])    -> 初始化随机序列产生器
+*   random.randrange(start, stop, step) -> equivalent to random.choice(range(start, stop, step)), 但效率更高
+*   random.randint(a,b) -> 产生一个在a, b之间的随机整数
+*   random.suffle(x)    -> 对序列对象x重新排列， 类似洗牌
+*   random.sample(x, k)    -> 在序列对象x中取出k个样本
+*   random.random()     -> 返回下一个随机数[0,1)之间
+*   random.uniform(a,b) -> 返回下一个在[a,b]之间的随机数

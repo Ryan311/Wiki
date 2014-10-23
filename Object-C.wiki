@@ -1,0 +1,43 @@
+%toc
+= Object-C =
+*   Objective-C is a powerful object-oriented (OO) language that extends the procedural language ANSI C with the addition of a few keywords and compiler directives, plus one syntactical addition (for sending messages to objects). 
+*   This simple extension of ANSI C is made possible by an Objective-C runtime library (libobjc) that is generally transparent to the Objective-C programmer.
+== Set develop env in Ubuntu12.04 ==
+*   Set GNUstep development environment
+{{{
+    sudo apt-get install build-essential gnustep gobjc gnustep-make libgnustep-base-dev gnustep-devel 
+}}}
+*   Add in .bashrc
+{{{
+    #set GNUstep
+    GNUSTEP_ROOT=/usr/share/GNUstep
+    export GNUSTEP_ROOT
+    source /usr/share/GNUstep/Makefiles/GNUstep.sh
+}}}
+*   创建一个目录,并编写*.m文件
+*   GNUmakefile, 注意TOOL_NAME的值是_OBJEC_FILES的前缀
+{{{
+    include $(GNUSTEP_MAKEFILES)/common.make
+    
+    #hello 是生成的可执行文件的文件名
+    TOOL_NAME = hello
+    
+    #hello_OBJC_FILES 里的 hello 必须同上文 hello 相同
+    #hello.m 就是刚编辑的Objective-C源文件
+    hello_OBJC_FILES = hello.m
+    
+    include $(GNUSTEP_MAKEFILES)/tool.make
+}}}
+*   make
+*   cd ./obj & ./hello
+== GNUstep ==
+*   GNUstep is an object-oriented development environment that provides the Objective-C programmer with a range of utilities and libraries for building large, cross-platform, applications and tools.
+    *   GNUstep Base Library: a powerful set of non-graphical Object-C classes
+    *   GNUstep Make Utility: GNU version of the UNIX make utility, plus a number of predefined rules specialized for building GNUstep projects
+    *   GUI
+
+== Langurage Basic ==
+*   大小写敏感
+*   注释//, /**/
+*   #import 和#include相同
+*   NSLog Objective-C库的打印函数,它在显示log之前会将时间日期, 程序名等信息打印出来.

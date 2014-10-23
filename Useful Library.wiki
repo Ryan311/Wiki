@@ -1,0 +1,13 @@
+%toc
+== [[https://github.com/philipbjorge/EditREPL|EditREPL]] ==
+*   Use it in python, for test code
+== PIL  [[https://github.com/python-pillow/Pillow|PILLOW]] ==
+*   Pillow is a replacement for PIL, the Python Image Library
+== distribute ==
+*   Python包管理工具
+*   distribute是setuptools的替代方案，pip是easy_install的替代方案
+*   Distribute提供一个安装python模块的框架
+== nose ==
+*   is nicer testing for python
+*   pip install nose
+*   https://nose.readthedocs.org/en/latest/

@@ -1,0 +1,263 @@
+%toc
+
+= Windows =
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+== [[http://msdn.microsoft.com/en-us/library/windows/hardware/ff554836(v=vs.85).aspx|Driver Concepts]] ==
+*   User mode and kernel mode
+*   Virtual address spaces
+*   Device nodes and device stacks
+*   I/O request packets
+*   Driver stacks
+*   Minidrivers and driver pairs
+*   KMDF as a generic driver pair model
+*   Upper and lower edges of drivers
+*   [[http://msdn.microsoft.com/en-us/library/windows/hardware/ff541224(v=vs.85).aspx|Device Identification Strings]]
+    *   Device IDs
+    *   Hardware IDs
+    *   Compatible IDs
+    *   Instance IDs
+    *   Device instance IDs
+    *   [[http://msdn.microsoft.com/en-us/library/windows/hardware/ff540024(v=vs.85).aspx|Container ID]]
+        *   Starting with Windows 7, the operating system uses a new ID (container ID) to group one or more devnodes that originated from 
+        *   and belong to each instance of a particular physical device.  
+        *   提供多功能的一个设备，加载起来后会有多个devnode，会在Device and Printers里显示多个单独设备，无法组织到一起，所以加入了该ID，
+        *   将属于同一个设备的Devnode组织在一起！
+        *   Generate Container ID
+            *   A bus driver provides a container ID
+            *   The PnP manager generates a container ID through the removable device capability
+            *   The PnP manager generates a container ID through an override of the removable device capability
+                *   Although the override mechanism does not change the value of the removable device capability, it forces the PnP manager 
+                *   to use the *override setting* and _not the value of the removable device capability_ when generating container IDs for devices. 
+                *   [[http://msdn.microsoft.com/en-us/library/windows/hardware/ff541144(v=vs.85).aspx|通过注册表来控制，这样的话可以不用设备提供的removable device capability, 客户报的问题就是通过这种方式来修改的]]
+                *   [[http://msdn.microsoft.com/en-us/library/windows/hardware/ff540101(v=vs.85).aspx|Container IDs Generated from a Removable Device Capability Override]]
+== WDF ==
+{{{
+KMDF version	Release method	            Included in this version of     Windows	Drivers using it run on
+1.13            Windows 8.1 Preview WDK     Windows 8.1 Preview             Windows 8.1 Preview
+1.11            Windows 8 WDK               Windows 8                       Windows Vista and later
+1.9             Windows 7 WDK               Windows 7                       Windows XP and later
+}}}
+== UMDF ==
+{{{
+UMDF version	Release method	            Included in this version of Windows	    Drivers using it run on
+2.0             Windows 8.1 Preview WDK     Windows 8.1 Preview                     Windows 8.1 Preview
+1.11            Windows 8                   WDK Windows 8                           Windows Vista and later
+1.9             Windows 7                   WDK Windows 7                           Windows XP and later
+}}}
+*   UMDF1.x:    requires using the COM programming model to write C++ code.
+*   UMDF2.0:    write a UMDF driver in the C programming language that calls many of the methods that are available to KMDF drivers
+*   File system drivers, display drivers, and print drivers cannot be UMDF drivers.
+=== Benefit from UMDF driver ===
+*   稳定性更高，因为只能访问进程的地址空间，而不像KMDF那样可以访问整个内核空间
+*   UMDF driver运行在LocalService account下，对用户数据及系统文件有有限的访问权限
+*   运行环境相对kernel-mode driver相对简单，不用考虑IRQL、page faults和thread context。
+*   UMDF2和KMDF可以相互转换，调用的函数大部分相同
+*   UMDF2可以在使用user-mode debugger，也可以使用kernel-mode debugger调试，wdfkd.dll有新增函数
+=== System-supplied components ===
+*   Driver host process(*Wudfhost.ext*)
+    *   a child process of the driver manager service
+    *   runs in the *LocalService* account
+    *   Device pooling
+*   Driver manager
+*   Reflector
+=== I/O request Flow ===
+{{{
+an application calls a Win32 file I/O function(such as CreateFile, ReadFileEx, or DeviceIoControl)
+==> the reflector ==> the driver host process ==> the top of the correct user-mode device stack
+|   ==> the reqeust is completed by one of the drivers in the user-mode stack
+|   ==> forward to the reflector ==> the reflector ==> kernel-mode stack for completion
+}}}
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+== UserMode ==
+*   DeviceIOControl的Overlapped参数
+    *   该参数只有在打开文件句柄时指明FILE_FLAG_OVERLAPPED才有效
+    *   如果带有Overlapped参数，则DeviceIOControl参数将马上返回，且LastError为ERROR_IO_PENDING
+    *   如果在Driver中马上将该Reqeust Complete，错误码会在Overlapped结构中保存
+    {{{// E:\SampleDriver\NONPNP_Win8
+        OverLap.hEvent = CreateEvent(NULL, TRUE, TRUE, "");   
+        OverLap.Offset = 0;  
+        OverLap.OffsetHigh = 0; 
+        printf("\nCalling DeviceIoControl IOCTL_NONPNP_IORETURN_TEST\n");
+        bRc = DeviceIoControl ( hDevice,
+                                (DWORD) IOCTL_NONPNP_IORETURN_TEST,
+                                InputBuffer,
+                                10,
+                                OutputBuffer,
+                                10,
+                                &bytesReturned,
+                                &OverLap 
+                                );
+        printf ( "  Error in DeviceIoControl : %x\n", bRc);
+        printf ( "  Error in DeviceIoControl : %x\n", GetLastError());
+        dwWaitResult = WaitForSingleObject(OverLap.hEvent, 0);
+        if(dwWaitResult == WAIT_OBJECT_0)
+        {
+            printf(" Event is set signaled \n");
+            bRc = GetOverlappedResult(hDevice, &OverLap, &bytesReturned, FALSE) ; 
+            printf ("Error in DeviceIoControl : bRc(%x), Error(%x)\n", bRc, GetLastError());
+        }
+        else
+        {
+            printf(" Event is not set signaled\n"); 
+        }
+    }}}
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+=== PE Format ===
+*   http://msdn.microsoft.com/en-us/library/ms809762.aspx
+*   Dumpbin.exe in VS
+    *   dumpbin /section:.rsrc rtkbtfilter.sys
+    *   dumpbin /headers rtkbtfilter.sys
+*   pefile(python module for PE) 
+    *   https://code.google.com/p/pefile/
+    *   https://code.google.com/p/pefile/wiki/UsageExamples
+*   pedump(ruby module for PE)
+ 
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+== System ==
+*   删除系统服务项
+    *   每一个Driver都对应一个Windows Service，该Service在Task Manager的Services List不可见，可以用工具[[http://tools.sysprogs.org/srvman/|srvman]]来查看
+    *   也可以用cmd-> sc query RtkBtfilter来查看该服务的状态
+    *   如果BT先安装公版device filter，卸载后，再安装Toshiba device filter，会提供service name or display name already exist
+    *   原因就是这两个Filter使用的相同的的Service Name&Display Name，即使卸载Driver，该服务RtkBtfilter仍然在Services list里，状态为Stop
+    *   只有将其从Service list删除才可以重装另一个Driver，因为Service Name&Display Name必须唯一!!!
+*   DxDiag
+    {{{
+        A DxDiag, short for Direct X diagnostic, is a listing of the components of your computer. This list includes your CPU, GPU (video card), 
+    memory, recent driver updates, and other useful pieces of information about your computer. A DxDiag does not contain any sensitive information
+    that Riot or anyone else can use against you; it is just a list of hardware and software installed on your computer.
+
+    DxDiags are used to quickly determine what system hardware or drivers may be conflicting with League of Legends. Whenever posting a technical 
+    issue on the support forums, or sending an email to support@riotgames.com, it's a good idea to include this diagnostic.
+    Here is a short guide to obtaining a DxDiag:
+    *   Press [Windows Key] + 'R' key
+    *   Type dxdiag in the field and hit 'Ok'
+    *   The DirectX Diagnostic Tool will open. Press the "Save All Information..." button.
+    *   Choose where to save the file like your desktop.
+    *   Attach the DxDiag to your response.
+    }}}
+*   无线AP
+    {{{
+    从win7开始，带有无线网卡（比如8723）的电脑，可以将自己的电脑做成无线AP，将有线网络分享给手机/平板使用。具体操作步骤：
+    *   用管理员方式运行附件中的.bat，记得将bat中第二行的AP名字和AP密码设成你需要的。
+    *   将有线网络共享给刚刚创建的无线AP:在控制面板中有线网络（本地连接）上点右键--属性--在共享一栏中打上勾，选择对应的无线AP(无线网络连接 2)，见图
+    *   每次重启都需重新运行.bat，共享设置过一次下次就不必再设置了
+        >netsh wlan show drivers
+        >netsh wlan set hostednetwork mode=allow ssid=AP名字 key=AP密码
+        >netsh wlan start hostednetwork
+        >pause
+    }}}
+*   UAC (User Account Control) 用户账户控制
+    *   Windows Vista引入，提高系统安全，要求用户在执行可能会影响电脑运行的操作之前提供许可权或管理员密码
+*   清理系统盘
+    *   OS及一些软件会将更新的东西一直Cache到硬盘里而不清理，所以越长越大，C盘越用越小
+    *   Outlook会将邮件内容存在一个文件outlook.ost中，它会持续增长，默认放在C:\Users\rui_huang\AppData\Local\Microsoft\Outlook
+    *   C:\ProgramData\Package Cache中的东西是VS安装时要用的，基本没用但Uninstall VS时如果删除就会Fail
+        *   解决方法， 将上面两个文件夹放到另一个分区（空间大），并在原位置做一个链接，
+            *   mklink /J "C:\ProgramData\Package Cache" "F:\SystemCache\Package Cache"
+            *   mklink /J "C:\Users\rui_huang\AppData\Local\Microsoft\Outlook" "F:\SystemCache\Outlook"
+    *   C:\Windows\WinSxS文件中的内容也有很多重复不用的，但最好不要手动删除，可以用工具Windows Update Clean Tool清理（Windows也自带清理工具）
+*   桌面上BAT的图标显示错误，变成与PDF文件相同的ICON，看着有些别扭，这可能是360安全卫士惹的祸，误删除了注册表项
+    *   可添加如下注册表项修复
+    {{{// 保存成一个.reg文件，然后导入， 重新启动explorer.exe就可以了
+    Windows Registry Editor Version 5.00
+
+    [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.bat]
+
+    [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.bat\OpenWithList]
+
+    [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.bat\OpenWithProgids]
+    "batfile"=hex:
+    }}}
+    *   查看一下注册表位置，可以看到这个表项下面列出了各种扩展名，如果是ICON或打开文件方式有问题，可以查看该处的注册表项是否正常
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+== Bat ==
+*   [[http://blog.csdn.net/davidhsing/article/details/1996180|for /f]]
+{{{
+    for /f %%i in (a.txt) do echo %%i       //这个会显示a.txt里面的内容，因为/f的作用，会读出a.txt中 的内容。
+    for %%i in (a.txt) do echo %%i          //而这个只会显示a.txt这个名字，并不会读取其中的内容。
+    for /f "tokens=2 delims= " %%i in (a.txt) do echo %%i   //以空格分割每一行，并显示第二列
+    for /f "tokens=* delims= " %%i in (a.txt) do echo %%i   //以空格分割每一行，并显示整行
+    for /f "skip=2 tokens=*" %%i in (a.txt) do echo %%i     //忽略文件头两行，显示每一行
+    for /f "eol=. tokens=*" %%i in (a.txt) do echo %%i      //eol用来告诉for忽略以.开始的行
+}}}
+*   call other.bat para1 para2 ...
+*   setlocal enabledelayedexpansion     -->  延时变量绑定
+*   find & findstr
+    {{{
+        1.findstr . 2.txt 或 Findstr "." 2.txt 
+        从文件2.txt中查找任意字符，不包括空字符或空行
+        ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+         
+        2.findstr .* 2.txt 或 findstr ".*" 2.txt
+        从文件2.txt中查找任意字符包括空行和空字符
+        ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+         
+        3.findstr "[0-9]" 2.txt
+        从文件2.txt中查找包括数字0－9的字符串或行
+        ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+         
+        4.findstr "[a-zA-Z]" 2.txt
+        从文件2.txt中查找包括任意字符的字符串或行
+        ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+         
+        5.findstr "[abcezy]" 2.txt
+        从文件2.txt中查找包括a b c e z y字母的字符串或行
+        ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+         
+        6.findstr "[a-fl-z]" 2.txt
+        从文件2.txt中查找小写字符a-f l-z的字符串，但不包含g h I j k这几个字母。
+        ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+         
+        7.findstr "M[abc] [hig]Y" 2.txt
+        从文件2.txt中可以匹配 MaiY, MbiY, MahY等…..
+        ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+         
+        8. ^和$符号的应用
+        ^ 表示行首，"^step"仅匹配 "step hello world"中的第一个单词
+        $ 表示行尾，"step$"仅匹配 "hello world step"中最后一个单词
+        ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+         
+        9.findstr "[^0-9]" 2.txt
+        如果是纯数字的字符串或者行便过滤掉，例如2323423423 这样的字符串，如果是345hh888这样的形式就显示出来。
+        ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+         
+        10.findstr "[^a-z]" 2.txt
+        同上，如果是纯字母的字符串或者行便过滤掉，例如 sdlfjlkjlksjdklfjlskdf这样的字符，如果是sdfksjdkf99999这样的形式，掺杂着数字就不成了
+        ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+         
+        11.*号的作用
+        前面已经说过了 ".*"表示搜索的条件是任意字符，*号在正则表达式中的作用不是任何字符，而是表示左侧字符或者表达式的重复次数，*号表示重复的次数为零次或者多次。
+        ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+         
+        12.findstr "^[0-9]*$" 2.txt
+        这个是匹配找到的纯数字，例如 234234234234，如果是2133234kkjl234就被过滤掉了。
+        ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+        
+        13   Findstr "^[a-z]*$" 2.txt
+        这个是匹配找到的纯字母，例如 sdfsdfsdfsdf，如果是213sldjfkljsdlk就被过滤掉了
+        ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+    }}}
+*   echo
+*   [[wmic]]    windows下强大的wmic命令行工具
+    *   wmic datafile where name="C:\\Windows\\System32\\Drivers\\RtkBtfilter.sys" get version | findstr [0-9].[0-9] 显示文件Version
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+== [[Work Debug]] ==
+
+==  Work experience ==
+*   Bushound
+{{{
+  11.0  CTL    20 00 00 00  00 00 03 00  SEND HCI                12.1.0       //send hci cmd 
+  11.0  OUT    05 10 00                  ...                     12.2.0       //hci cmd data: 1005
+  11.1  IN     0e 0b 01 05  10 00 fd 03  ........                13.1.0       //hci event: 0xe->Command Complete Event, 0x0b->Event length(not include 0xe and 0xb)
+               60 05 00 05  00           `....                   13.1.8       //the other-> parameter 
+  11.0  CTL    20 00 00 00  00 00 03 00  SEND HCI                14.1.0        
+  11.0  OUT    01 10 00                  ...                     14.2.0        
+  11.1  IN     0e 0c 01 01  10 00 06 00  ........                15.1.0        
+               05 06 02 00  00 05        ......                  15.1.8 
+}}}

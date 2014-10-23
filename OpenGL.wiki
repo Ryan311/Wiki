@@ -1,0 +1,95 @@
+%toc
+== OpenGL ==
+=== Install ===
+{{{
+$ sudo apt-get install build-essential  //编译器与基本的函数库
+$ sudo apt-get install libgl1-mesa-dev // 安装opengl library
+$ sudo apt-get install libglu1-mesa-dev // 安装opengl utilities, 组建于opengl library之上的工具组，提供许多方便的函数使用opengl更容易使用
+$ sudo apt-get install libglut-dev | freeglut3-dev  // 建立在opengl utilities之上的工具箱，强化utilities并增加了对视察介面的支持
+}}}
+
+=== Basic ===
+*   在最高抽象层次上，有３种绘图操作是最基本的: 清除窗口、绘制几何图形、绘制光栅对象。光栅对象包括像二维图像、位图和字体之类的东西。
+*   渲染(rendering): 计算机根据模型创建图像的过程
+*   模型(model): 根据几何图元创建的物体，包括点、直线和多边形等，通过顶点指定
+*   lgLoadIdentity(void): 可以隔离各个模型变换，实际是将当前的矩阵清为单位矩阵，或理解为将坐标系恢复到初始位置
+*   glMatrixMode(GLenum mode): 通过参数指定是模型视图矩阵、投影矩阵还是纹理矩阵。
+*   模型变换
+    *   在OpenGL中，有三个函数用于执行模型变换，glTranslate*(), glRotate*(), glScale*()，通过移位、旋转、拉伸或收缩，对物体（或坐标系）进行变换
+    *   这三个函数相当于产生一个适当的移动、旋转或缩放矩阵，然后以这个矩阵作为参数调用glMultMatrix*()，但这三个函数速度更快。
+*   视图变换
+    *   它用于修改观察点的位置和方向。
+    *   视图变换函数必须在调用任何模型变换函数之前调用，以确保首先作用于物体的是模型变换。
+    *   默认的观察点位置是原点和方向是Ｚ轴的负方向。
+*   投影变换
+    *   目的是定义一个视景体，决定一个物体是如何映射到屏幕上（透视投影还是正投影），定义哪些物体被裁剪到最终的图像之外。
+    *   也用于对场景中的顶点进行变换
+    *   调用任何投影变换之前，都要调用glMatrixMode(GL_PROJECTION); glLoadIdentity();
+    *   glFrustum()创建一个表示透视视图平截头体的矩阵，并与当前矩阵相乘
+    *   gluPerspective()创建一个表示透视视图平截头体的矩阵，并与当前矩阵相乘。仅限于创建沿视线方向同时对称于x和y轴的平截头体。
+    *   正投影可以调用glOrtho()函数来实现
+    *   当场景中物体的顶点通过模型视图矩阵和投影矩阵进行变换之后，位于视景体之外的所有图元都将截掉。６个截剪平面就是定义视景体６个侧面的平面。
+*   视口变换
+    *   对应于选择被冲洗相片的大小这个阶段
+    *   glViewPort()定义一个像素矩形，最终的图像将映射到这个矩形中。
+    *   视口的纵横比一般和视景体的纵横比相同，如果不同，当图像投影到视口时就会变形。
+*   缓冲区
+    *   颜色缓冲区
+    *   深度缓冲区
+    *   累积缓冲区
+    *   模板缓冲区
+*   光照
+    *   物体的法线向量美决定了它相对于光源的方向。
+    *   光源具有几种属性，如颜色、位置和方向，由glLight＊来指定
+
+=== Pipeline ===
+*   Vetex processor
+*   Geometry processor
+*   Clipper
+*   Rasterizer
+*   Fragement processor
+
+=== GLUT ===
+*   回调函数
+    *   glutDisplayFunc(RenderSceneCB);     //显示回调，当前窗口需要重新绘制时被调用
+    *   glutIdleFunc(RenderSceneCB);        //空闲回调，当没有事件发生时会持续调用
+    *   glutSpecialFunc(SpecialKeyboardCB); //功能键和方向键
+    *   glutPassiveMotionFunc(PassiveMouseCB); //不按下鼠标按键时的移动鼠标
+    *   glutKeyboardFunc(KeyboardCB);       //产生ASCII码的键
+
+=== Terms ===
+*   shader  着色器
+*   Rasterizer  光栅化
+*   primitive   图元
+*   homogenuous coordinates 奇次坐标
+
+=== [[http://www.opengl.org/documentation/specs/glut/spec3/spec3.html|GLUT API]] ===
+*   glutPostRedisplay(): marks the current window as needing to be redisplayed, the window's display callback will be called.
+*   GLUT中包含了几个绘制简单３Ｄ几何物体的函数
+    *   sphere, cube, cone, torus, dodecahedron, octahedron...
+
+=== GLSL ===
+*   着色器编程语言
+
+
+== OGLDEV ==
+*   http://ogldev.atspace.co.uk/
+*   ogldev-source
+    *   要按照[[http://ogldev.atspace.co.uk/instructions.html|Instructioin]]中的指示安装gcc-c++，glew，freeglut，libmagick++, 否则不能编译
+=== ASSIMP ===
+*   An open source library that can handle many 3D formats, including the most popular ones
+*   Install
+    *   Download package from http://assimp.sourceforge.net/
+    *   sudo apt-get install cmake libboost-dev
+    *   unzip the package and goto the top dir
+    *   cmake -DNAME_OF_SETTING=VALUE
+    *   cmake -G 'Unix Makefiles'   生成普通的makefile文件
+    *   make
+    *   sudo make install
+    *   sudo ldconfig
+=== GLFX ===
+*   svn checkout http://glfx.googlecode.com/svn/trunk/ libglfx
+*   cd libglfx
+*   cmake .
+*   make
+*   sudo make install

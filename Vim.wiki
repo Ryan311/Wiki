@@ -1,0 +1,15 @@
+%toc
+== VIM ==
+*   [[VIM Tricky]]
+*   [[VIM Commands]] 
+*   [[Plugins]]
+*   [[Writing VIM Plugins]]
+*   [[Encoding]]
+*   Docs
+    *   [[http://blog.sanctum.geek.nz/buffers-windows-tabs/|Buffer Window Tab]]
+    *   [[file:///F:/Wiki/wiki2_html/Vimwiki1.1.1QR.pdf|VimWiki help]]
+    *   [[http://vim.wikia.com/wiki/Mapping_keys_in_Vim_-_Tutorial_(Part_1)|Key map]]
+*   MyVimrc
+    *   [[vimrc_for_linux]] 
+*   TODO:
+    *   INF Syntax

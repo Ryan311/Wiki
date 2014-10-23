@@ -1,0 +1,100 @@
+{{{class = "brush: python"
+"""
+LogChange
+
+Wpp trace and rtkdebug line should be same
+So change the old rtkdebug print format to match both
+"""
+import os
+import sys
+
+TargetStr1 = 'RT_DEBUG'
+TraceDir = {'LEVEL_MIN':'TRACE_LEVEL_VERBOSE', 'LEVEL_TRACE':'TRACE_LEVEL_INFORMATION',
+            'LEVEL_INFO':'TRACE_LEVEL_WARNING','LEVEL_ERROR':'TRACE_LEVEL_ERROR',
+            'LEVEL_MAX':'TRACE_LEVEL_FATAL'}
+
+TargetStr2 = 'precomp.h'
+IncludeStrStart = '#ifdef WPP_TRACING_ENABLE'
+IncludeStrEnd = '#endif'
+
+def TracingChange(Inline):
+    """
+    如果是log行， 生成新的log格式
+    """
+    r1 = Inline.find(TargetStr1) + len(TargetStr1) + 1
+    str1 = Inline[:r1]
+    str2 = Inline[r1:]
+
+    r2 = str2.find('("')
+    str3 = str2[:r2]
+    str4 = str2[r2:]
+
+    strlist = str3.split(',')
+    print strlist
+    Outline = str1 + TraceDir[strlist[1].strip()] + ',' + strlist[0].strip() + ',' + str4
+    return Outline
+    
+
+def DealFile(fileinfo, filename):
+    """
+    打开文件，并逐行处理
+    """
+    CurDir = os.getcwd()
+    #CurDir = r'C:\Users\rui_huang\Desktop\strchange'
+    DestDir = CurDir + '\\Change'
+    if os.path.exists(DestDir) != True:
+        os.mkdir(DestDir)          
+        
+    ModFile = os.path.join(DestDir, filename)
+    #print ModFile
+    
+    file_obj = open(filename)
+    file_obj2 = open(ModFile,'w')
+    line_nu = 0;
+    for eachline in file_obj:
+        if eachline.find(TargetStr2) != -1:
+            name, ext = os.path.splitext(filename)
+            IncludeStrMid = '#include ' + '"' + name + '.tmf' + '"'           
+            Modline = eachline + '\n' + IncludeStrStart + '\n' + IncludeStrMid + '\n' + IncludeStrEnd + '\n\n' 
+            file_obj2.write(Modline)
+            continue
+
+        if eachline.find(TargetStr1 + '(') != -1:
+            line_nu = line_nu + 1
+            print line_nu, eachline
+            Modline = TracingChange(eachline)
+            fileinfo.write('\t\t' + 'Line Number:' + str(line_nu) + '\n')
+            file_obj2.write(Modline)
+        else:
+            file_obj2.write(eachline)
+    file_obj.close()
+    file_obj2.close()
+
+def walk_dir(dir,fileinfo,topdown=True):
+    """
+    遍历dir目录下的所有.c文件
+    """
+    for root, dirs, files in os.walk(dir, topdown):
+        for name in files:
+            filename, ext = os.path.splitext(name);
+            if cmp(ext, '.c') == 0 and cmp(filename, 'bt_debug') != 0:
+                print(os.path.join(name))
+                fileinfo.write('\t' + os.path.join(root,name) + '\n')
+                DealFile(fileinfo,name)
+            
+        #for name in dirs:
+            #print(os.path.join(name))
+            #fileinfo.write('  ' + os.path.join(root,name) + '\n')
+
+if __name__=="__main__":
+    if len(sys.argv)==1:
+        dir=os.getcwd()
+    else:
+        dir=sys.argv[1]
+    #dir = raw_input('please input the path:')
+    fileinfo = open('list.txt','w')
+    print('Files need to change tracing:')
+    fileinfo.write('Files need to change tracing:' + '\n')
+    walk_dir(dir,fileinfo)
+    fileinfo.close()
+}}}

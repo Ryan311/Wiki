@@ -1,0 +1,401 @@
+%toc
+== VIM Tricky ==
+------------------------------------------------------------------------------------------------------------
+*   在当前行移动:0^$g_fFtT
+    {{{
+    *   0       →  跳到第一列
+    *   ^       →  跳到当前行的第一个字符
+    *   $       →  跳到最后一列
+    *   g_      →  跳到这行的最后一个字符
+    *   fa      →  跳到这行a字母的下一个出现的地方。 ";"会查找下一个（上一个）地方
+    *   t,      →  跳到，字符的前一个字符.
+    *   3fa     →  在这行中查找a出现的第三个位置.
+    *   F和T    →  与f和t相似， 但是方向相反.
+    *   20|     →  move cursor to column 20
+    *   一个有用的提示：dta "→删除所有的直到a"。
+    }}}
+-------------------------------------------------------------------------------------------------------------------
+*   关键字补全 Ctrl+N, Ctrl+P
+    *   在Insert模式下，按下Ctrl+N， vim会搜索文件内容，然后出现一个下拉列表，在状态栏里变成"关键字补全 ~N~P"
+    *   再按下Ctrl+P，就会在下拉列表里上下选择要补全的内容，回车后就自动补全了
+*   更多的补全 Ctrl+X
+    *   Ctrl + X 和 Ctrl + D    宏定义补齐
+    *   Ctrl + X 和 Ctrl + ]    Tag补齐
+    *   Ctrl + X 和 Ctrl + F    文件名补齐
+    *   Ctrl + X 和 Ctrl + I    也是关键词补齐，但是关键后会有个文件名，告诉你这个关键词在哪个文件中
+    *   Ctrl + X 和 Ctrl + V    表达式补齐
+    *   Ctrl + X 和 Ctrl + L    整个行补齐
+*   自定义补完
+    *   vim通过定义快键来实现括号自动补全： 
+        让vim实现输入： [      而在文件中输入:     []      并把光标置于中括号中，方法如下： 
+        :inoremap  [  []<Esc>i  
+-------------------------------------------------------------------------------------------------------------------
+*   Key map
+    *   show mapping relevant to a particular key
+        *   :map <C-J>
+    *   Find mapping interface(and where they come from), this is useful when map confilct
+        *   :verbose nmap <C-J>
+        *   :verbose nmap j
+-------------------------------------------------------------------------------------------------------------------
+*   Comment Out Block
+    *   在行首注释
+    {{{
+    *   Shift-V         select a block
+    *   :norm 0i#<cr>   add # at the start of each line
+    *   :norm 0x<cr>    del # at the start of each line
+    *   :norm $i//<cr>  add // at the end of each line
+    }}}
+    *   在每行的第一个字符前注释
+    {{{
+    *   Shivt-V         select a block
+    *   :norm 0^#<cr>   add # at the start character of each line
+    *   :norm 0^x<cr>   del # at the start character of each line
+    }}}
+    *   May not keep in vimrc, move them to ftplugin
+    {{{
+    "Comment out block for Python, ftplugin/python.vim
+        vnoremap <silent> # :norm 0i#<cr>
+        vnoremap <silent> - :norm 0x<cr>
+    
+    "Comment out block for C++/C, ftplugin/c.vim
+        vnoremap <silent> / :norm 0i//<cr>
+        vnoremap <silent> - :norm 02x<cr>
+    
+    "Comment out block for VIML, ftpugin/vim.vim
+        vnoremap <silent> # :norm 0i"<cr>
+        vnoremap <silent> - :norm 0x<cr>
+    Note: in vim, use '#' instead of '"' as comment symbol, because '"' is used as register pefix
+    }}}
+-------------------------------------------------------------------------------------------------------------------
+*   Windows GVIM中，CTRL-V不能用：将_vimrc中的
+    {{{
+    *   source $VIMRUNTIME/mswin.vim
+    *   behave mswin
+    *   注释掉且不定义CTRL-V, CTRL-C, CTRL-X, 与Linux下一致
+    *   如果想继续使用mswin的其它定义，可只移除CTRL-V，不注释上边两行，只加入"unmap <C-V>"即可
+    }}}
+------------------------------------------------------------------------------------------------------------
+*   Virsual Mode
+{{{
+    v                       进入可视模式，以字符为单位选择。
+    V                       进入可视模式，以行为单位选择。
+    CTRL-V                  进入列块可视模式。备注: 在 Windows 环境中，CTRL-V 可能被映射为粘贴操作，所以可能无法用来进入列块可视模式
+                            见http://edyfox.codecarver.org/html/vimrc_mswin.html
+
+    对可视区域可以使用的操作符包括:
+    ~       切换大小写                                      |v_~|
+    d       删除                                            |v_d|
+    c       修改                                            |v_c|
+    y       抽出                                            |v_y|
+    >       右移                                            |v_>|
+    <       左移                                            |v_<|
+}}}
+    *   列插入：
+    {{{
+    *   CTRL-V, 选中某一列，要在它之前插入内容
+    *   按下I，进入列插入模式，
+    *   输入所要插入的内容，如<br>
+    *   按Esc，则所选列的前面都插入了<br>
+    }}}
+    *   行尾列模式：
+    {{{
+    *   CTRL-V，进入列选择模式
+    *   按G，选择全文第一列
+    *   按$，进入行尾块模式
+    *   按A，进入插入模式
+    *   输入插入内容， 如///
+    *   按Esc，则所有列的后面都是插入了<br>
+    }}}
+    *   Join lines
+    {{{
+    *   Shift-v or v     选择多行
+    *   J                连接
+    }}}
+    *   Indent
+    {{{
+    *   [count]< >       左、右对齐
+    *   =                自动对齐
+    }}}
+    *   Copy or move block
+    {{{
+    *   shift-v          选择多行
+    *   :co 10           将选择的行Copy在10行下面
+    *   :mv 10           将选择的行Move到第10行下面
+    }}}
+    *   [[https://github.com/vim-scripts/VisIncr|Vislncr]] [[http://www.ibm.com/developerworks/cn/linux/l-cn-vimcolumn/|Example]]
+
+------------------------------------------------------------------------------------------------------------
+*   Registers in vim
+    *   There are nine types of registers  -->  "{a-zA-Z0-9.%#:-"}
+    {{{
+    *   The unnamed register ""
+    *   10 numbered registers "0 to "9
+    *   The small delete register "-
+    *   26 named registers "a to "z or "A to "Z
+    *   four read-only registers ":, "., "% and "#
+        *   ".	Contains the last inserted text
+        *   "%	Contains the name of the current file.
+        *   "#	Contains the name of the alternate file.
+        *   ":	Contains the most recent executed command-line.
+    *   the expression register "=
+    *   The selection and drop registers "*, "+ and "~
+    *   The black hole register "_
+    *   Last search pattern register "/
+    }}}
+-------------------------------------------------------------------------------------------------------------------
+*   Jump
+    {{{
+            A "jump" is one of the following commands: "'", "`", "G", "/", "?", "n",
+        "N", "%", "(", ")", "[[", "]]", "{", "}", ":s", ":tag", "L", "M", "H" and
+        the commands that start editing a new file.  If you make the cursor "jump"
+        with one of these commands, the position of the cursor before the jump is
+        remembered.  You can return to that position with the "''" and "``" command,
+        unless the line containing that position was changed or deleted.
+    }}}
+    *   jumplist    if make a jump(use jump cmd) , the jump will be remembered in a jump list
+    *   :jumps      show jump list
+    *   CTRL-o      goto the last cursor position in jump list
+    *   CRTL-i      goto the next cursor position in jump list
+------------------------------------------------------------------------------------------------------------
+*   区域操作：  <命令>a<对象> 或 <命令>i<对象>
+    *   命令        d, y, v
+    *   对象        可以是:  w(一个单词), W(一个单词, 扩展的), s(一个句子), p(一个段落), 而且也可以是普通的字符， 例如"，'，)，}，]
+    *   Examples
+    {{{
+    1.  v， 普通字符
+        假设现在光标在 (map (+) ("foo")) 这个字符串的第一个o上。
+        vi"→ 将会选择 foo
+        va"→ 将会选择 "foo"
+        vi)→ 将会选择 "foo"
+        va)→ 将会选择 ("foo")
+        v2i)→ 将会选择 map (+) ("foo")
+        v2a)→ 将会选择 (map (+) ("foo"))
+
+    2.  v,  单词
+        光标在字符串<head> title </head>的i上。
+        viw ->  将会选择 title
+        viW ->  将会选择 title_(一个空格???,这就是扩展???)
+    }}}
+-------------------------------------------------------------------------------------------------------------------
+*   UndoFile
+    *   设置了UndoFile之后，会在目录下为每个文件创建一个undo history文件，它记录了所有更改，即使保存关闭再打开,'u'也是有效的
+    *   在windows下如果将UndoDir设置为C:\Window\Temp，保存文件时会出现E828错误，权限不够，所以最好设置为用户目录下
+    *   每次保存文件时，也会将所有的undo history保存到指定文件中, 该文件不是文本文件
+    *   :undo   列出undo list
+    {{{
+    if MySys() == "windows"
+      set undofile    " automatically save undo history to an undo file when write a buffer to a file
+    else
+      set undodir=~/.vim_runtime/undodir
+    endif
+
+    set undofile
+    }}}
+------------------------------------------------------------------------------------------------------------
+*   Repeat
+    *   Single repeats   (.)
+    *   Mutiple repeats  (pattern)
+        *   Command
+        {{{
+        :[range]g[lobal]/{pattern}/[cmd]
+                    Execute the Ex command [cmd] (default ":p") on the
+                    lines within [range] where {pattern} matches.
+
+        :[range]g[lobal]!/{pattern}/[cmd]
+                    Execute the Ex command [cmd] (default ":p") on the
+                    lines within [range] where {pattern} does NOT match.
+
+        :[range]v[global]/{pattern}/[cmd]
+                    Same as :g!.re
+        }}}
+        *   Examples
+        {{{
+            1.  g/pattern/d                 删除包含指定字符的行
+            2.  v/pattern/d                 删除不包含指定字符的行
+            3.  g!/pattern/d                同上
+        }}}
+        *   help in vim
+        {{{
+            *   :help :g
+            *   :help :v
+        }}}
+    *   Complex repeats  (Record)
+        *   Command
+        {{{
+            1.  q{0-9a-zA-Z"}               "start to record
+            2.  commands to edit file       "
+            3.  q                           "stop to record
+            4.  count@{0-9a-zA-Z"}          "repeat count times
+        }}}
+        *   要注意Commands在录制时结束点必须是下次重复操作的起始点!!!
+        *   如果是line repeat -->   结束点必须和起始点有相同的列坐标!!!
+        *   如果是column repeat --> 结束点必须和起始点有相同的行坐标!!!
+        *   Examples
+        {{{
+        在只有数字1的一行上， 像这样键入命令:
+            qaYp<C-a>q
+                    →  qa开始记录。
+                    →  Yp记录这一行。
+                    →  <C-a>增加数字大小。
+            q       →  停止记录。
+            @a      →  在1下面写2
+            @@      →  在2下面写3
+            100@@   →  产生一个到 103 的自增列。
+        }}}
+        *   [[http://edyfox.codecarver.org/html/vim_edit_tips.html|More]]
+------------------------------------------------------------------------------------------------------------
+*   Substitute
+    *   command
+    {{{
+    :[range]s[ubstitute]/{pattern}/{string}/[flags] [count]
+			For each line in [range] replace a match of {pattern} with {string}.
+			{string} can be a literal string, or something special.
+			When [range] and [count] are omitted, replace in the current line only.
+			When [count] is given, replace in [count] lines, starting with the last line in [range].  When [range] is omitted start in the current line.
+			[flags] ->  c       Confirm each substitution
+                        g       Replace all occurrences in the line
+                        i/I     Ignore or Don't ignore cace for the pattern
+                        n       Report the number of matches, don't actually substitute
+    }}}
+    *   Examples    [[http://www.cnblogs.com/sunleecn/articles/2198633.html|More]]
+    {{{
+    :s/old/new/g            可以替换 old 为 new。
+    :#,#s/old/new/g         要替换两行之间出现的每个匹配串，请输入  (#,#代表的是两行的行号)。
+    :%s/old/new/g           则是替换整个文件中的每个匹配串。
+    :%s/old/new/gc          全文替换时询问用户确认每个替换需添加 c 选项
+
+    :.,$s/str1/str2/g       用字符串 str2 替换正文当前行到末尾所有出现的字符串 str1
+    :1,$s/^str1/str2/g      用字符串 str2 替换正文中所有出现的,每行以str1开头的字符串
+    :1,$s/str1/str2/g       用字符串 str2 替换正文中所有出现的字符串 str1
+    :g/str1/s//str2/g       功能同上
+    :%s/str1/str2/g         功能同上
+    :g/foobar/s/bar/baz/g   首先搜寻foobar,然后把它变成foobaz. 它没有改变 jailbars, 而其他的一些命令可能会改变jailbars.
+    :%s/str1/str2/gc        替换全文所有符合的单词并让用户确认
+    :%s/str1/str2/gi        用字符串 str2 替换正文中所有出现的字符串 str1,在查找时不区分大小写，在查找时可以完全做到忽略大小写
+    :10,20s/^/ /            将第10行至第20行资料的最前面插入5个空白
+    :%s/$/str/g             在整个文件每一行的行尾添加“str”
+    :3,7s/str1/str2/g       仅替换文件中的第3行到第7行中的“str1”成“str2”
+    :%s/:.*//g              删除/etc/passwd中用户名后面的从冒号开始直到行尾的所有部分(前提是已经打开了/etc/passwd文件）
+    }}}
+
+------------------------------------------------------------------------------------------------------------
+*   Copying and moving text
+    *   Command
+    {{{
+    *   :reg[isters] {arg}  Display the contents of the numbered and named registers that are mentioned in {arg}
+    *   ["x]y{motion}       Yank {motion} text [into register x]
+    *   ["x]d{motion}       Delete {motion} text [into register x]
+    *   ["x]p			    Put the text [from register x] after the cursor times
+    }}}
+    *   vim与系统剪贴板，windows下为"*, Linux???
+    {{{
+    "*yy        复制当前行到系统剪贴板
+    "*y2j       复制当前行及以下两行到剪贴板
+    "*dd        剪切当前行到系统剪贴板
+    "*p         复制系统剪贴板内容在当前cursor之后
+    }}}
+    *   Copy between different files
+    {{{
+    *   use ""  the two files must be all active, so split in two window, yy, CTRL-J, p
+    *   use named register  no need to be both active, use "ay, "ap 
+    }}}
+
+------------------------------------------------------------------------------------------------------------
+*   Useful
+    {{{
+    *   :nohl               Remove highlight
+
+
+    *   J                   Join lines, remove indents and insert up to two spaces
+    *   gJ                  Join lines, Don't insert and remove spaces
+
+    *   ~                   Switch character case
+    *   {Visual}U           Make Highlight text Upercase
+    *   {Visual}u           Make Highlight text Lowercase
+
+    *   [count]CTRL-A       Add [count] to the number or alphabetic character at or after the cursor
+    *   [count]CTRL-X       Subtract [count] to the number or alphabetic character at or after the cursor
+
+    *   gf                  Open file name under cursor
+    *   r infile            Insert the content of infile in the current cursor
+    *   23r infile          Insert the content of infile under line 23
+    *   1, 10 w outfile     Saves lines 1 to 10 in outfile
+    *   1, 10 w >> outfile  Appends lines 1 to 10 to outfile
+     
+    *   Ctrl+n Ctrl+p (insert mode)     Complete word
+    *   Ctrl+x Ctrl+l (insert mode)     Complete line
+    
+    *   %!xxd               hexadecimal digit   % means all the lines
+    *   %!od                octal digit
+    *   %!xxd -r            turn to text
+    }}}
+
+------------------------------------------------------------------------------------------------------------
+*   Search and replace
+    {{{
+    *   /fred\|joe              Search fred or joe
+    *   /<\d\d\d\d\>            Search exactly 4 digits
+    *   /^\n\{3}                Find 3 empty lines
+    *   :bufdo /searchstr/      Search in all open files
+    *   :%s/ *$//g              Delete all white spaces
+    *   :%s/^M//g               Delete DOS carriage returns(^M)
+    *   :%s#<[^>]\+>##g         Delete HTML tags but keeps text
+    *   :%s/^\(.*\)\n\1$/\1/    Delete lines which appears twice
+    *   :%s/SOFTWARE\(.*\)/\"SOFTWARE\1\"/  Add " in line start and end
+    *   :%s/\\/\\\\/            change \ to \\ in each line
+    *   :%s/\\\\\\\\/\\\\/      change \\\\ to \\ in each line
+    }}}
+------------------------------------------------------------------------------------------------------------
+*   Mark
+    {{{
+    *   m[a-z]              set mark [a-z] at current cursor location
+    *   '[a-z]              jump to line of mark[a-z]
+    *   `[a-z]              jump to position of mark[a-z]
+    *   d'[a-z]             delete from current line to line of mark a
+    *   d`[a-z]             delete from current cursor position to position of mark a
+    *   :marks              list all the current marks
+    *   :delmarks [a-z]*    delete certain markers
+    *   :delmarks!          delete all markers
+    }}}
+------------------------------------------------------------------------------------------------------------
+*   Tab Buffer Window
+    {{{
+    Tab
+    *   gt, gT              switch between tabs 
+    *   :tabn, tabp, tabN   same to gt, gT
+    *   :tabc               close current tab page
+    *   :tabo               close all other tab pages
+    *   :tabr               goto the first tab page
+    *   :tabl               goto the last tab page
+    *   :tabs               list the tab pages and the windows they contain
+    
+    Buffer                  :help windows
+    *   :ls, buffers        show all buffers
+    *   :bd[N]              unload buffer[N] and delete it from buffer list
+    *   :[N]b               Edit N buffer from buffer list
+    *   :[N]sb              splite window and edit buffer N
+
+    Window
+    *   :all                open one window for each argument, all other are closed
+    *   :ball               open one window for each buffer in the buffer list
+    *   :hid                
+    *   :on[ly]             make the current window the only one on the screen
+    *   CTRL-W hjklw        move cursor accross window
+    *   CRTL-W tbp          t: top-left  b: bottom-right  p: previous
+    }}}
+------------------------------------------------------------------------------------------------------------
+*   Jump in help
+    *   CTRL-]              jump to link
+    *   CTRL-T              return to previous page you visited
+------------------------------------------------------------------------------------------------------------
+*   Insert Shell cmd content
+    *   :r!date     插入日期
+    *   :r!ls       插入当前目录的文件列表
+------------------------------------------------------------------------------------------------------------
+*   Funny
+    *   :h!
+    *   :h 42
+-------------------------------------------------------------------------------------------------------------------
+*   Wiki auto convert to HTML
+    *   Add autocmd to plugin/vimwiki.vim
+    <br>_autocmd! bufwritepost *.wiki Vimwiki2HTML_

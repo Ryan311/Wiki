@@ -1,0 +1,49 @@
+%toc
+== filter driver ==
+=== patch code download ===
+*   在收到bthusb的event read request时来做download patch动作
+*   客户在WHCK时遇到BSOD(0x9F), stack text如下： 
+{{{
+    nt!KiSwapContext+0x7a
+    nt!KiCommitThreadWait+0x1d2
+    nt!KeWaitForSingleObject+0x19f
+    Wdf01000!FxIoTarget::SubmitSync+0x355
+    Wdf01000!imp_WdfRequestSend+0x2d1
+    RtkBtfilter!WdfRequestSend+0x15 (Inline Function @ fffff880`08a7aa34) [c:\program files\windows kits\8.0\include\wdf\kmdf\1.9\wdfrequest.h @ 660]
+    RtkBtfilter!FilterSendCommand+0x24c [e:\btsw\trunk\hostsw\win7-inbox-driver\rtkfilter\generic\filter_helper.c @ 2271]
+    RtkBtfilter!FilterSendVendorCommandToBrEdr+0xa6 [e:\btsw\trunk\hostsw\win7-inbox-driver\rtkfilter\generic\filter_helper.c @ 2316]
+    RtkBtfilter!FilterIsPatchCodeExist+0x7a [e:\btsw\trunk\hostsw\win7-inbox-driver\rtkfilter\generic\fwpatch.c @ 388]
+    RtkBtfilter!FilterDownLoadPatchCode+0x5b [e:\btsw\trunk\hostsw\win7-inbox-driver\rtkfilter\generic\fwpatch.c @ 920]
+    RtkBtfilter!FilterEvtIoInternalDeviceControl+0x510 [e:\btsw\trunk\hostsw\win7-inbox-driver\rtkfilter\generic\filter.c @ 944]
+    Wdf01000!FxIoQueue::DispatchRequestToDriver+0x542
+    Wdf01000!FxIoQueue::DispatchEvents+0x66f
+    Wdf01000!FxIoQueue::QueueRequest+0x2ab
+    Wdf01000!FxPkgIo::Dispatch+0x4da
+    Wdf01000!FxDevice::Dispatch+0x19a
+    Wdf01000!FxDevice::DispatchWithLock+0xa6
+    BTHUSB!UsbWrapSubmitInterruptRead+0x1ec
+    BTHUSB!UsbWrapStartAllPingPongs+0xe0
+    BTHUSB!USBStartInterruptTransfers+0x64
+    BTHUSB!BthUsb_SetPipeState+0x1b9
+    BTHUSB!BthUsb_StartUpPipes+0xe8
+    BTHUSB!BthUsb_PnpStartDevice+0xfc
+    bthport!BthProcessStart+0x75
+    bthport!BthHandleStartDevice+0x3be
+    bthport!BthHandlePnp+0x17c
+    bthport!BthDispatchPnp+0x73
+    nt!PnpAsynchronousCall+0xce
+    nt!PnpStartDevice+0x11d
+    nt!PnpStartDeviceNode+0x156
+    nt!PipProcessStartPhase1+0x74
+    nt!PipProcessDevNodeTree+0x296
+    nt!PiProcessReenumeration+0x98
+    nt!PnpDeviceActionWorker+0x327
+    nt!ExpWorkerThread+0x111
+    nt!PspSystemThreadStartup+0x5a
+    nt!KxStartSystemThread+0x16
+}}}
+*   从中可以看到
+    *   event read request是bthusb发下来的
+    *   该request发下来时，bthport在做StartDevice动作，PNP IRP没有Complete
+    *   所以整个Download过程不能超过10s, 否则就会出现0x9F BSOD
+    *   WdfRequestSend本身是异步的函数，但这里是当成同步来用的（加了参数），所以不太合适

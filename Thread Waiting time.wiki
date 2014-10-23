@@ -1,0 +1,221 @@
+%toc
+== Thread Waiting Time ==
+Almost all threads in any system are waiting for resources or waiting in a ready-to-run queues to be scheduled.<br>
+At any moment of time the number of running threads is equal to the number of processors. The rest, hundreds and <br>
+thousands of threads, are waiting. Looking at their waiting times in kernel and complete memory dumps provides some 
+<br>interesting observations that worth their own pattern name: Waiting Thread Time.
+<br>When a thread starts waiting that time is recorded in WaitTime field of _KTHREAD structure:
+{{{
+1: kd> dt _KTHREAD 8728a020
+   +0x000 Header           : _DISPATCHER_HEADER
+   +0x010 MutantListHead   : _LIST_ENTRY [ 0x8728a030 - 0x8728a030 ]
+   +0x018 InitialStack     : 0xa3a1f000
+   +0x01c StackLimit       : 0xa3a1a000
+   +0x020 KernelStack      : 0xa3a1ec08
+   +0x024 ThreadLock       : 0
+   +0x028 ApcState         : _KAPC_STATE
+   +0x028 ApcStateFill     : [23]  "H???"
+   +0x03f ApcQueueable     : 0x1 ''
+   +0x040 NextProcessor    : 0x3 ''
+   +0x041 DeferredProcessor : 0x3 ''
+   +0x042 AdjustReason     : 0 ''
+   +0x043 AdjustIncrement  : 1 ''
+   +0x044 ApcQueueLock     : 0
+   +0x048 ContextSwitches  : 0x6b7
+   +0x04c State            : 0x5 ''
+   +0x04d NpxState         : 0xa ''
+   +0x04e WaitIrql         : 0 ''
+   +0x04f WaitMode         : 1 ''
+   +0x050 WaitStatus       : 0
+   +0x054 WaitBlockList    : 0x8728a0c8 _KWAIT_BLOCK
+   +0x054 GateObject       : 0x8728a0c8 _KGATE
+   +0x058 Alertable        : 0 ''
+   +0x059 WaitNext         : 0 ''
+   +0x05a WaitReason       : 0x11 ''
+   +0x05b Priority         : 12 ''
+   +0x05c EnableStackSwap  : 0x1 ''
+   +0x05d SwapBusy         : 0 ''
+   +0x05e Alerted          : [2]  ""
+   +0x060 WaitListEntry    : _LIST_ENTRY [ 0x88091e10 - 0x88029ce0 ]
+   +0x060 SwapListEntry    : _SINGLE_LIST_ENTRY
+   +0x068 Queue            : (null)
+   +0¡Á06c WaitTime         : 0¡Á82de9b
+   +0¡Á070 KernelApcDisable : 0
+¡­
+¡­
+¡­
+}}}
+
+This value is also displayed in decimal format as Wait Start TickCount when you list threads or use !thread command:
+{{{
+0: kd> ? 0x82de9b
+Evaluate expression: 8576667 = 0082de9b
+1: kd> !thread 8728a020
+THREAD 8728a020  Cid 4c9c.59a4  Teb: 7ffdf000 Win32Thread: bc012008 WAIT: (Unknown) UserMode Non-Alertable
+    8728a20c  Semaphore Limit 0x1
+Waiting for reply to LPC MessageId 017db413:
+Current LPC port e5fcff68
+Impersonation token:  e2b07028 (Level Impersonation)
+DeviceMap                 e1da6518
+Owning Process            89d20740       Image:         winlogon.exe
+Wait Start TickCount      8576667        Ticks: 7256 (0:00:01:53.375)
+Context Switch Count      1719                 LargeStack
+UserTime                  00:00:00.0359
+KernelTime                00:00:00.0375
+}}}
+
+Tick is a system unit of time and KeTimeIncrement double word value contains its equivalent as the number of 100-nanosecond units:
+{{{
+0: kd> dd KeTimeIncrement l1
+808a6304  0002625a
+0: kd> ? 0002625a
+Evaluate expression: 156250 = 0002625a
+0: kd> ?? 156250.0/10000000.0
+double 0.015625
+Therefore on that system one tick is 0.015625 of a second.
+The current tick count is available via KeTickCount variable:
+0: kd> dd KeTickCount l1
+8089c180  0082faf3
+If we subtract the recorded start wait time from the current tick count we get the number of ticks passed since the thread began waiting:
+0: kd> ? 0082faf3-82de9b
+Evaluate expression: 7256 = 00001c58
+}}}
+
+Using our previously calculated constant of the number of seconds per tick (0.015625) we get the number of seconds passed:
+{{{
+0: kd> ?? 7256.0 * 0.015625
+double 113.37499999999999
+113.375 seconds is 1 minute 53 seconds and 375 milliseconds:
+0: kd> ?? 113.375-60.0
+double 53.374999999999986
+}}}
+
+We can see that this value corresponds to Ticks value that WinDbg shows for the thread:
+<br>*Wait Start TickCount 8576667 Ticks: 7256 (0:00:01:53.375)*
+<br>Why do we need to concern ourselves with these ticks? 
+<br>    If we know that some activity was frozen for 15 minutes we can filter out threads from our search space 
+<br>    because threads with significantly less number of ticks were running at some time and were not waiting for 15 minutes.
+
+Threads with low number of ticks were running recently:
+{{{
+THREAD 86ced020  Cid 0004.3908  Teb: 00000000 Win32Thread: 00000000 WAIT: (Unknown) KernelMode Non-Alertable
+    b99cb7d0  QueueObject
+    86ced098  NotificationTimer
+Not impersonating
+DeviceMap                 e10038e0
+Owning Process            8ad842a8       Image:         System
+Wait Start TickCount      8583871        Ticks: 52(0:00:00:00.812)
+Context Switch Count      208
+UserTime                  00:00:00.0000
+KernelTime                00:00:00.0000
+Start Address rdbss!RxWorkerThreadDispatcher (0xb99cdc2e)
+Stack Init ad21d000 Current ad21ccd8 Base ad21d000 Limit ad21a000 Call 0
+Priority 8 BasePriority 8 PriorityDecrement
+ChildEBP RetAddr
+ad21ccf0 808330c6 nt!KiSwapContext+0¡Á26
+ad21cd1c 8082af7f nt!KiSwapThread+0¡Á284
+ad21cd64 b99c00e9 nt!KeRemoveQueue+0¡Á417
+ad21cd9c b99cdc48 rdbss!RxpWorkerThreadDispatcher+0¡Á4b
+ad21cdac 80948e74 rdbss!RxWorkerThreadDispatcher+0¡Á1a
+ad21cddc 8088d632 nt!PspSystemThreadStartup+0¡Á2e
+00000000 00000000 nt!KiThreadStartup+0¡Á16
+}}}
+
+Another application would be to find all threads from different processes whose wait time
+<br>roughly corresponds to15 minutes and therefore they might be related to the same frozen
+<br>activity. For example, these RPC threads below from different processes are most likely
+<br>related because one is the RPC client thread, the other is the RPC server thread waiting
+<br>for some object and their common Ticks value is the same: 15131.
+{{{
+THREAD 89cc9750  Cid 0f1c.0f60  Teb: 7ffd6000 Win32Thread: 00000000 WAIT: (Unknown) UserMode Non-Alertable
+    89cc993c  Semaphore Limit 0x1
+Waiting for reply to LPC MessageId 0000a7e7:
+Current LPC port e18fcae8
+Not impersonating
+DeviceMap                 e10018a8
+Owning Process            88d3b938       Image:         svchost.exe
+Wait Start TickCount      29614          Ticks: 15131(0:00:03:56.421)
+Context Switch Count      45
+UserTime                  00:00:00.0000
+KernelTime                00:00:00.0000
+Win32 Start Address 0¡Á0000a7e6
+LPC Server thread working on message Id a7e6
+Start Address kernel32!BaseThreadStartThunk (0¡Á7c82b5bb)
+Stack Init f29a6000 Current f29a5c08 Base f29a6000 Limit f29a3000 Call 0
+Priority 11 BasePriority 10 PriorityDecrement 0
+Kernel stack not resident.
+ChildEBP RetAddr
+f29a5c20 80832f7a nt!KiSwapContext+0¡Á26
+f29a5c4c 8082927a nt!KiSwapThread+0¡Á284
+f29a5c94 8091df86 nt!KeWaitForSingleObject+0¡Á346
+f29a5d50 80888c6c nt!NtRequestWaitReplyPort+0¡Á776
+f29a5d50 7c94ed54 nt!KiFastCallEntry+0xfc
+0090f6b8 7c941c94 ntdll!KiFastSystemCallRet
+0090f6bc 77c42700 ntdll!NtRequestWaitReplyPort+0xc
+0090f708 77c413ba RPCRT4!LRPC_CCALL::SendReceive+0¡Á230
+0090f714 77c42c7f RPCRT4!I_RpcSendReceive+0¡Á24
+0090f728 77cb5d63 RPCRT4!NdrSendReceive+0¡Á2b
+0090f9cc 67b610ca RPCRT4!NdrClientCall+0¡Á334
+0090f9dc 67b61c07 component!NotifyOfEvent+0¡Á14
+¡­
+¡­
+¡­
+0090ffec 00000000 kernel32!BaseThreadStart+0¡Á34
+THREAD 89b49590  Cid 098c.01dc  Teb: 7ff92000 Win32Thread: 00000000 WAIT: (Unknown) UserMode Non-Alertable
+    88c4e020  Thread
+    89b49608  NotificationTimer
+Not impersonating
+DeviceMap                 e10018a8
+Owning Process            89d399c0       Image:         MyService.exe
+Wait Start TickCount      29614          Ticks: 15131(0:00:03:56.421)
+Context Switch Count      310
+UserTime                  00:00:00.0015
+KernelTime                00:00:00.0000
+Win32 Start Address 0¡Á0000a7e7
+LPC Server thread working on message Id a7e7
+Start Address kernel32!BaseThreadStartThunk (0¡Á7c82b5bb)
+Stack Init f2862000 Current f2861c60 Base f2862000 Limit f285f000 Call 0
+Priority 11 BasePriority 10 PriorityDecrement 0
+Kernel stack not resident.
+ChildEBP RetAddr
+f2861c78 80832f7a nt!KiSwapContext+0¡Á26
+f2861ca4 8082927a nt!KiSwapThread+0¡Á284
+f2861cec 80937e4c nt!KeWaitForSingleObject+0¡Á346
+f2861d50 80888c6c nt!NtWaitForSingleObject+0¡Á9a
+f2861d50 7c94ed54 nt!KiFastCallEntry+0xfc
+0a6cf590 7c942124 ntdll!KiFastSystemCallRet
+0a6cf594 7c82baa8 ntdll!NtWaitForSingleObject+0xc
+0a6cf604 7c82ba12 kernel32!WaitForSingleObjectEx+0xac
+0a6cf618 3f691c11 kernel32!WaitForSingleObject+0¡Á12
+0a6cf658 09734436 component2!WaitForResponse+0¡Á75
+¡­
+¡­
+¡­
+0a6cf8b4 77cb23f7 RPCRT4!Invoke+0¡Á30
+0a6cfcb4 77cb26ed RPCRT4!NdrStubCall2+0¡Á299
+0a6cfcd0 77c409be RPCRT4!NdrServerCall2+0¡Á19
+0a6cfd04 77c4093f RPCRT4!DispatchToStubInCNoAvrf+0¡Á38
+0a6cfd58 77c40865 RPCRT4!RPC_INTERFACE::DispatchToStubWorker+0¡Á117
+0a6cfd7c 77c357eb RPCRT4!RPC_INTERFACE::DispatchToStub+0xa3
+0a6cfdbc 77c41e26 RPCRT4!RPC_INTERFACE::DispatchToStubWithObject+0xc0
+0a6cfdfc 77c41bb3 RPCRT4!LRPC_SCALL::DealWithRequestMessage+0¡Á42c
+0a6cfe20 77c45458 RPCRT4!LRPC_ADDRESS::DealWithLRPCRequest+0¡Á127
+0a6cff84 77c2778f RPCRT4!LRPC_ADDRESS::ReceiveLotsaCalls+0¡Á430
+0a6cff8c 77c2f7dd RPCRT4!RecvLotsaCallsWrapper+0xd
+0a6cffac 77c2de88 RPCRT4!BaseCachedThreadRoutine+0¡Á9d
+0a6cffb8 7c826063 RPCRT4!ThreadStartRoutine+0¡Á1b
+0a6cffec 00000000 kernel32!BaseThreadStart+0¡Á34
+- Dmitry Vostokov @ DumpAnalysis.org ¨C
+}}}
+
+
+
+=== Time Limit for DPC ===
+    The maximum and minimum DPC timeout limit is 10 seconds and 20 ms
+    respectively. This is the time allowed for a single DPC.
+
+    The maximum and minimum DPC watchdog period limit is 30 seconds and 2
+    seconds. This is the total time allowed for a sequence of DPCs.
+    Microsoft recommends that DPCs should not run longer than 100 microseconds and 
+    ISRs should not run longer than 25 microseconds.
+

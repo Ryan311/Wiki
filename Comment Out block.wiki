@@ -1,0 +1,25 @@
+== Commnet Out for Block ==
+*Comment block for program langurage*::
+
+=== Python ===
+* Add this two line in Vimrc
+    <br>vnoremap # :norm 0i#<cr>
+    <br>vnoremap -# :norm 0x<cr>
+* Usage
+    *   Visual Mode, use _Shift-v_ to select a block
+    *   press _#_, then the block is commentted out by '#'
+* Detail
+    *   Shift-v select a block
+    *   :norm   deal with each line
+    *   0i#     <br>    0   goto the start of the line
+                <br>    i   change into insert mode
+                <br>    #   insert a '#'
+
+=== C ===
+vnoremap / :norm i0//<cr>
+vonremap -/ :norm 02x<cr>
+
+=== vim script ===
+vnoremap " :norm i0"<cr>
+vnoremap -" :norm 0x<cr>
+

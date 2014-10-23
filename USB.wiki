@@ -1,0 +1,118 @@
+%toc
+== USB ==
+=== Tools ===
+*   CATC
+    *   SOF(Start of frame), 每一个Frame指的是段固定的时间间隔，在该间隔内，Control先发，然后Sync，最后才是Bulk
+    *   SOF是每个Frame的开始也是上一个Frame的结束，可以Hide SOF
+    *   XFR，可以将显示的Transfer级的，可将USB的命令解析出来
+    *   在打开LeCroy USB Protocol Suite后，要设置Setup->Recording Options->选择Manual Trigger， BufferSize设为最大
+    *   每个packet
+=== Doc ===
+*   [[http://blogs.msdn.com/b/usbcoreblog/archive/2011/05/11/demystifying-usb-selective-suspend.aspx|Demystifying USB Selective Suspend]]
+=== USB Spec ===
+*   USB Speed       ==>   Hubs isolate high-speed signaling from full-/low-speed
+    *   high-speed signaling at 480 Mb/s    (usb2.0)
+    *   full-speed signaling at 12.0 Mb/s   (usb1.1)
+    *   low-speed signaling at 1.5 Mb/s     (usb1.1)
+signaling environments 
+*   USB Frames and Microframes
+    *   USB establishes a 1 millisecond time base called a frame on a full-/low-speed bus and a 125??s time base called a microframe on a high-speed bus. 
+    *   A (micro)frame can contain several transactions.  
+*   USB Transfer types
+    *   Control Transfers:  Bursty, non-periodic, host software-initiated request/response communication, typically used for command/status operations.
+    *   Isochronous Transfers:  Periodic, continuous communication between host and device, typically used for time-relevant information. 
+    *   Interrupt Transfers:  Low-frequency, bounded-latency communication.
+    *   Bulk Transfers:  Non-periodic, large-packet bursty communication, typically used for data that can use any available bandwidth and can also be delayed until bandwidth is available.
+*   USB Data Format
+    *   Sync Field: All packets begin with a synchronization (SYNC) field, A SYNC from an initial transmitter is defined to be eight bits in length for full/low-speed and 32 bits
+for high-speed
+    *   Packet Field Formats
+        *   Field formats for the token, data, and handshake packets  
+        *   PID(Packet Identifier Field): follows SYNC field, consists of four-bit packet type field followed by a four-bit check field
+        {{{
+        PID Type    PID Name    PID     Description
+        Tocken      OUT         0001
+                    IN          1001
+                    SOF         0101
+                    SETUP       1101
+        Data        DATA0       0011
+                    DATA1       1011
+                    DATA2       0111
+                    MDATA       1111
+        Handshake   ACK         0010
+                    NAK         1010
+                    STALL       1110
+                    NYET        0110
+        Special     PRE         1100
+                    ERR         1100
+                    SPLIT       1000
+                    PING        0100
+                    Reserved    0000
+        }}}
+        *   Address Fields, Function endpoints are addressed using two fields:
+            *   Address Field
+            *   Endpoint Field
+        *   Frame Number Field  ???????l?????????
+            *   only sent in SOF tokens at the start of each (micro)frame
+        *   Data Field
+            *   range from zero to 1024 bytes
+        *   CRC, protect all non-PID fields in token and data packets for all single- and double-bit errors
+            *   Token CRCs
+            *   Data CRCs
+    *   Packet Formats
+        *   SOP(start of packet)
+            {{{
+            //  FS/LS
+            each packet begins with a synchronization sequence of 8-bits
+
+            // HS
+            each packet begins with a synchronization sequence of 32-bits
+            }}}
+        *   EOP(end of packet)
+            {{{
+            //  FS/LS
+            eop is signaled by SE0
+
+            // HS   ？？？
+            eop sequence is 8bits long
+            }}}
+        *   Token Packets
+            *   A token consists of a PID, specifying either IN, OUT, or SETUP packet type and ADDR and ENDP fields. 
+            {{{
+            Field   PID     ADDR    ENDP    CRC5
+            Bits    8       7       4       5
+            }}}
+        *   Start-of-Frame Packets
+            {{{
+            Field   PID     FrameNumber     CRC5
+            Bits    8       11              5
+            }}}
+        *   Data Packets
+            {{{
+            Field   PID     DATA    CRC5
+            Bits    8       0-8192  16
+            }}}
+        *   Handshake Packets
+            {{{
+            Field   PID
+            Bits    8
+            }}}
+            *  Handshake packets are used to report the status of a data transaction and can return values indicating successful reception of data, command acceptance or rejection, flow control, and halt conditions 
+            *  Only transaction types that support flow control can return handshakes. There are four types of handshake packets and one special handshake packet:
+                *  ACK:  ACK can be returned by the host for IN transactions and by a function for OUT, SETUP, or PING transactions.
+                *  NAK: The host can never issue NAK.
+                *  STALL:  The host is not permitted to return a STALL under any condition.
+                *  NYET: high-speed
+                *  ERR: high-speed
+    *   Transactions    Spec 8.5
+        *   Bulk Transactions:
+        *   Control Transfers:
+            *   Setup transaction
+            *   Data transaction
+            *   Status transaction
+        *   Interrupt Transactions:
+        *   Isochronous Transactioins: Isochronous transactions have a token and data phase, but no handshake phase.
+
+== Unknown ==
+*   Split Transaction Special Token Packets
+*   Transactions

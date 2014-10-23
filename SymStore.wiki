@@ -1,0 +1,37 @@
+*   *Symbol Tool*
+    <br>_symstore.exe_  in WinDDK\7600...\Debuggers
+    <br>__symsrv.dll_
+    <br>_symsrv.yes_
+
+
+*   *Add Symbol to Symbol Store*
+{{{class = "brush: python"
+import os
+
+symstoreAdd = 'symstore add /r '
+symstoreDel = 'symstore del '
+
+symStorePath = r'"G:\LocalSymbols"'
+symStoreSrcDir = r'"E:\BTSW\trunk\HostSW\win7-inbox-driver\bin\RtkFilter\driver_win7_x86\*.pdb"'
+
+cmdlist = symstoreAdd + "/f " + symStoreSrcDir + " /s " + symStorePath + " /t " + '"HRSymbleStore"' + " /v " + '"0.0.636.0."' + " /c " + '"filter driver version"'
+print cmdlist
+os.system(cmdlist)
+}}}
+
+*   *Del Symbol from Symbol Store*
+{{{class = "brush: python"
+import os
+
+symstoreAdd = 'symstore add /r '
+symstoreDel = 'symstore del '
+
+symStorePath = r'"F:\WinSymbols\LocalSymbol"'
+
+cmdlist = symstoreDel + " /i 0000000001 " + " /s " + symStorePath
+print cmdlist
+os.system(cmdlist)
+}}}
+
+*   *Add Symbol Path to Enviroment*
+_NT_SYMBOL_PATH = srv*c:\mss*http://msdl.microsoft.com/download/symbols; G:\LocalSymbols

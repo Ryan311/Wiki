@@ -1,0 +1,20 @@
+= Python Library =
+== [[Buildin]] ==
+== [[re]] ==
+== string ==
+== urllib urllib2 ==
+== [[pickle cpickle]] ==
+== [[http://docs.python.org/2/library/subprocess.html|subprocess]] ==
+== [[http://docs.python.org/2/library/json.html|json]] ==
+== [[time]] ==
+== [[pprint]] ==
+== [[ZipFile]] ==
+== [[mt]] ==
+== [[random]] ==
+== [[PIL]] ==
+== [[http://www.scipy.org/|Scipy]] ==
+    *   SciPy (pronounced “Sigh Pie”) is a Python-based ecosystem of opensource software for mathematics, science, and engineering. 
+    *   NumPy是一个定义了数值数组和矩阵类型和它们的基本运算的语言扩展。
+    *   SciPy是另一种使用NumPy来做高等数学、信号处理、优化、统计和许多其它科学任务的语言扩展。
+    *   Matplotlib是一个帮助绘图的语言扩展。
+    *   [[http://reverland.org/python/2012/08/24/scipy/#scipynumpymatplotlib|Example]]

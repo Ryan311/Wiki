@@ -1,0 +1,19 @@
+%toc
+
+==  Windows Debugging and Troubleshooting ==
+=== Ntdebugging ===
+*   [[http://blogs.msdn.com/b/ntdebugging/default.aspx?PageIndex=1|msdn blog -> debugging]]
+
+=== [[http://blogs.msdn.com/b/iliast/archive/2007/10/06/driver-driver-and-driver-application-communication.aspx|Driver-Driver and Driver-Application Communication]] ===
+
+=== My experience ===
+*   [[Debug Settings and Useful commands]]
+*   [[/GS (Buffer Security Check)]]
+*   [[http://www.novell.com/support/kb/doc.php?id=7004093|How to get a Windows memory dump]]
+*   [[使用WinDbg抓取程序报错的Dump文件，例如抓取IE崩溃的Dump]]
+*   [[BSOD 0x9F]]
+*   [[IRP]]
+*   [[Dead Lock]]
+*   [[http://blogs.msdn.com/b/ntdebugging/archive/2011/10/26/debugging-a-clock-watchdog-timeout-bugcheck.aspx|Debugging a CLOCK_WATCHDOG_TIMEOUT Bugcheck]]
+*   [[Thread Waiting time]]
+*   [[Resource Leak]]

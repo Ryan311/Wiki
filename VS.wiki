@@ -1,0 +1,66 @@
+%toc
+== VS2012 ==
+*   VS2012 Config
+    *   Turn off Unicode in VC++ Project
+        *   Project Properties -> General -> Project Defaults -> *Character Set*
+    *   .sdf and ipch
+        *   Visual Studio用来保存预编译的头文件和Intellisense用的
+        *   不在当前工程中生成这些文件, VS用临时文件夹保存这些文件
+        {{{
+        Tools->Options  Text Editor -> C/C++ -> Advanced
+        Fallback Location:  Always use Fallback Location -> Set True
+                            Do Not Warn if Fallback Location Used  -> Set True
+        }}}
+*   [[https://github.com/jaredpar/VsVim|VsVim]] vim extension in VS2012
+    *   Tools -> Extensions and Updates -> Search VsVim and Install -> Restart VS2012
+    *   Config Key mappings
+    *   :set vimrc          -> Show the vimrc which VsVim read
+*   VS2012 静态编译c c++运行库
+    *   Win8上编译的程序在Win7上有可能不能运行，原因是它们使用的C运行库不一样，好的解决方法是在编译时将运行库编译进程序，随程序一起发布
+    *   在VS2012中修改设置：Project Property->Configuration Properties->C/C++->Code Generation->Runtime Library->修改选项为"Mutiple-threaded(/MT)"
+*   VS里面非常好用的功能，在build之前或之后可以完成一些动作，比如文件Copy，但是在Copy时注意命令的写法：(nonpnp sample in e:\work\sampledriver)
+{{{//不能想当然的写相对路径，要使用VS定义的宏来指明路径，在调用该cmd时会解析成完整路径
+Error   copy "..\..\wdf\x86\WdfCoInstaller01011.dll" ".\bin"
+Right   copy "$(SolutionDir)..\..\wdf\x86\WdfCoInstaller01011.dll" "$(SolutionDir)bin\"
+}}}
+
+=== VS2012 写DLL ===
+*   File->New->Project  ==> 
+    *   New Project:    Win32 -> Win32 Project -> Name & Location   ==> Next 
+    *   Win32 Application Wizard:   DLL -> Empty Project    创建空项目
+    *   手动创建.c和.h文件，并添加到项目中(刚开始要有dllmain.c)
+    *   在Resource Files中右键： Add -> Resource    添加rc文件，file version
+    *   PROJECT-> Property Pages-> c/c++-> Preprocessor-> Preprocessor Definitions ==>
+        *   Add "*****_EXPORTS"   
+{{{
+Note:   这里之所以创建空的项目，是因为我想用.c文件而不是.cpp文件
+        因为在cpp中使用wpp输出log总是编译不过, 原因还不太清楚！！！
+}}}
+*   在项目中使用WPP
+    *   增加trace.h文件到项目中，内容见模板，GUID要重新生成
+    *   增加RunTraceWpp.bat， CleanTmh.bat到项目目录下
+    *   在每个.c文件头部添加  #include "trace.h" \  #include "文件名.tmh"
+    *   PROJECT -> Property Pages -> Build Events ==>
+        *   Pre-Build Event:    Command Line -> "RunTraceWpp"
+        *   Post-Build Event:   Command Line -> "CleanTmh"
+    *   在dllmain.c中加入：
+        *   DLL_PROCESS_ATTACH:     WPP_INIT_TRACING(L"LEGap.dll")
+        *   DLL_PROCESS_DETACH:     WPP_CLEANUP():w
+*   如何在Dll中导出API
+    *   定义宏    LEGAP_API
+    *   将想要导出的函数之前加入宏LEGAP_API即可
+    *   在Preprocessor Definitions中加入LEGAP_EXPORTS
+    {{{
+    #ifdef LEGAP_EXPORTS    // 导出函数
+        #define LEGAP_API __declspec(dllexport)
+    #else                   // 导入函数
+        #define LEGAP_API __declspec(dllimport)
+    #endif
+    }}}
+*   dll是用C来写，如果Test函数用C++来写的话，会有编译错误，用C来写Test函数就OK
+    *   原因是C和C++编译出的函数名称不同，要用extern "C"来告诉编译器按照C的方式来使用函数，这是一种约定！
+    *   可参考http://www.cnblogs.com/skynet/archive/2010/07/10/1774964.html
+    *   可能用工具dumpbin.exe(VS自带,分析PE文件格式)来调试这种链接错误
+    *   dumpbin.exe -exports LEGap.dll      //查看dll的导出函数
+    *   dumpbin.exe -imports LEGapTest.exe  //查看exe中导入的函数
+
