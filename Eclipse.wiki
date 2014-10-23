@@ -8,6 +8,44 @@
 *   Show eclipse icon in the Unity launcher
     <br>*sudo cp ~/Persnail_WorkSpace/eclipse/icon.xpm /usr/share/pixmaps/eclispe.xpm*
 
+==  Eclipse + Cygwin for C/C++ ==
+http://www.cnblogs.com/zhxxcq/archive/2013/04/21/3033389.html
+
+==  Eclipse CDT 对 Doxygen 型注释的支持 ==
+1、工作空间默认
+ 
+Windows -> Preferrences -> C/C++ -> Editor -> Documentation tool comments
+ 
+默认为none，修改为Doxygen即可
+ 
+2、工程特别属性
+如果不想设置为整个工作空间的默认属性，可以在工作属性对话框的这里找到：
+ 
+Project -> Properties -> C/C++ General -> Enable project specific settings
+ 
+选择Doxygen即可
+
+==  Doxygen文档工具在Eclipse中的集成    Eclox ==
+http://blog.csdn.net/zhhymh/article/details/6256966
+http://www.cnblogs.com/lanxuezaipiao/p/3551609.html
+
+==  Good Examples  ==
+*   http://fnch.users.sourceforge.net/doxygen_c.html
+
+==  Folding ==
+*   Windows -> Preferences -> c/c++ -> Editor -> Folding 
+*   Select the items
+*   Windows -> Preferences -> General -> Keys:  fold
+*       Toggle Folding -> Binding -> Type a binding key such as "Ctrl + F"
+
+==  高亮显示选中变量  ==
+windows-> preferences-> c/c++ -> Editor-> Mark Occurences 
+最上边的大标题的复选框勾上，下面的就都可以高亮显示了，Local variables是变量的高亮显示
+
+==  修改变量， 方法等字体颜色  ==
+windows-> preferences-> c/c++ -> Editor-> Syntax Coloring
+
+
 ==  Shortcut ==
 *   Bind Keys:  Window -> Preferences -> General -> Keys
     *   Command：命令的名称
@@ -32,4 +70,19 @@
         CTrl+左键 or F3     跳到光标所在标识符的定义代码，用于查看变量、方法、类的定义
         Ctrl+Shift+G        在工作空间中查找引用了光标所在标识符的位置（查找所有引用）
         Ctrl+Shift+L        显示快捷键列表
+        
+        Debug 
+            作用域 功能 快捷键 
+            全局 单步返回 F7 
+            全局 单步跳过 F6 
+            全局 单步跳入 F5 
+            全局 单步跳入选择 Ctrl+F5 
+            全局 调试上次启动 F11 
+            全局 继续 F8 
+            全局 使用过滤器单步执行 Shift+F5 
+            全局 添加/去除断点 Ctrl+Shift+B 
+            全局 显示 Ctrl+D 
+            全局 运行上次启动 Ctrl+F11 
+            全局 运行至行 Ctrl+R 
+            全局 执行 Ctrl+U
     }}}
