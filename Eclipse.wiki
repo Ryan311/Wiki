@@ -45,6 +45,9 @@ windows-> preferences-> c/c++ -> Editor-> Mark Occurences
 ==  修改变量， 方法等字体颜色  ==
 windows-> preferences-> c/c++ -> Editor-> Syntax Coloring
 
+==  修改Editor中显示字体  ==
+windows-> preferences-> appearence -> Colors and Fonts -> c/c++ -> Editor:  Edit...
+
 
 ==  Shortcut ==
 *   Bind Keys:  Window -> Preferences -> General -> Keys
