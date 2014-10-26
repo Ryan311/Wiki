@@ -1,12 +1,26 @@
-==  Enthought Canopy    ==
-*   Enthought Canopy is a comprehensive Python analysis environment that provides
-*   easy installation of the core scientific analytic and scientific Python packages,
-*   creating a robust platform you can explore, develop, and visualize on. 
-*   https://www.enthought.com/
-
+=== [[http://www.pythonforbeginners.com/basics/ipython-a-short-introduction/|IPython]] ===
+*   Tab completion              " very useful
+*   Using Python debugger
+*   Profiles
+*   QT-based
+ 
 ==  Useful Command  ==
 *   %edit
     *   ?%edit  查看使用方法
     *   %edit -p | _    打开上次编辑的临时文件
     *   %edit _Number   打开之前编辑过的文件
 *   %timeit     计算运行时间 
+
+==== [[http://yangzetian.github.io/2013/02/08/ipython-notebook-interactive-computing-new-era/|IPython-notebook]] ====
+{{{
+IPython Notebook 是一种新兴的交互式数据分析与记录工具，它定义了一种全新的计算文件格式，其中包含了代码，
+代码说明以及每一步的计算输出(数值或图片等)，也就是说这一个文件完整记录了计算过程中的所有相关信息。此外，
+该文件还可以嵌入网络视频，图片， 公式等众多副文本格式，实为交互计算，记录思维，传播思想的好帮手。
+}}}
+*   > sudo ipython notebook
+*   > sudo ipython notebook --pylab
+*   > sudo ipython notebook --pylab inline
+*   As ipython notebook kernel must run as root while chrome can't run as root
+*   modify /usr/bin/google-chrome, add *--user-data-dir* in the end of last line
+
+

@@ -1,0 +1,6 @@
+==  Enthought Canopy    ==
+*   Enthought Canopy is a comprehensive Python analysis environment that provides
+*   easy installation of the core scientific analytic and scientific Python packages,
+*   creating a robust platform you can explore, develop, and visualize on. 
+*   https://www.enthought.com/
+

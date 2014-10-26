@@ -32,6 +32,16 @@
         *   关于Python的提案，但不针对Python语言本身
     *   PEP 0       //index of PEPs
     *   PEP 1       //PEP Purpose and Guidelines
+*   python自定义库文件路径
+    {{{
+    Python 运行环境在查找库文件时是对 sys.path 列表进行遍历，如果我们想在运行环境中注册新的类库，主要有以下三种方法：
+    1.  在sys.path列表中添加新的路径。
+    2.  设置PYTHONPATH环境变量。
+    3.  将库文件复制到sys.path列表中的目录里（如site-packages目录）。
+    4.  用 .pth 文件来实现。Python 在遍历已知的库文件目录过程中，如果见到一个 .pth 文件，就会将文件中所记录的路径加入到 sys.path 设置中，这样 .pth 文件说指明的库也就可以被 Python 运行环境找到。
+        操作：
+        在Python/Lib/site-package目录下创建一个MyModule.pth文件，其中内容为自定义的模块所在的路径。
+    }}}
 
 == Tools ==
 *   Show image in terminal when call Image.show() within PIL
@@ -149,24 +159,6 @@ Other::
     manage.py shell它能进行一些必要的Django环境设置
     如果安装ipython，manage.py shell会默认使用它。
 * [[http://showmedo.com/videotutorials/video?name=1100000&fromSeriesID=110|Wiki over Django]]
-
-=== [[http://www.pythonforbeginners.com/basics/ipython-a-short-introduction/|IPython]] ===
-*   Tab completion              " very useful
-*   Using Python debugger
-*   Profiles
-*   QT-based
- 
-==== [[http://yangzetian.github.io/2013/02/08/ipython-notebook-interactive-computing-new-era/|IPython-notebook]] ====
-{{{
-IPython Notebook 是一种新兴的交互式数据分析与记录工具，它定义了一种全新的计算文件格式，其中包含了代码，
-代码说明以及每一步的计算输出(数值或图片等)，也就是说这一个文件完整记录了计算过程中的所有相关信息。此外，
-该文件还可以嵌入网络视频，图片， 公式等众多副文本格式，实为交互计算，记录思维，传播思想的好帮手。
-}}}
-*   > sudo ipython notebook
-*   > sudo ipython notebook --pylab
-*   > sudo ipython notebook --pylab inline
-*   As ipython notebook kernel must run as root while chrome can't run as root
-    *   modify /usr/bin/google-chrome, add *--user-data-dir* in the end of last line
 
 === [[http://www.scipy.org/|Scipy]] ===
 *   SciPy (pronounced “Sigh Pie”) is a Python-based ecosystem of opensource software for mathematics, science, and engineering. 

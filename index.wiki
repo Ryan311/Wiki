@@ -17,7 +17,7 @@
 *   [[OpenStack]]
 *   [[Wiki]] [[Jekyll]] [[BootStrap]] [[DISQUS]]
 *   [[Programming]] [[Python]] [[Python3]] [[Erlang]] [[JavaScript]] [[Object-C]]
-*   [[IPython]]
+*   [[IPython]] [[Canopy]]
 *   GCC MSVC [[Clang]]
 *   [[DataBase]]
 *   [[Vim]] [[Eclipse]] [[VS]] [[Vimer]]
