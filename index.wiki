@@ -22,7 +22,7 @@
 *   GCC MSVC [[Clang]]
 *   [[DataBase]]
 *   [[Vim]] [[Eclipse]] [[VS]] [[Vimer]]
-*   [[Bluetooth]] [[USB]]
+*   [[Bluetooth]] [[BLE]] [[USB]]
 *   [[HTML]] [[JavaScript]] [[CSS]] [[LAMP]]
 *   [[VirsualBox]]
 *   [[http://www.ruanyifeng.com/blog/2011/12/ssh_remote_login.html|SSH]]

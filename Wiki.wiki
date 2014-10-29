@@ -1,5 +1,6 @@
 %toc
 = Wiki =
+http://www.gracecode.com/vimwiki-usage-notes.html
 
 # What is wiki
     <br>http://www.baike.com/wiki/wiki
@@ -10,4 +11,16 @@
 # Wiki Work group
 # VimWiki-HTML
 # Reference
+
+== 在Wiki中插入图片 ==
+*   Example:
+    {{{
+        images表示picture所在目录
+        {{images/picture.png}}
+        
+        生成的HTML为：
+        <p>
+            <img src="images/ble_extension.png" />
+        </p>
+    }}}
 

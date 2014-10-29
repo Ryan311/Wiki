@@ -1,0 +1,30 @@
+%toc
+
+==  From Wibree to BLE  ==
+*   [[诺基亚的Wibree来了谁将死去]]
+*   [[Wibree论坛并入蓝牙技术联盟]]
+
+==  BT4.2 Features  ==
+#   LE Data Packet Length Extension
+#   LE Secure Connections
+#   Link Layer Privacy
+#   Link Layer Extended Filter Policies
+
+The term for ‘LE privacy v1.2’ is changed to Link Layer Privacy and Link Layer Extended Filter Policies.
+
+==  ble data extension VS ble 2Mbps rate ==
+以 throughput 考量, ble data extension 的效益是比 ble 2Mbps rate 还要大, 底下是最大的 ble packet, 考量 maximum asymmetric traffic :
+
+Phy rate 1M : (27 x 8) / (328/1 + 150 + 80/1 + 150) = 0.305 Mbps
+
+Phy rate 2M : (27 x 8) / (328/2 + 150 + 80/2 + 150) = 0.428Mbps
+
+Phy rate 1M + data extension : (251 x 8) / (2120/1 + 150 + 80/1 + 150) = 0.8032Mbps
+
+{{images/ble_extension.png}}
+
+==  BLE in Win8+    ==
+*   https://social.msdn.microsoft.com/Forums/windowsdesktop/en-US/home?searchTerm=Windows%208%2C%20Bluetooth%20LE%20and%20BluetoothFindFirstDevice%2FBluetoothFindNextDevice%2FBluetoothFindDeviceClose
+*   The Windows 8 Bluetooth GATT apis requires that the device be paired using the built-in UI and does not allow application to connect to an arbitrary Bluetooth LE device.
+*   Windows上BLE的缺点， 只能通过Buildin UI来scan， pairy设备， 不能将Classic Device和BLE Device区别开来
+*   对于BLE设备来说， 有很多情景并不需要配对，如iBeacon，它只支持Advertising，IPhone只需要Scan到它并从Advertising中得到信息就可以了。Windows中对类似iBeacon的应用就不能提供支持

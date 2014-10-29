@@ -42,16 +42,3 @@
     * This enhancement will not only increase the level of anonymity for the LE 
     * Peripheral, but also apply the same level of Privacy to the LE Central device. 
 
-==  BT4.2 Features  ==
-#   LE Data Packet Length Extension
-#   LE Secure Connections
-#   Link Layer Privacy
-#   Link Layer Extended Filter Policies
-
-The term for ‘LE privacy v1.2’ is changed to Link Layer Privacy and Link Layer Extended Filter Policies.
-
-==  BLE in Win8+    ==
-*   https://social.msdn.microsoft.com/Forums/windowsdesktop/en-US/home?searchTerm=Windows%208%2C%20Bluetooth%20LE%20and%20BluetoothFindFirstDevice%2FBluetoothFindNextDevice%2FBluetoothFindDeviceClose
-*   The Windows 8 Bluetooth GATT apis requires that the device be paired using the built-in UI and does not allow application to connect to an arbitrary Bluetooth LE device.
-*   Windows上BLE的缺点， 只能通过Buildin UI来scan， pairy设备， 不能将Classic Device和BLE Device区别开来
-*   对于BLE设备来说， 有很多情景并不需要配对，如iBeacon，它只支持Advertising，IPhone只需要Scan到它并从Advertising中得到信息就可以了。Windows中对类似iBeacon的应用就不能提供支持
