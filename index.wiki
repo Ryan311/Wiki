@@ -18,7 +18,7 @@
 *   [[Wiki]] [[Jekyll]] [[BootStrap]] [[DISQUS]]
 *   [[Algorithms]]
 *   [[Programming]] [[Python]] [[Python3]] [[Erlang]] [[JavaScript]] [[Object-C]]
-*   [[IPython]] [[Canopy]]
+*   [[IPython]] [[Canopy]] [[Anaconda]]
 *   GCC MSVC [[Clang]]
 *   [[DataBase]]
 *   [[Vim]] [[Eclipse]] [[VS]] [[Vimer]]

@@ -1,3 +1,6 @@
+== IPython ==
+*   http://ipython.org/install.html
+
 === [[http://www.pythonforbeginners.com/basics/ipython-a-short-introduction/|IPython]] ===
 *   Tab completion              " very useful
 *   Using Python debugger
