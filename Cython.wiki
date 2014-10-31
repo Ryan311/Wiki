@@ -1,0 +1,5 @@
+%toc
+
+http://cython.org/
+
+*   pip install cython

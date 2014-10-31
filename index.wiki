@@ -17,7 +17,7 @@
 *   [[OpenStack]]
 *   [[Wiki]] [[Jekyll]] [[BootStrap]] [[DISQUS]]
 *   [[Algorithms]]
-*   [[Programming]] [[Python]] [[Python3]] [[Erlang]] [[JavaScript]] [[Object-C]]
+*   [[Programming]] [[Python]] [[Python3]] [[Cython]] [[Erlang]] [[JavaScript]] [[Object-C]]
 *   [[IPython]] [[Canopy]] [[Anaconda]]
 *   GCC MSVC [[Clang]]
 *   [[DataBase]]

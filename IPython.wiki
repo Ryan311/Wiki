@@ -34,4 +34,19 @@ IPython Notebook 是一种新兴的交互式数据分析与记录工具，它定
 *   As ipython notebook kernel must run as root while chrome can't run as root
 *   modify /usr/bin/google-chrome, add *--user-data-dir* in the end of last line
 
+==  Windows Install line_profiler for ipython == 
+*   pip install cython
+*   pip install line_profiler
+*   pip install memory_profiler
+*   If error happened: "error: Unable to find vcvarsall.bat", follow this
+    {{{
+        1.  Install mingw32
+        2.  Add mingw32's bin directory to your environment variables
+            Append C:\Programs\MinGW\bin;C:\Programs\MinGW\msys\1.0\bin; to the PATH
+        3.  Edit (create if it doesn't exist) the distutils.cfg file located at C:\Python26\Lib\distutils\distutils.cfg to be:
+                [build]
+                compiler=mingw32
+    }}}
+
+
 

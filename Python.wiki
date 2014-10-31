@@ -103,7 +103,6 @@ print "=> elasped lpop: %s s" % t.secs
 *   [[PythonVirtualEnviroment]]
 *   [[http://www.ibm.com/developerworks/cn/linux/l-cn-pythondebugger/|Debug]]
 *   [[http://www.lfd.uci.edu/~gohlke/pythonlibs/|Unofficial Windows Binaries for Python Extension Packages]]
-*   [[Distribute and Install package]]
 *   [[http://www.pythonforbeginners.com/basics/ipython-a-short-introduction/|IPython]] ===
     *   Tab completion              " very useful
     *   Using Python debugger
@@ -120,6 +119,7 @@ IPython Notebook 是一种新兴的交互式数据分析与记录工具，它定
     *   > sudo ipython notebook --pylab inline
     *   As ipython notebook kernel must run as root while chrome can't run as root
         *   modify /usr/bin/google-chrome, add *--user-data-dir* in the end of last line
+*   [[http://www.lfd.uci.edu/~gohlke/pythonlibs/|Unofficial Windows Binaries for Python Extension Packages]]
 
 == Books & Docs ==
 *   [[Python Cook Book]]
