@@ -24,6 +24,7 @@
 *   [[Closure]]
 *   [[Python Tricky]]
 *   [[Python Challenge]]
+*   [[Python性能分析]]
 *   [[http://legacy.python.org/dev/peps/|PEP]](Python增强建议书)
     *   PEP是Python Enhancement Proposals的缩写
     *   一个PEP是一份为Python社区提供各种增强功能的技术规格
@@ -43,7 +44,7 @@
         在Python/Lib/site-package目录下创建一个MyModule.pth文件，其中内容为自定义的模块所在的路径。
     }}}
 
-== [[http://www.huyng.com/posts/python-performance-analysis/|Analyzing performance]] ==
+== [[http://www.oschina.net/translate/python-performance-analysis?cmp|Analyzing performance]] ==
 === time ===
 *   $ time python yourprogram.py
 === execute within a timing context manager ===
