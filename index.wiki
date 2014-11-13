@@ -22,7 +22,7 @@
 *   GCC MSVC [[Clang]]
 *   [[DataBase]]
 *   [[Vim]] [[Eclipse]] [[VS]] [[Vimer]]
-*   [[Bluetooth]] [[BLE]] [[USB]]
+*   [[wireless]] [[Bluetooth]] [[BLE]] [[USB]] [[ANT]] [[Zigbee]]
 *   [[HTML]] [[JavaScript]] [[CSS]] [[LAMP]]
 *   [[VirsualBox]]
 *   [[http://www.ruanyifeng.com/blog/2011/12/ssh_remote_login.html|SSH]]
@@ -31,6 +31,7 @@
 *   [[git  github]] [[bitbucket]] [[google code]]
 *   [[Cloud Compute]]  [[OpenStack]]
 *   [[Security]]
+*   [[TCP_IP]]
 
 
 === As a programmer ===

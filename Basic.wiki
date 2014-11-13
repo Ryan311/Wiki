@@ -132,3 +132,212 @@ print "Your third variable is:", third
     str[-4:]    // show the last four letters
     }}}
 
+*   字典(dict)
+    *   dict 用 {} 包围 
+    *   dict.keys(),dict.values(),dict.items() 
+    *   hash(obj)返回obj的哈希值，如果返回表示可以作为dict的key 
+    *   del 或 dict.pop可以删除一个item,clear清除所有的内容 
+    *   sorted(dict)可以吧dict排序 
+    *   dict.get()可以查找没存在的key，dict.[]不可以 
+    *   dict.setdefault() 检查字典中是否含有某键。 如果字典中这个键存在，你可以取到它的值。 如果所找的键在字典中不存在，你可以给这个键赋默认值并返回此值。 
+    *   {}.fromkeys()创建一个dict，例如: {}.fromkeys(('love', 'honor'), True) =>{'love': True, 'honor': True} 
+    *   不允许一个键对应多个值 
+    *   键值必须是哈希的，用hash()测试 
+    *   一个对象，如果实现_hash()_方法可以作为键值使用
+
+
+*   集合(set)
+    *   集合是一个数学概念，用set()创建， 是无序的集合
+    *   set.add(),set.update,set.remove，添加更新删除，-= 可以做set减法 
+    *   set.discard 和 set.remove不同在于如果删除的元素不在集合内，discard不报错，remove 报错 
+    *   < <= 表示 子集，> >=表示超集 
+    *   | 表示联合 & 表示交集 - 表示差集 ^ 对称差集（项在t或s中，但不会同时出现在二者中）
+    *   list和set可以相互转换
+    *   set不支持sort操作， 但可以转换成list再排序
+    *   在删除list中多个/海量重复元素时，可以先转换成set，然后再转回list并排序(set没有排序)。此种方法不仅方便且效率较高。
+    *   sets 支持 x in set, len(set),和 for x in set。
+    *   作为一个无序的集合，sets不记录元素位置或者插入点。因此，sets不支持 indexing, slicing, 或其它类序列（sequence-like）的操作。  
+    {{{
+        下面来点简单的小例子说明把。  
+          
+        >>> x = set('spam')  
+        >>> y = set(['h','a','m'])  
+        >>> x, y  
+        (set(['a', 'p', 's', 'm']), set(['a', 'h', 'm']))  
+          
+          
+        >>> x & y # 交集  
+        set(['a', 'm'])  
+          
+        >>> x | y # 并集  
+        set(['a', 'p', 's', 'h', 'm'])  
+          
+        >>> x - y # 差集  
+        set(['p', 's'])  
+          
+          
+        >>> a = [11,22,33,44,11,22]  
+        >>> b = set(a)  
+        >>> b  
+        set([33, 11, 44, 22])  
+        >>> c = list(b)
+        >>> c  
+        [33, 11, 44, 22]  
+          
+          
+        1.8　集合   
+           
+        集合用于包含一组无序的对象。要创建集合，可使用set()函数并像下面这样提供一系列的项：  
+          
+          
+        s = set([3,5,9,10])      #创建一个数值集合  
+          
+        t = set("Hello")         #创建一个唯一字符的集合  
+          
+        与列表和元组不同，集合是无序的，也无法通过数字进行索引。此外，集合中的元素不能重复。例如，如果检查前面代码中t集合的值，结果会是：  
+          
+        >>> t  
+          
+        set(['H', 'e', 'l', 'o'])  
+          
+          
+        注意只出现了一个'l'。  
+          
+        集合支持一系列标准操作，包括并集、交集、差集和对称差集，例如：  
+          
+           
+        a = t | s          # t 和 s的并集  
+        b = t & s          # t 和 s的交集  
+        c = t – s          # 求差集（项在t中，但不在s中）  
+        d = t ^ s          # 对称差集（项在t或s中，但不会同时出现在二者中）  
+          
+           
+          
+        基本操作：  
+          
+        t.add('x')            # 添加一项  
+          
+        s.update([10,37,42])  # 在s中添加多项  
+          
+          
+        使用remove()可以删除一项：  
+          
+        t.remove('H')  
+          
+        len(s)  
+        set 的长度  
+          
+        x in s  
+        测试 x 是否是 s 的成员  
+          
+        x not in s  
+        测试 x 是否不是 s 的成员  
+          
+        s.issubset(t)  
+        s <= t  
+        测试是否 s 中的每一个元素都在 t 中  
+          
+        s.issuperset(t)  
+        s >= t  
+        测试是否 t 中的每一个元素都在 s 中  
+          
+        s.union(t)  
+        s | t  
+        返回一个新的 set 包含 s 和 t 中的每一个元素  
+          
+        s.intersection(t)  
+        s & t  
+        返回一个新的 set 包含 s 和 t 中的公共元素  
+          
+        s.difference(t)  
+        s - t  
+        返回一个新的 set 包含 s 中有但是 t 中没有的元素  
+          
+        s.symmetric_difference(t)  
+        s ^ t  
+        返回一个新的 set 包含 s 和 t 中不重复的元素  
+          
+        s.copy()  
+        返回 set “s”的一个浅复制  
+          
+          
+        请注意：union(), intersection(), difference() 和 symmetric_difference() 的非运算符（non-operator，就是形如 s.union()这样的）版本将会接受任何 iterable 作为参数。相反，它们的运算符版本（operator based counterparts）要求参数必须是 sets。这样可以避免潜在的错误，如：为了更可读而使用 set('abc') & 'cbs' 来替代 set('abc').intersection('cbs')。从 2.3.1 版本中做的更改：以前所有参数都必须是 sets。  
+          
+        另外，Set 和 ImmutableSet 两者都支持 set 与 set 之间的比较。两个 sets 在也只有在这种情况下是相等的：每一个 set 中的元素都是另一个中的元素（二者互为subset）。一个 set 比另一个 set 小，只有在第一个 set 是第二个 set 的 subset 时（是一个 subset，但是并不相等）。一个 set 比另一个 set 打，只有在第一个 set 是第二个 set 的 superset 时（是一个 superset，但是并不相等）。  
+          
+        子 set 和相等比较并不产生完整的排序功能。例如：任意两个 sets 都不相等也不互为子 set，因此以下的运算都会返回 False：a<b, a==b, 或者a>b。因此，sets 不提供 __cmp__ 方法。  
+          
+        因为 sets 只定义了部分排序功能（subset 关系），list.sort() 方法的输出对于 sets 的列表没有定义。  
+          
+          
+        运算符  
+           运算结果  
+          
+        hash(s)  
+           返回 s 的 hash 值  
+          
+          
+        下面这个表列出了对于 Set 可用二对于 ImmutableSet 不可用的运算：  
+          
+        运算符（voperator）  
+        等价于  
+        运算结果  
+          
+        s.update(t)  
+        s |= t  
+        返回增加了 set “t”中元素后的 set “s”  
+          
+        s.intersection_update(t)  
+        s &= t  
+        返回只保留含有 set “t”中元素的 set “s”  
+          
+        s.difference_update(t)  
+        s -= t  
+        返回删除了 set “t”中含有的元素后的 set “s”  
+          
+        s.symmetric_difference_update(t)  
+        s ^= t  
+        返回含有 set “t”或者 set “s”中有而不是两者都有的元素的 set “s”  
+          
+        s.add(x)  
+          
+        向 set “s”中增加元素 x  
+          
+        s.remove(x)  
+          
+        从 set “s”中删除元素 x, 如果不存在则引发 KeyError  
+          
+        s.discard(x)  
+          
+        如果在 set “s”中存在元素 x, 则删除  
+          
+        s.pop()  
+          
+        删除并且返回 set “s”中的一个不确定的元素, 如果为空则引发 KeyError  
+          
+        s.clear()  
+          
+        删除 set “s”中的所有元素  
+    }}}
+
+
+*   列表(list)
+    *   列表是序列对象，可包含任意的Python数据信息，如字符串、数字、列表、元组等。列表的数据是可变的，我们可通过对象方法对列表中的数据进行增加、修改、删除等操作。可以通过list(seq)函数把一个序列类型转换成一个列表。
+    *   append(x) 在列表尾部追加单个对象x。使用多个参数会引起异常。 
+    *   count(x) 返回对象x在列表中出现的次数。 
+    *   extend(L) 将列表L中的表项添加到列表中。返回None。 
+    *   Index(x) 返回列表中匹配对象x的第一个列表项的索引。无匹配元素时产生异常。 
+    *   insert(i,x) 在索引为i的元素前插入对象x。如list.insert(0,x)在第一项前插入对象。返回None。 
+    *   pop(x) 删除列表中索引为x的表项，并返回该表项的值。若未指定索引，pop返回列表最后一项。 
+    *   remove(x) 删除列表中匹配对象x的第一个元素。匹配元素时产生异常。返回None。 
+    *   reverse() 颠倒列表元素的顺序。 
+    *   sort() 对列表排序，返回none。bisect模块可用于排序列表项的添加和删除。 
+
+
+*   元组(tuple)
+    *   tuple=(1,)，这是单个元素的元组表示，需加额外的逗号。
+    *   tuple=1，2，3，4，这也可以是一个元组，在不使用圆括号而不会导致混淆时，Python允许不使用圆括号的元组。
+    *   和列表一样，可对元组进行索引、分片、连接和重复。也可用len()求元组长度。  
+    *   元组的索引用tuple[i]的形式，而不是tuple(i)。 
+    *   和列表类似，使用tuple(seq)可把其它序列类型转换成元组。
+

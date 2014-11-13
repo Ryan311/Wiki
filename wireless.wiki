@@ -1,0 +1,11 @@
+%toc
+
+== Topology ==
+http://cn.mouser.com/applications/wireless_mesh_networking_topologies/
+
+*   P2P
+*   star
+*   tree
+*   mesh:   full mesh and partial mesh
+
+{{images/topology.PNG}}

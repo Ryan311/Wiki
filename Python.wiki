@@ -24,7 +24,7 @@
 *   [[Closure]]
 *   [[Python Tricky]]
 *   [[Python Challenge]]
-*   [[Python性能分析]]
+*   Python性能分析
 *   [[http://legacy.python.org/dev/peps/|PEP]](Python增强建议书)
     *   PEP是Python Enhancement Proposals的缩写
     *   一个PEP是一份为Python社区提供各种增强功能的技术规格

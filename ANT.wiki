@@ -1,0 +1,7 @@
+%toc
+
+http://www.thisisant.com/
+http://www.thisisant.com/developer/resources/downloads/#documents_tab
+
+[[http://electronicdesign.com/mobile/what-s-difference-between-bluetooth-low-energy-and-ant|What’s The Difference Between Bluetooth Low Energy And ANT?]]
+
