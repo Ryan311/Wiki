@@ -12,7 +12,12 @@
     *   ?%edit  查看使用方法
     *   %edit -p | _    打开上次编辑的临时文件
     *   %edit _Number   打开之前编辑过的文件
-*   %timeit     计算运行时间 
+*   %time       计算运行脚本所用的时间
+*   %timeit     运行多次， 计算平均运行时间 
+    *   %timeit -n 100  []      指定运行次数
+*   %memit      运行多次， 计算平均占用的内存
+    *   %memit -r 3 []      指定运行次数
+*   %prun       See how long it took each function in a script to run
 
 == IPython shortcuts for line_profiler and memory_profiler ==
 *   http://www.huyng.com/posts/python-performance-analysis/
