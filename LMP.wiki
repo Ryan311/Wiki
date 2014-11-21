@@ -1,0 +1,13 @@
+%toc 
+
+==  LMP ==
+*   LMP over ACL-C     L2cap over ACL-U     LLID is different
+*   ACL-C has higher priority than other traffic
+
+==  ACL SCO eSCO ==
+*   SCO, eSCO在固定的Slot中传输
+*   ACL没有固定的Slot， 有能力就传
+
+==  Sniff Mode  ==
+*   Tsniff  -- offest
+*   Dsniff  -- interval

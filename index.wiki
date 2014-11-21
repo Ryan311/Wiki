@@ -47,15 +47,5 @@
 *   [[http://www.tidesdk.org/|TideSDK]]   
     *   Create multi-platform desktop apps with HTML5, CSS3 and JavaScript
 
-=== Book Read ===
-*   HTML&CSS    
-    *   作者:   Jon Duckell: 
-    *   2013/10/28 - 2013/11/5
-    *   非常适合向我这样零基础的人学习HTML&CSS
-*   HTML、XHTML、CSS与JavaScript入门经典
-    *   作者:   Jon Duckell
-    *   2013/11/06
-    *   看了第11和12章，了解了JavaScript的语法及基本应用
-    *   DOM使用一系列对象表示加载到浏览器中的网页，主要是document对象及子对象,JavaScript使用这些对象来操控HTML文档
-    *   JavaScript基本语法: 变量，运算符，函数，条件语句，循环，内置对象
+=== [[Raeding Notes]] ===
 
