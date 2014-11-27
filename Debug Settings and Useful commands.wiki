@@ -42,7 +42,7 @@
     }}}
 ChildEBP        表示函数的EBP指针位置
 
-                8d89fc30表示函数LeBuildEIR的EBP基址指针，它指向的位置保存了caller的基础指针 
+                8d89fc30表示函数LeBuildEIR的EBP基址指针，它指向的位置保存了caller的基指针 
                 0: kd> dd 8d89fc30 
                 8d89fc30 ==> 8d89fcb0 8b47e626 78cceff8 86583c08
                 8d89fcb0指向它的调用函数LeAdvReportToMsEIR的基址

@@ -83,7 +83,22 @@ VS8及以上编译器(VS2005及以上)Release版本中采用Cookie机制来防�
     ret
 
 *   4. 安全检查失败处理
-因为stack buffer overrun可能覆盖掉函数的本来返回地址，使函数返回到未知的地方，从而使程序出现不可预期的后果。因此这种exception被看作是fatal error,一旦遇到这种错误，程序就会马上终止。但为了debug,在terminate process之前，_report_gsfailure函数会记录下错误发生时的重要信息，并提供JIT调试机会。
+因为stack buffer overrun可能覆盖掉函数的本来返回地址，使函数返回到未知的地方，从而使程序出现不可预期的后果。因此这种exception被看作是fatal error,
+一旦遇到这种错误，程序就会马上终止。但为了debug,在terminate process之前，_report_gsfailure函数会记录下错误发生时的重要信息，并提供JIT调试机会。
+{{{ //当出现错误时， 会跳转到_report_gsfailure中处理错误， 如果在Driver中就表现为BSOD， 栈中可以看到它 
+    void _security_check_cookie(UINT _PTR cookie)
+    {
+    _asm
+          {
+              cmp ecx,_security_cookie;
+              jne failure;
+              rep ret;
+        failure:
+
+              jmp _report_gsfailure;
+          }
+    }
+}}}
 
 == More ==
 *   在Windbg中可以看到某个程序或Driver的Cookie值

@@ -1,0 +1,118 @@
+%toc
+
+==  Packet structure ==
+*   Basic Rate
+{{{
+    LSB     68/72       54          0-2790          bits
+            ACCESS Code     HEADER      PAYLOAD
+}}}
+*    Enhanced Data Rate
+{{{
+    LSB                                                                                 MSB
+    ACCESS CODE     HEADER  GUARD   SYNC    ENHANCED Data Rate Payload      Trailer
+    | <--    GFSK    --> |   | <--     DPSK                          --> |
+}}}
+
+=== ACCESS CODE  ===
+*   In the Bluetooth system all transmissions over the physical channel begin with an access code
+    * device access code (DAC)      used during page, page scan and page response substates and shall be derived from the paged device’s BD_ADDR
+    * channel access code (CAC)     used in the CONNECTION state, synchronization train substate, and synchronization scan substate
+    * inquiry access code (IAC)     used in the inquiry substate
+*   All access codes are derived from the LAP of a device address or an inquiry address
+*   
+
+=== Packet Header ===
+{{{ 18 bits
+    The header contains link control (LC) information and consists of 6 fields: 
+    LT_ADDR:    3-bit logical transport address 
+    TYPE:       4-bit type code 
+    FLOW:       1-bit flow control 
+    ARQN:       1-bit acknowledge indication 
+    SEQN:       1-bit sequence number 
+    HEC:        8-bit header error check
+    
+    LSB     3           4       1       1       1       8       MSB
+            LT_ADDR     TYPE    FLOW    ARQN    SEQN    HEC
+}}}
+
+===  Packet Types  ===
+The packets used on the piconet are related to the logical transports on which 
+they are used. Four logical transports with distinct packet types are defined 
+*   SCO logical transport 
+*   eSCO logical transport 
+*   ACL logical transport
+*   CSB logical transport 
+
+====  Common Packet Types ====
+*   ID Packet
+*   NULL Packet
+    *   no payload, 126 bits
+    *   return link information to the source regarding the success of the previous transmission (ARQN), or the status of the RX buffer (FLOW)
+    *   The NULL packet may not have to be acknowledged
+*   POLL Packet
+    *   no payload, 126 bits
+    *   requires a confirmation from the recipient
+    *   It is not a part of the ARQ scheme
+    *   This packet can be used by the master in a piconet to poll the slaves. 
+    *   Slaves shall not transmit the POLL packet.
+*   FHS Packet  (Frequency Hop Synchronization)
+    *   The payload contains 144 information bits plus a 16-bit CRC code. 
+    *   The payload is coded with a rate 2/3 FEC(Forward Error Correction code) with a gross payload length of 240 bits
+    *   The FHS packet contains real-time clock information
+    *   The FHS packet is used in page master response, inquiry response and in role switch.
+    {{images/FHS.jpg}}
+*   DM1 Packet
+
+=== SCO Packet Types ===
+*   HV(High quality Voice) packets do not include a MIC or CRC and shall not be retransmitted
+*   DV(Data Voice) packets include a CRC on the data section, but not on the synchronous data section. DV packets do not include a MIC. The data section of DV packets shall be retransmitted
+*   HV1 Packet
+*   HV2 Packet
+*   HV3 Packet
+*   DV Packet
+
+=== eSCO Packet Types ===
+*   Three eSCO packet types (EV3, EV4, EV5) are defined for Basic Rate operation and four additional eSCO packet types (2-EV3, 3-EV3, 2-EV5, 3-EV5) for Enhanced Data Rate operation.
+*   Basic Rate:
+    *   EV3 Packet
+    *   EV4 Packet
+    *   EV5 Packet
+*   Enhanced Rate:
+    *   2-EV3 Packet    payload is modulated using  π/4-DQPSK
+    *   2-EV5 Packet    payload is modulated using  π/4-DQPSK
+    *   3-EV3 Packet    payload is modulated using 8DPSK
+    *   3-EV5 Packet    payload is modulated using 8DPSK
+
+=== ACL Packets ===
+*   M   2/3 FEC enabled
+*   Basic Rate:
+    *   DM1 Packet
+    *   DH1 Packet
+    *   DM3 Packet
+    *   DH3 Packet
+    *   DM5 Packet
+    *   DH5 Packet
+    *   AUX1 Packet
+*   Enhanced Rate:      [symbol rate]-D*[slots]
+    *   2-DH1 packet
+    *   2-DH3 packet
+    *   2-DH5 Packet
+    *   3-DH1 packet
+    *   3-DH3 Packet
+    *   3-DH5 Packet
+
+=== Packet Format ===
+{{{
+    HCI Header
+        U16 Handle_Flag
+        U16 DataLength
+    L2cap Header
+        U16 Length
+        U16 Channel ID
+    PayLoad
+        Fix Channel
+            U8  Cmd
+                Parameter
+        Data Channel
+            Data Payload
+}}}
