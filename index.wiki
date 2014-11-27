@@ -21,7 +21,7 @@
 *   [[IPython]] [[Canopy]] [[Anaconda]] [[Conda]]
 *   GCC MSVC [[Clang]]
 *   [[DataBase]]
-*   [[Vim]] [[Eclipse]] [[VS]] [[Vimer]]
+*   [[Vim]] [[Eclipse]] [[VS]] [[Vimer]] [[Sumblime]]
 *   [[wireless]] [[Bluetooth]] [[BLE]] [[USB]] [[ANT]] [[Zigbee]]
 *   [[HTML]] [[JavaScript]] [[CSS]] [[LAMP]]
 *   [[VirsualBox]]
@@ -58,4 +58,5 @@
     *   看了第11和12章，了解了JavaScript的语法及基本应用
     *   DOM使用一系列对象表示加载到浏览器中的网页，主要是document对象及子对象,JavaScript使用这些对象来操控HTML文档
     *   JavaScript基本语法: 变量，运算符，函数，条件语句，循环，内置对象
+*   [[程序员的自我修养2]]
 
