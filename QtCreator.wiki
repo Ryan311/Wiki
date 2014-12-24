@@ -1,0 +1,46 @@
+%toc
+
+== ShortCut ==
+{{{
+    F1                      查看帮助
+    F2                      跳转到函数定义（和Ctrl+鼠标左键一样的效果）
+    Shift+F2                声明和定义之间切换
+    F4                      头文件和源文件之间切换
+    Ctrl+1                  欢迎模式
+    Ctrl+2                  编辑模式
+    Ctrl+3                  调试模式
+    Ctrl+4                  项目设置模式
+    Ctrl+5                  帮助模式  
+    Ctrl+6                  输出模式
+    Alt+0                   显示或者隐藏侧边条，编辑模式下起作用（有时写的函数太长，屏幕不够大，就用这个）
+    Ctrl+Space              自动补全（貌似会和输入法的切换冲突）
+    ESc                     切换到编辑模式
+    Alt+1                   创建细节窗口
+    Alt+2                   搜索结果窗口
+    Alt+3                   程序输出窗口
+    Alt+4                   编译输出窗口
+    Ctrl+B                  编译工程
+    Ctrl+R                  运行工程
+    Ctrl+I                  自动对齐
+    Ctrl+/                  注释行，取消注释行
+    Ctrl+Shift+<            折叠代码块
+    Ctrl+Shift+>            展开代码块
+    Ctrl+[                  跳到代码块的头部
+    Ctrl+]                  跳到代码块的尾部
+    Ctrl+L                  跳到某一行
+    Ctrl+F                  查找替换当前选中的内容，按下Ctrl+F，会列出所有和你选的内容一样的语句
+    Ctrl+Shift+F            查找内容
+    F5                      开始调试
+    Shift+F5                停止调试
+    F9                      设置和取消断点
+    F10                     单步前进
+    F11                     单步进入函数
+    Shift + F11             单步跳出函数
+}}}
+
+== Qt Creator 中的段落 注释的 快捷方法 ==
+*   http://jingyan.baidu.com/article/d5c4b52bc2bd1dda560dc5bb.html
+
+==  Using FakeVim Mode ==
+*   http://qt-project.org/doc/qtcreator-2.5/creator-editor-fakevim.html
+*   To run the editor in the FakeVim mode, select Edit > Advanced > Use Vim-style Editing or press Alt+V,Alt+V.

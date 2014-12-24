@@ -1,0 +1,27 @@
+%toc
+
+== Input/Output ==
+The C++ language does not define any statements to do input or output (IO).
+Instead, C++ includes an extensive standard library(iostream) that provides IO.
+    #include <iostream>
+    std::cout
+    std::cin
+    std::cerr
+    std::clog
+All the names defined by the standard library are in the std namespace
+The standard library headers typically have no suffix at all.
+
+== class types ==
+C++, allow programmers to define types that include operations as well as data. A
+major design goal of C++ is to let programmers define their own types that are as
+easy to use as the built-in types.
+
+== Char ==
+A char is guaranteed to be big enough to hold numeric values corresponding to the 
+characters in the machine’s basic character set. That is, a char is the same size
+as a single machine byte.
+The remaining character types—wchar_t, char16_t, and char32_t—are used
+for extended character sets. The wchar_t type is guaranteed to be large enough to
+hold any character in the machine’s largest extended character set. The types
+char16_t and char32_t are intended for Unicode characters. (Unicode is a
+standard for representing characters used in essentially any natural language.)

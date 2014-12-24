@@ -1,0 +1,5 @@
+%toc
+
+== Install ==
+*   http://sourceforge.net/projects/mingwbuilds/files/external-binary-packages/Qt-Builds/
+*   http://www.qt.io/download/

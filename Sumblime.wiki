@@ -8,6 +8,63 @@
 *   download zip and unzip it to "C:\Program Files (x86)\Sublime Text 2\Data\Packages"
 *   install package:    ctrl+shift+P   ->  Install
 
+== C Build ==
+在Sublime Text中, 点击 Tools -> Build System -> New Build System... 
+会弹出一个配置文件的模版将模版中的内容替换成结果:
+{{{
+    {
+         "cmd": ["gcc", "${file}", "-o", "${file_path}/${file_base_name}"],
+         "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
+         "working_dir": "${file_path}",
+         "selector": "source.c",
+         "encoding": "cp936",
+         "shell": true,
+
+         "variants":
+         [
+              {
+                   "name": "Run",
+                   "cmd": ["${file_path}/${file_base_name}.exe"]
+              }
+         ]
+    }
+}}}
+保存为C_Build.sublime-build
+
+== C++ Build ==
+在Sublime Text中, 点击 Tools -> Build System -> New Build System... 
+输入如下内容，并将文件保存为C++Bulider.sublime-bulid。
+{{{
+    {
+         "cmd": ["g++", "${file}", "-o", "${file_path}/${file_base_name}"],
+         "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
+         "working_dir": "${file_path}",
+         "selector": "source.c++",
+         "encoding": "cp936",
+         "shell": true,
+
+         "variants":
+         [
+              {
+                   "name": "Run",
+                   "cmd": [ "start", "${file_path}/${file_base_name}.exe"]
+              }
+         ]
+    }
+}}}
+
+==  Python3 Build ==
+Copy from python build
+"shell": "true"     如果不添加此项， 在执行Python GUI程序时不会显示出界面
+{{{
+    {
+        "cmd": ["C:/Python34/python3.exe", "-u", "$file"],
+        "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+        "selector": "source.python",
+        "shell": "true" 
+    }
+}}}
+
 ==  Keys ==
 {{{
     Ctrl+L 选择整行（按住-继续选择下行）
