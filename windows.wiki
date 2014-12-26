@@ -30,6 +30,38 @@
                 *   to use the *override setting* and _not the value of the removable device capability_ when generating container IDs for devices. 
                 *   [[http://msdn.microsoft.com/en-us/library/windows/hardware/ff541144(v=vs.85).aspx|通过注册表来控制，这样的话可以不用设备提供的removable device capability, 客户报的问题就是通过这种方式来修改的]]
                 *   [[http://msdn.microsoft.com/en-us/library/windows/hardware/ff540101(v=vs.85).aspx|Container IDs Generated from a Removable Device Capability Override]]
+*   USB Selective Suspend and Remote Wakeup
+    *   USB configuration description:  
+        *   当bmAttributes的bit6为1时，device支持selective suspend
+        *   当bmAttributes的bit5和bit6同时为1时，则device支持selective suspend和remote wakeup
+    *   注册表位置：HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Enum\USB\*VID_0461&PID_4D22*\5&b9fd9be&0&2\Device Parameters
+        *   SelectiveSuspendEnabled为1时， DeviceManager中PowerManagement页的Selective Suspend(first one)勾勾是打上的，为0时， 没有勾勾
+        *   DeviceRemoteWakeSupported为1时， 第二项Remote Wake选项不是灰色， 为0时该选项为灰色， 不支持Remote Wakeup
+        *   HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\BTHPORT\Parameters -> SystemRemoteWakeSupported与DeviceRemoteWakeSupported具有相同功能
+        *   DeviceRemoteWakeSupported为1， RemoteWakeEnabled为1时， 勾勾选中， RemoteWakeEnabled为0时， 勾勾取消
+        *   这三个注册表值都可以在INF当中指定其值：
+        {{{
+            [RsBthFilter]
+                Include=bth.inf
+                Needs=BthUsb.NT
+                CopyFiles=RsBthFilter.CopyList
+
+            [RsBthFilter.HW]
+                include    = bth.inf
+                needs      = BthUsb.NT.HW
+                AddReg=RsBthFilter.HW.Reg
+                
+            [RsBthFilter.HW.Reg]
+                HKR, , LowerFilters, 0x00010000, RtkBtFilter
+                HKR, ,"RemoteWakeEnabled",0x00010001,1
+                HKR, ,"DeviceRemoteWakeSupported",0x00010001,1
+                HKR, ,"SelectiveSuspendEnabled",0x00010001,0
+        }}}
+        *   SelectiveSuspend控制Idle Request行为， 如果支持， 当Driver中没有IO操作时， USB Client Driver会先发一个Idle Reqeust， 然后让Device进入D2
+        *   RemoteWakeup控制WaitWake IRP行为，WaitWake IRP是在D0状态下发到Bus的，如果支持该功能， 则在系统进入S3时， WakitWakeIRP不返回， 当Wait Signal产生时， 系统被唤醒， 该IRP才会返回
+        *   如果RemoteWake的勾勾不选中， 则当OS进入S3之前， 这个Wait Wake irp就会返回， 并且只有当系统醒来之后设备在D0状态时再发下去。
+    *   对于Bluetooth来说， 只有当配对一个HID 设备时才会有Remote Wakeup功能， 可以看一下Enum枚举出设备的Power Data， S3->D2且SupportWakeFromS3。
+    *   Enum是根据Cod + SDP Record来枚举PDO的， 如果Cod是HID且SDP Record中的HID支持RemoteWake功能， 则在枚举PDO时， Power Data会继承Enum的
 == WDF ==
 {{{
 KMDF version	Release method	            Included in this version of     Windows	Drivers using it run on
@@ -173,6 +205,7 @@ an application calls a Win32 file I/O function(such as CreateFile, ReadFileEx, o
     "batfile"=hex:
     }}}
     *   查看一下注册表位置，可以看到这个表项下面列出了各种扩展名，如果是ICON或打开文件方式有问题，可以查看该处的注册表项是否正常
+*   [[http://jingyan.baidu.com/article/fea4511a79b323f7bb9125bb.html|如何禁止Windows更新驱动]]
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 == Bat ==
 *   [[http://blog.csdn.net/davidhsing/article/details/1996180|for /f]]

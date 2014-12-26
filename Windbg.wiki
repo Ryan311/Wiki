@@ -4,7 +4,12 @@
 === Ntdebugging ===
 *   [[http://blogs.msdn.com/b/ntdebugging/default.aspx?PageIndex=1|msdn blog -> debugging]]
 
-=== [[http://blogs.msdn.com/b/iliast/archive/2007/10/06/driver-driver-and-driver-application-communication.aspx|Driver-Driver and Driver-Application Communication]] ===
+
+=== windows下捕获dump ===
+*   [[Windows平台下实现和使用的异常处理机制]]
+*   http://www.cnblogs.com/cswuyg/p/3207576.html
+*   [[write_dump_when_capture_exceptions]]
+*   [[http://www.cnblogs.com/hdtianfu/archive/2011/12/27/2303113.html|异常和异常处理(windows平台)]]
 
 === My experience ===
 *   [[Debug Settings and Useful commands]]

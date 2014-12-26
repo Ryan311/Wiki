@@ -15,10 +15,14 @@
         Fallback Location:  Always use Fallback Location -> Set True
                             Do Not Warn if Fallback Location Used  -> Set True
         }}}
-*   [[https://github.com/jaredpar/VsVim|VsVim]] vim extension in VS2012
-    *   Tools -> Extensions and Updates -> Search VsVim and Install -> Restart VS2012
-    *   Config Key mappings
-    *   :set vimrc          -> Show the vimrc which VsVim read
+*   Extensions:     Tools -> Extensions and Updates...
+    *   [[https://github.com/jaredpar/VsVim|VsVim]] vim extension in VS2012
+        *   Options... -> VsVim -> Config Key mappings
+        *   :set vimrc          -> Show the vimrc which VsVim read
+    *   Productivity Power Tools
+        *   Enhanced scroll bar(full bar mode)
+    *   Visual Studio Color Theme Editor
+        *   Dark Theme
 *   VS2012 静态编译c c++运行库
     *   Win8上编译的程序在Win7上有可能不能运行，原因是它们使用的C运行库不一样，好的解决方法是在编译时将运行库编译进程序，随程序一起发布
     *   在VS2012中修改设置：Project Property->Configuration Properties->C/C++->Code Generation->Runtime Library->修改选项为"Mutiple-threaded(/MT)"
@@ -87,6 +91,10 @@ section, 在img被装载到内存时，该section不一定会存在（被paged o
     *   Property Pages->Configuration Properties->Linker->General: Output File ==> $(OutDir)rtsocket.dll    //指定要生成文件的名字及存放的目录
     *   Property Pages->Configuration Properties->Linker->Debugging: Generate Program Database File ==> $(OutDir)rtsocket.pdb   //指定PDB文件名字及存放目录， 一般要与上面的相同
     *   Property Pages->Configuration Properties->Linker->Advanced: Import Library ==> $(OutDir)rtsocket.lib    //指定导入库文件的名字及目录， 一般要上面相同
+*   在Driver中显示Build信息
+    *   DriverEntry：   TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT,("Built on %s %s\n", __DATE__, __TIME__));
+    *   Property Pages -> Driver Module Settings -> General -> Allow Data, time and Timestamp ==> Yes
+    *   More Settings:  http://blog.csdn.net/hxybiseng/article/details/8568132
 
 
 === VS2012 写DLL ===

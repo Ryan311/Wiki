@@ -29,6 +29,7 @@
 
 == [[LMP]] ==
 
+== [[SDP]] ==
 
 ==  Bluetooth in 2014   ==
 * LE Secure Connections - Host Functionality has been changed
