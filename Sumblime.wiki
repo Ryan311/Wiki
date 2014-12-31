@@ -101,3 +101,4 @@ Copy from python build
     Ctrl+Shift Enter 插入行前
     F9 行排序（按a-z）
 }}}
+*   [[http://blog.jobbole.com/82527/|常用的 16 个 Sublime Text 快捷键]]

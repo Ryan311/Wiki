@@ -1,0 +1,79 @@
+%toc
+
+https://www.microsoft.com/windowsembedded/zh-cn/products-solutions.aspx
+https://www.microsoft.com/windowsembedded/zh-cn/downloads.aspx?windows-server-2012-for-embedded-systems
+MSDN Blog
+    http://blogs.msdn.com/b/windows-embedded/
+
+== Windows Embeded ==
+Windows Embedded Standard，微软在2008年年初推出了新的Windows Embedded产品线命名规则：
+    Windows CE改名为Windows Embedded Compact，
+    而XP Embedded改名为Windows Embedded Standard 2009, 
+    WEPOS改名为Windows Embedded POSReady，
+    还有新推出的针对导航产品的Windows Embedded NavReady。
+
+== Windows Embedded 8 ==
+*   Windows Embedded 8.1 Industry (2014/4开始更新)
+    *   Windows Embedded 8.1 行业版将 Windows 8.1 行业版将 Windows 8.1 推广到一系列的行业及边缘设备，此类设备来自零售业、
+    *   制造业、医疗保健业以及任何其他行业，这些行业迫切需要强大的业务流程应用程序和相关能力来安全可靠地执行特定职能。
+*   Windows Embedded 8.1 Pro
+    *   Windows Embedded 8.1 Pro将Windows 8.1 操作系统的完整功能引入专为智能系统中的行业设备而设计的版本中。 
+    *   它还在与基于 Windows 8.1 的智能系统的电源管理、连接性以及企业集成等方面获得改进，从而促进业务增长。
+*   Windows Embedded 8 Standard
+    *   Windows Embedded 8是一款模块化的操作系统，使企业和设备制造商可以自由选择他们的行业设备和智能系统解决方案中要包
+    *   含哪些功能。 以 Windows 8 为基础，Windows Embedded 8提供先进的技术，供您实现内容丰富、多点触控的体验，让客户积极
+    *   参与，让员工的消息灵通且工作富有成效；它还提供锁定工具以确保其用途明确、安全和始终如一。
+
+== Windows Embedded 7 ==
+*   Windows Embedded Enterprise
+    *   Windows Embedded Enterprise 系列操作系统包含 Windows 7 Professional for Embedded Systems 
+    *   和 Windows 7 Ultimate for Embedded Systems，从而使行业设备可以享受 Windows 7 的所有企业级
+    *   功能、拥有完整的 Windows 应用程序兼容性，以及灵活地创建定制体验。
+*   Windows Embedded Standard 7
+    *   Windows Embedded Standard 7 以模块化形式提供 Windows 7 的性能、可靠性以及灵活性，从而满足智能系统中行业设备的特定要求。
+    *   详细介绍http://blog.sina.com.cn/s/blog_5f5910640100q2n3.html
+*   Windows Embedded POSReady 7
+    *   Windows Embedded POSReady 7 是一款专为服务点 (POS) 解决方案而优化的操作系统，它将 Windows 7 
+    *   的能量完全释放，从而带来引人入胜同时又令人信服的客户体验。 平台简化管理和部署，它不仅进行库存跟踪，
+    *   而且进一步提供对信息的综合性访问，从而帮助零售商应对当今的挑战，并且为明天的机遇做好准备。
+
+=== Install Windows Standard 7 ===
+*   Download Packages from MSDN
+*   解压， 用7zip总是解压失败， 用WinRAR就OK， ISO镜像
+*   用UltraISO制作USB启动盘
+*   安装在一个空闲分区
+*   默认安装不支持BT, 解决方法http://reboot.pro/topic/16383-windows-embedded-standard-7-add-packages-on-a-live-image/
+*   在ISO的目录\DS\Packages\Driver目录搜索bth相关的cab， Copy到C:\Temp
+*   执行命令(As Administrator) __DISM.exe /online /Add-Package /PackagePath:C:Temp /NoRestart__
+*   Restart就可以了
+*   和Win7 OS没有太多区别， 安装其它常用软件也正常， 但是C盘占用会少很多。 可以尝试在低配机上用用。
+
+== Windows Embeded Compact ==
+http://zh.wikipedia.org/wiki/Windows_Embedded_Compact
+Windows Embedded Compact（曾被称为Microsoft Windows CE），为微软研发的嵌入式操作系统，可以应用在各种嵌入式系统，或是硬件规格较低的电脑系统（例如很少的存储器，较慢的中央处理器等）。
+在2008年4月15日举行的嵌入式系统大会上，微软宣布将Windows CE更名为Windows Embedded Compact，
+与Windows Embedded Enterprise、Windows Embedded Standard和Windows Embedded POSReady组成Windows Embedded系列产品。
+
+TimeLine:
+2002年1月微软又推出Windows CE.Net，即Windows CE 4.0。
+2004年5月份推出Windows CE 5.0，开放有250万行源代码。
+2006年11月，微软推出Windows Embedded CE 6.0。
+2010年10月，微软推出 Windows Phone 7，Windows Embedded Compact 7。
+
+Windows CE并非从台式机的Windows（NT，98，XP...）修改缩小而来，而是使用一套完全重新设计的核心，所以它可以在功能非常有限的硬件上运行。
+虽然核心不同，但是它却提供了高度的Win32 API软件开发接口的兼容性，功能有内存管理、文档操作、多线程、网络功能等。因此，开发台式机软件
+的人可以很容易编写甚或直接移植软件到Windows CE上。
+
+*   Windows Embedded Compact 2013   (2013/3)
+    *   Windows Embedded Compact 2013 是一套简化的组件化设备操作系统，现经过更新可同时支持 Visual Studio 2013 和 Visual Studio 2012，
+    *   支持 x86 和 ARM 架构
+*   Windows Embedded Compact 7
+    *   2010年6月1日
+    *   WinCE 7
+
+
+== Win PE ==
+Windows预先安装环境（Microsoft Windows Preinstallation Environment，简称Windows PE或WinPE）是简化版的Windows XP、Windows Server 2003、
+Windows Vista、Windows 7、Windows 8、Windows 8.1。WinPE是以光盘或其他可携设备作媒介。
+基于在保护模式下运行的WindowsXP个人版内核，是一个只拥有较少（但是非常核心）服务的Win32子系统。
+这些服务为Windows安装、实现网络共享、自动底层处理进程和实现硬件验证。
