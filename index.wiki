@@ -48,5 +48,5 @@
 *   [[http://www.tidesdk.org/|TideSDK]]   
     *   Create multi-platform desktop apps with HTML5, CSS3 and JavaScript
 
-=== [[Raeding Notes]] ===
+=== [[Reading Notes]] ===
 

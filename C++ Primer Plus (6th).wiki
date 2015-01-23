@@ -1,0 +1,106 @@
+%toc
+
+== C ==
+*   20世纪70年代早期诞生于贝尔实验室
+*   Dennis Ritchie
+
+== C++ ==
+*   20世纪80年代诞生于贝尔实验室
+*   Bjarne Stroustrup
+
+== C++融合了3种不同的编程方式 ==
+*   C语言代表的过程性语言
+*   C++在C语言基础上添加的类代表的面向对象的语言
+*   C++模板支持的泛型编程  
+    *   泛型： 指的是创建独立于类型的化代码， C++模板提供了完成这种任务的机制。
+
+== Basic ==
+*   using std namespace
+    *   所谓namespace，是指标识符的各种可见范围。
+    *   C++标准程序库中的所有标识符都被定义于一个名为std的namespace中。
+    *   using则类似于Python中的Import。
+{{{//std使用方式
+1、直接指定标识符。例如std::ostream而不是ostream。完整语句如下：
+    std::cout << std::hex<< 3.4<< std::endl;
+
+2、使用using关键字，部分导入。
+    using std::cout;
+    using std::endl;
+
+    cout << std::hex<< 3.4<< endl;
+
+3、最方便的就是在函数声明之前使用using namespace std；全部导入。
+}}}
+
+*   头文件climits中定义了符号常量来表示类型的限制
+    *   cout << "Minimum int value = " << INT_MIN << endl;
+    *   cout << "Maxmum int value = " << INT_MAX << endl;
+
+*   const限定符
+    *   const int Months = 12   声明Months为符号常量， 其值是固定的， 编译器不允许再修改这个常量的值。
+    *   C语言中定义符号常量用#define， const比它好
+        *   能够明确指定类型
+        *   可以使用C++作用域将其定义限制在特定函数内
+        *   可以将const用于复杂类型
+
+*   cin    istream对象， 处理输入
+    *   cin >> name     将标准输入内容放到name中， 它只处理单词， 遇到空格、制表符、换行符就停止
+    *   cin.getline(name, length)  每次读取一行， 并最多读取length个字符到name中， 换行符不会存在name中， 用空字符结尾
+    *   cin.get()       也是按行读取， 但换行符不会丢弃
+    *   混合输入字符串和数字
+
+*   string.h, cstring和string文件区别
+    *   string.h是C语言中字符串操作函数的头文件
+    *   cstring是c++语言中对C风格字符串的操作函数的头文件，与string.h是功能相同， 但是属于C++， 包含在std中。
+    *   string是c++语言中string类模板的申明 
+     
+*   结构体是可以像变量一样赋值的
+    *   struct Student S1 { 10, 165.2 };
+    *   struct Student S2;
+    *   S2 = S1;        OK, S1的内容会直接赋值给S2
+ 
+*   内存分配、指针
+    *   运算符new， delete
+    *   int* a = new int;   分配一个类型为int的存储空间， 并将指针赋值给a， 这个存储空间是匿名的， 它只能通过a来访问
+    *   delete a；          释放new分配的内存
+    *   int* parr = new int[10];    创建动态数组
+    *   delete [] parr;             删除动态数组
+    *   指针算术： 整数变量加1后， 其值将增加1； 指针变量加1后， 增加的量等待它指向的类型的字节数
+    *   C++将数组名视为数组的第一个元素的地址
+
+
+== C++ 11 ==
+*   新增类型
+    *   long long
+    *   char16_t和Char32_t
+        *   L'C'    前缀L表示wcha_t的字符常量和字符串常量
+        *   u'C'    前缀u表示char16_t的字符常量和字符串常量
+        *   U'C'    前缀U表示char32_t的字符常量和字符串常量
+        *   R"Hello\n"    前缀R表示原始字符串, 显示时不进行字符串解析， 即\n不会表示换行
+        *   R"+*"(Who are your?)", she whispered+*"      "+*...*+" 是自定义边界
+*   数组初始化新增功能
+    *   初始化数组， 可省略等号
+        *   int arr[4] {2,3,4,5}
+    *   可不在大括号内包含任何东西， 这将所有元素都设为零
+        *   float blance[100] {};
+    *   列表初始化禁止缩窄转换
+        *   char slifs[4] { 'h', 4, 111210, '\0'}   Error, 111210超过Char取值范围
+*   字符串初始化
+    *   字符数组是用于存储字符串的存储单元， 而string类变量是一个表示字符串的对象， 包含了字符串相关操作
+    *   char first_date[] = {"Le Chapon Dodu"};
+    *   char second_date[] {"The Elegant Plate"};
+    *   string third_date = {"The Bread Bowl"};
+    *   string fourth_date {"Hank's Fine Eats"};
+*   作用域内枚举
+*   Array
+    *   C++98新增的标准模板库(STL)提供了模板类vector, 它是动态数组的替代品。 功能强大， 效率低。
+    *   C++11提供了模板类array， 它是定长数组的替代品。 长度固定时比vector好
+{{{
+    #include <vector>       //stl c++98, vector
+    #include <array>        //c++11, array
+
+    vector<double> a2[4];
+    array<double, 4> a3 = {3.14, 3.12, 1.68, 2.7};
+    array<double, 4> a4;
+    a4 = a3;
+}}}

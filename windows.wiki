@@ -1,6 +1,35 @@
 %toc
 
 = Windows =
+== System ==
+*   睡眠(Sleep) ---  S3
+    {{{
+        是Windows系统提供的一种节能状态，当用户需要离开电脑的时候，可以在“关机”菜单里面选择这个命令。
+        这样系统将正在处理的数据保存到内存中，除内存以外的所有设备都停止供电。当用户回到电脑面前的时候，
+        通过移动鼠标或按下任意键，就可以唤醒系统，让电源为其他设备重新开始供电。在短短的几秒钟，计算机
+        就可以恢复到离开之前的状态。这种状态的特点就是唤醒速度快（一般只需要几秒钟），但是不能让内存断电，
+        否则数据会丢失。
+    }}}
+*   休眠(Hibernate) --- S4
+    {{{
+        是微软为移动电脑设计的一种电源节能状态，所以在台式机的“关机”菜单里面看不到它。这种状态是把内存
+        里的所有数据，存储到硬盘的一个特定空间里，然后切断所有的电源供应。以后当用户重新按下开机键，就会
+        将硬盘里临时存储的内存数据恢复到内存里，就可以返回到离开之前的状态。所以这种状态的特点就是可以复
+        原到断电以前的状态，而且可以完全断电，但是恢复的时间较长而且需要占用较大的硬盘空间。
+    }}}
+*   待机
+    {{{
+        是系统将当前状态保存于内存中，然后退出系统，此时电源消耗降低，维持CPU、内存和硬盘最低限度的运行；
+        按计算机上的电源就可以激活系统，电脑迅速从内存中调入待机前状态进入系统，这是重新开机最快的方式，
+        但是系统并未真正关闭，适用短暂离开使用。
+    }}}
+*   混合睡眠(hiber-sleep)
+    {{{
+        是针对台式电脑推出的一种新的睡眠/休眠方法。该技术指睡眠（sleep）和休眠（hibernate）同时进行，也就
+        是说，先把信息写到硬盘的hiberfil.sys文件中，再进行睡眠。如果没有终止外部供电，则睡眠，如终止外部供电，
+        则再次开机时读取hiberfil.sys进行恢复，可以说整合了两者的优势：比起睡眠有防掉电的功能，且比起休眠在
+        不终止外部供电的情况下启动速度更快。
+    }}}
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 == [[http://msdn.microsoft.com/en-us/library/windows/hardware/ff554836(v=vs.85).aspx|Driver Concepts]] ==
 *   User mode and kernel mode
@@ -64,17 +93,21 @@
     *   Enum是根据Cod + SDP Record来枚举PDO的， 如果Cod是HID且SDP Record中的HID支持RemoteWake功能， 则在枚举PDO时， Power Data会继承Enum的
 == WDF ==
 {{{
-KMDF version	Release method	            Included in this version of     Windows	Drivers using it run on
-1.13            Windows 8.1 Preview WDK     Windows 8.1 Preview             Windows 8.1 Preview
-1.11            Windows 8 WDK               Windows 8                       Windows Vista and later
-1.9             Windows 7 WDK               Windows 7                       Windows XP and later
+    KMDF version	Release method	            Included in this version of     Windows	Drivers using it run on
+    1.13            Windows 8.1 Preview WDK     Windows 8.1 Preview             Windows 8.1 Preview
+    1.11            Windows 8 WDK               Windows 8                       Windows Vista and later
+    1.9             Windows 7 WDK               Windows 7                       Windows XP and later
 }}}
+*   WdfIoQueueReadyNotify
+    *   向一个I/O Queue注册一个回调函数， 当Queue从Empty到Non-Empty时会调用这个Callback函数。
+    *   只能用于manual dispatching Queue
+    
 == UMDF ==
 {{{
-UMDF version	Release method	            Included in this version of Windows	    Drivers using it run on
-2.0             Windows 8.1 Preview WDK     Windows 8.1 Preview                     Windows 8.1 Preview
-1.11            Windows 8                   WDK Windows 8                           Windows Vista and later
-1.9             Windows 7                   WDK Windows 7                           Windows XP and later
+    UMDF version	Release method	            Included in this version of Windows	    Drivers using it run on
+    2.0             Windows 8.1 Preview WDK     Windows 8.1 Preview                     Windows 8.1 Preview
+    1.11            Windows 8                   WDK Windows 8                           Windows Vista and later
+    1.9             Windows 7                   WDK Windows 7                           Windows XP and later
 }}}
 *   UMDF1.x:    requires using the COM programming model to write C++ code.
 *   UMDF2.0:    write a UMDF driver in the C programming language that calls many of the methods that are available to KMDF drivers

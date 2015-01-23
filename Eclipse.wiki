@@ -10,6 +10,17 @@
 
 ==  Eclipse + Cygwin for C/C++ ==
 http://www.cnblogs.com/zhxxcq/archive/2013/04/21/3033389.html
+==  Eclipse + MinGW ==
+*  安装Eclipse的CDT
+*  安装MinGW
+*  将MinGW\bin下的“mingw32-make.exe”改为“make.exe”
+*  系统环境变量PATH增加“C:\MinGW\bin”（假如安装目录为C:\MinGW）
+    *  C_INCLUDEDE_PATH，CPLUS_INCLUDE_PATH——C:\MinGW\include；LIBRARY_PATH——C:\MinGW\lib
+*  Vim Support
+    *  Help -> Install new Software： http://vrapper.sourceforge.net/update-site/stable
+*  Color Theme
+    *  Help -> Install new Software:  http://eclipse-color-theme.github.com/update
+    *  Window→Preferences→General→Appereance→Color Theme ，在里面就可以选择喜欢的主题
 
 ==  Eclipse CDT 对 Doxygen 型注释的支持 ==
 1、工作空间默认

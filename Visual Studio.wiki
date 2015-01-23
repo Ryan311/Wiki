@@ -1,5 +1,21 @@
 %toc
 
+== VC C++ ==
+*   #pragma是C++中最复杂的预处理指令，下面是最常用的几个#pragma指令：
+    * #pragma comment(lib,"XXX.lib")    表示链接XXX.lib这个库，和在工程设置里写上XXX.lib的效果一样。
+    * #pragma comment(linker,"/ENTRY:main_function")    表示指定链接器选项/ENTRY:main_function
+    * #pragma once  表示这个文件只被包含一次, 它是基于磁盘文件的，而#ifndef则是基于宏的。
+    * #pragma warning(disable:4705)     表示屏蔽警告4705 
+        *   #pragma warning(disable:4507 34) // 不显示4507和34号警告信息   
+        *   #pragma warning(once:4385)       // 4385号警告信息仅报告一次   
+        *   #pragma warning(error:164)       // 把164号警告信息作为一个错误
+        *   #pragma warning(default:176)     // 重置编译器的176号警告行为到默认状态  
+    * #pragma pack(push, n)     将当前字节对齐方式放入到内部编译器栈中，并将当前的内存对齐方式设置为4 
+    * #pragma pack(pop)         将内部编译器栈顶的记录弹出，并将其作为当前的内存对齐方式€?€?
+    * #pragma alloc_text        编译时控制分页能力
+        *   #pragma alloc_text(INIT, DriverEntry)           如果某些代码在驱动程序完成初始化后不再需要，可以直接把它插入到INIT段
+        *   #pragma alloc_text(PAGE, a)                     表示函数a运行在分页内存中
+
 == VC ==
 *   [[Query Register and Convert 64 int to String]]
 *   [[file operation in kernal mode]]
@@ -95,6 +111,9 @@ section, 在img被装载到内存时，该section不一定会存在（被paged o
     *   DriverEntry：   TraceEvents(TRACE_LEVEL_INFORMATION, DBG_INIT,("Built on %s %s\n", __DATE__, __TIME__));
     *   Property Pages -> Driver Module Settings -> General -> Allow Data, time and Timestamp ==> Yes
     *   More Settings:  http://blog.csdn.net/hxybiseng/article/details/8568132
+*   error MSB6006: "tracewpp.exe" exited with code 2
+    *   解决方法， 编辑osrusbfx2.vcxproj文件， 将其中的WppEnabled项设置为false，然后重新加载项目即可
+    *   vcxproj文件中保存了编译链接的所有信息， 有出现类似问题可以查看该文件
 
 
 === VS2012 写DLL ===
@@ -136,3 +155,4 @@ Note:   这里之所以创建空的项目，是因为我想用.c文件而不是.
     *   可能用工具dumpbin.exe(VS自带,分析PE文件格式)来调试这种链接错误
     *   dumpbin.exe -exports LEGap.dll      //查看dll的导出函数
     *   dumpbin.exe -imports LEGapTest.exe  //查看exe中导入的函数
+

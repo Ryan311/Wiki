@@ -1,8 +1,37 @@
 %toc
 
-=== [[http://blogs.msdn.com/b/iliast/archive/2007/10/06/driver-driver-and-driver-application-communication.aspx|Driver-Driver and Driver-Application Communication]] ===
+= [[http://blogs.msdn.com/b/iliast/archive/2007/10/06/driver-driver-and-driver-application-communication.aspx|Driver-Driver and Driver-Application Communication]] =
 
-=== Windows API ===
+= [[http://msdn.microsoft.com/en-us/library/windows/hardware/ff544200%28v=vs.85%29.aspx|Driver Support Routines]] =
+*   Run-time routines
+    *   是MSFT提供的通用处理函数供内核Driver调用， 与user mode的ANSI-C库函数相对应
+    *   The so-called run-time library component (prefix Rtl) contains utility routines,  such as list and 
+    *   string-management routines, that kernel-mode drivers can use instead of regular ANSI-standard library routine
+
+== Unicode String in Driver ==
+*   structure
+{{{  
+    typedef struct _UNICODE_STRING {
+      USHORT Length;
+      USHORT MaximumLength;
+      PWSTR  Buffer;
+    } UNICODE_STRING, *PUNICODE_STRING;
+}}}
+*   DECLARE_CONST_UNICODE_STRING        macro, 定义并初始化一个unicode string
+*   RtlAnsiCharToUnicodeChar
+*   RtlAnsiStringToUnicodeSize
+*   RtlAnsiStringToUnicodeString
+*   RtlAppendUnicodeStringToString
+*   RtlCompareUnicodeString
+*   RtlCopyUnicodeString
+*   RtlInitEmptyUnicodeString
+*   RtlInt64ToUnicodeString
+*   RtlIntegerToUnicodeString
+*   RtlIntPtrToUnicodeString
+*   RtlUpcaseUnicodeChar
+*   RtlUpcaseUnicodeString
+
+= Windows API =
 *   [[http://www.cppblog.com/sunshinealike/archive/2009/03/10/76050.html|Windows 应用程序基本结构]]
     *   WinMian 函数由三个基本组成部分：函数说明、初始化和消息循环。该函数的功能:
         *   注册窗口类，建立窗口及执行其他必要的初始化工作
@@ -19,7 +48,7 @@
 *   [[http://www.cppblog.com/sunshinealike/archive/2009/03/12/76346.html|对键盘和鼠标的响应]]
 *   [[http://www.cppblog.com/sunshinealike/archive/2009/03/14/76539.html|资源在Windows编程中的应用]]
 
-=== Windows Service ===
+= Windows Service =
 *   [[http://msdn.microsoft.com/en-us/library/ms685141%28v=vs.85%29.aspx|What is an service application]]
 {{{ A service application conforms to the interface rules of the Service Control Manager (SCM). 
     It can be started automatically at system boot, by a user through the Services control panel applet, 
@@ -29,11 +58,11 @@
 *   [[http://www.codeproject.com/Articles/499465/Simple-Windows-Service-in-Cplusplus|Simple Windows Service in C++]]
 *   Windows Samples:    [[https://code.msdn.microsoft.com/CppInteractiveWindowsServic-c241d080|Interactive Windows Service in C++]] && [[https://code.msdn.microsoft.com/CppWindowsService-cacf4948|A basic Windows service in C++]]
 
-=== [[http://msdn.microsoft.com/en-us/library/windows/desktop/ms632590%28v=vs.85%29.aspx|Messages and Message Queues]] ===
+== [[http://msdn.microsoft.com/en-us/library/windows/desktop/ms632590%28v=vs.85%29.aspx|Messages and Message Queues]] ==
 *   Windows-based applications are event-driven, The system passes all input for an application to the various windows in the application. 
 *   Each window has a function, called a window procedure, that the system calls whenever it has input for the window. The window procedure processes the input and returns control to the system
 
-=== [[http://msdn.microsoft.com/en-us/library/windows/desktop/aa363224%28v=vs.85%29.aspx|Device Management]] ===
+== [[http://msdn.microsoft.com/en-us/library/windows/desktop/aa363224%28v=vs.85%29.aspx|Device Management]] ==
 *   Note
 {{{
     Device management provides a way to uniformly notify all applications and system features of changes 

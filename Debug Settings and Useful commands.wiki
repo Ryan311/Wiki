@@ -11,8 +11,8 @@
 *   Windbg 显示 Dbgprint信息
     *   在windows 7/vista/2008用WinDBG调试时显示KdPrint信息收藏在注册表 HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager 新建一项Debug Print Filter， 新建一个DWORD值，名称为DEFAULT，(注意：必须全部是大写) 值为8。重启即可。
     {{{
-    [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Debug Print Filter]
-    "DEFAULT"=dword:00000008
+        [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Debug Print Filter]
+        "DEFAULT"=dword:00000008
     }}}
 *   u, uf   反汇编
     {{{

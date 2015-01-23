@@ -20,3 +20,4 @@
     *   主要介绍系统软件的运行机制和原理， 涉及Windows和Linux两个系统平台上， 一个应用程序在编译、链接和运行时刻发生的各种事项。
     *   系统调用和Windows API
 *   [[CppPrimer]] fifth Edion
+*   [[C++ Primer Plus (6th)]]
