@@ -50,3 +50,5 @@
 
 === [[Reading Notes]] ===
 
+=== Useful Links ===
+*   [[http://wiki.osdev.org/Main_Page|OSDEV]] build os

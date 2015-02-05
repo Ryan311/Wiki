@@ -39,6 +39,12 @@
         *   Enhanced scroll bar(full bar mode)
     *   Visual Studio Color Theme Editor
         *   Dark Theme
+    *   Visual Assist
+    *   Visual HG       good enough
+        *   需要在工程文件夹上先创建Repository， 再打开VS2012工程， 添加文件并Commit
+    *   HgSccPackage
+        *   Hg source control
+        *   https://bitbucket.org/zzsergant/hgsccpackage/wiki/configVS
 *   VS2012 静态编译c c++运行库
     *   Win8上编译的程序在Win7上有可能不能运行，原因是它们使用的C运行库不一样，好的解决方法是在编译时将运行库编译进程序，随程序一起发布
     *   在VS2012中修改设置：Project Property->Configuration Properties->C/C++->Code Generation->Runtime Library->修改选项为"Mutiple-threaded(/MT)"

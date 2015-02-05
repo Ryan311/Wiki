@@ -60,6 +60,25 @@ RetAddr         表示函数的返回地址， caller的下一个执行地址
                 
 Args            表示调用参数
 
+    
+    {{{ // x64下的stack
+        0: kd> k
+         # Child-SP          RetAddr           Call Site
+        00 fffff880`0a56f4f8 fffff880`05491d4e nt!KeBugCheckEx
+        01 fffff880`0a56f500 fffff880`0548c092 RtkBtfilter!__report_gsfailure+0x26
+        02 fffff880`0a56f540 fffff880`0548bae3 RtkBtfilter!LeBuildEIR+0x462
+        03 fffff880`0a56f980 fffff880`0548c8c9 RtkBtfilter!LeAdvReportToMsEIR+0x187
+        04 fffff880`0a56faa0 fffff880`0548a63d RtkBtfilter!LePostProcessAdvReport+0x51
+        05 fffff880`0a56fb60 fffff880`0546bf7a RtkBtfilter!FilterLePostProcessHciEvent+0x125
+        06 fffff880`0a56fba0 fffff880`0546f978 RtkBtfilter!FilterProcessEvent+0xf72
+        07 fffff880`0a56fc50 fffff880`05471ae7 RtkBtfilter!BluetoothAnalyzeEvent+0x60
+        08 fffff880`0a56fca0 fffff800`04b762ea RtkBtfilter!BluetoothEventThread+0x267
+        09 fffff880`0a56fd00 fffff800`048ca8e6 nt!PspSystemThreadStartup+0x5a
+            0a fffff880`0a56fd40 00000000`00000000 nt!KxStartSystemThread+0x16
+    }}}
+Child-SP        表示在本函数调用时RSP寄存器中保存的指针
+RetAddr         与x86下一致， 表示本函数的Caller的下一条指令地址
+
 == Command On Line ==
 *   http://windbg.info/doc/1-common-cmds.html
 *   http://blog.csdn.net/blog_index/article/details/10817437

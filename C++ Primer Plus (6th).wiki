@@ -13,6 +13,12 @@
 *   C++在C语言基础上添加的类代表的面向对象的语言
 *   C++模板支持的泛型编程  
     *   泛型： 指的是创建独立于类型的化代码， C++模板提供了完成这种任务的机制。
+*   最重要的OOP特性：
+    *   抽象
+    *   封装和数据隐藏
+    *   多态
+    *   继承
+    *   代码的可重用性
 
 == Basic ==
 *   using std namespace
@@ -59,14 +65,110 @@
     *   struct Student S2;
     *   S2 = S1;        OK, S1的内容会直接赋值给S2
  
-*   内存分配、指针
+*   内存分配
     *   运算符new， delete
     *   int* a = new int;   分配一个类型为int的存储空间， 并将指针赋值给a， 这个存储空间是匿名的， 它只能通过a来访问
     *   delete a；          释放new分配的内存
     *   int* parr = new int[10];    创建动态数组
     *   delete [] parr;             删除动态数组
+     
+*   指针
     *   指针算术： 整数变量加1后， 其值将增加1； 指针变量加1后， 增加的量等待它指向的类型的字节数
-    *   C++将数组名视为数组的第一个元素的地址
+    *   int i;  i++;  i的值加1                       int ar[10]; int *p = ar;  p++;     p的值增加4， 因为它是指向int型的指针
+    *   const用于指针
+        *   让指针指向一个常量对象， 防止使用该指针修改指向的值
+            {{{
+                int gorp = 16;
+                int chips = 12;
+                const int jar = 11;
+                const int* p_snack = &gorp;
+
+                *p_snack = 20       // invalid -- 不能修改指针指向的值， 不能通过p_snack修改gorp的值， 但可以通过gorp本身来修改其值
+                *p_snack = &jar     // valid -- 可以将const变量的地址批赋给指向const的指针， 这时， jar的值任何情况下都不能改变
+                p_snack = &chips    // valid -- 可以修改指针的指向， 但仍不能修改其值
+                
+                // 如果数据本身并不是指针， 可以将const数据或非const数据的地址赋给指向const的指针
+                // 但只能将非const数据的地址赋给非const指针
+            }}}
+        *   将指针本身声明为常量， 防止改变指针指向的位置
+            {{{
+                int gorp = 16;
+                int chips = 12;
+                int* const p_snack = &gorp;
+
+                *p_snack = 20;      // valid -- 可以修改指针指向的值
+                p_snack = &chips    // invalid -- 指针本身不能再改变
+            }}}
+        *   指向const对象的const指针
+            {{{
+                double trouble = 2.001;
+                const double* const stick = & trouble;  // 指针和值都不能改变
+            }}}
+        *   尽可能的使用const， 如将函数的形参声明为指向const的指针
+            *   可以避免由于无意间修改数据而导致的编程错误
+            *   使用const使得函数能够处理const和非const实参， 否则只能接受非const数据作为实参
+            *   使用const引用使函数能够正确生成并使用临时变量
+             
+*   引用
+    *   C++中的复合类型， 是已定义的变量的别名， 必须在定义时初始化(与const指针相同)
+    {{{
+        int rats;
+        int & rodents = rats;
+        
+        //rodents只是一个符号，和rodents完全等价，它不占用任何资源 
+    }}}
+    *   函数按引用传递参数， 比按值传递好， 不用复制数据。 C只支持按值传递。
+    *   如果函数的实参与引用参数不匹配， C++将生成临时变量， 当前仅当参数为const引用时才允许这样做
+    *   函数返回引用
+        *   传统的返回是按值返回， 与按值传递类似， 需要copy。 返回引用时少了一次copy动作， 效率更高
+            {{{
+                double m = sqrt(16.0);  // 传统的返回， sqrt将结果复制到一个临时变量， 然后再将临时变量copy到m中
+
+                int & sum(int &a, int &b);
+                int a = 3, b = 4;
+                int &a1 = a;
+                int &b1 = b;
+                a1 = sum(a1, a2);
+                // sum返回引用， 会将结果直接赋给a1， 比按值返回效率更高 
+
+            }}}
+        *   返回的引用不能是临时变量的引用， 否则函数退出时该变量被释放， 引用无效， 可以用以下方法避免：
+            *   可返回一个作为参数传递给函数的引用
+            *   可返回用new来分配的新的存储空间的引用
+            {{{
+                const free_throws & clone(free_throws & ft)
+                {
+                    free_throws newguy;      
+                    newguy = ft;            
+                    return newguy;          
+                }
+                /// Error, newguy是临时变量， 出了函数就不存在了， 引用也就无效
+            }}}
+
+*   数组
+    *   *C++将数组名视为数组的第一个元素的地址*
+    *   const保护数组
+        *   函数声明中可使用const保护数组， void show_array(const int ar[], int n)  //表示ar是一个常量数组， 只读
+        *   const int ar[]  ==  const int* ar
+    *   二维数组作为函数参数
+        *   int sum(int ar2[][4], int size)     //ar2是指针， 指向包含4个元素的数组
+        *   int sum(int (*ar2)[4], int size)    //size指明了行数
+     
+*   cctype    -->   C中的ctype.h
+    *   与字符相关的函数
+    *   isalnum(), isalpha()....
+     
+*   文件输入输出
+    *   include <fstream>       --> 包含ofstream和ifstream, 用于输出和输入
+    *   将创建的对象与文件关联后， 使用方式与cout和cin相同
+{{{
+    ofstream outFile;
+    outFile.open("carinfo.txt");
+
+    outFile << "year 2015" << endl;
+
+    outFile.close();
+}}}
 
 
 == C++ 11 ==
@@ -104,3 +206,88 @@
     array<double, 4> a4;
     a4 = a3;
 }}}
+*   decltype    关键字， 用于解决模板函数问题
+    {{{
+        template<typename T1, typename T2>
+        auto Add2Diff(T1 x, T2 y) -> decltype(x+y)  // 返回类型不知道何类型， 用后置声明
+        {
+            decltype(x+y) xy = x+y;     // 声明的变量无法知道类型， 用decltype定义
+            cout << xy << endl;
+            return x+y;
+        }
+    }}}
+*   auto    自动类型推断 
+*   constexpr   创建常量表达式  ？？？
+*   thread_local    用于多线程编程  ？？？
+       
+
+== C++ > C ==
+*   C++包含完整的C标准库函数， 头文件在C头文件基础上加c， 包含在std中。 如cctype.h
+*   引用
+*   函数默认参数
+    *   对于带参数列表的函数， 必须从右向左添加默认值， 即要为某个参数添加默认值， 必须为其右边所有参数添加。
+    *   实参按从左向右的顺序依次向形参赋值， 不能跳过任何参数
+*   函数重载：仅当函数基本上执行相同的任务， 但使用不同形式的数据时才使用重载。
+    *   名称修饰：  实现重载的关键
+*   函数模板， 使用泛型来定义函数， 其中的泛型可使用具体的类型来代替
+    *   模板并不创建函数， 只是告诉编译器如何定义函数
+    {{{
+        //template和typename是关键字
+        template <typename T>
+        void Swap(T &a, T &b)
+        {
+            T temp;
+            temp = b;
+            b = a;
+            a = temp;
+        }
+    }}}
+    *   具体化      得到模板实例， 即包含具体类型的函数定义
+        *   隐式实例化  最初只能使用该方式
+        *   显示实例化  前缀template， 显示让编译器创建特定函数实例
+        *   显示具体化  前缀template <>， 不使用模板来生成函数定义， 而应使用专门为该类型显式地定义的函数定义
+        {{{
+            template <class T>
+            void Swap (T &, T &);   //template prototype
+
+            template <> void Swap<job> (job &, job &);  // explicit specialization for job
+
+            int main(void)
+            {
+                template void Swap<char> (char &, char &);  // explicit instantiation for char
+
+                short a, b;
+                Swap(a, b);     // implicit template instatiation for short
+
+                job n, m;
+                Swap(n,m);      // use explicit specialization for job          job is a struct
+                
+                char g, h;
+                Swap(g,h);      // use explicit template instatitiation for char
+            }
+
+        }}}
+*   语言链接性
+    *   extern "C" void spiff(int);     // use C protocol for name look-up , _spiff
+    *   extern void spiff(int);         // use C++ protocol , _spiff_i  , default
+    *   extern "C++" void spiff(int);   // use C++ protocol , _spiff_i
+*   定位New运行符， 它只返回传递给它的地址， 并将其强制转换为void *, 以便能够赋给任何指针类型。
+    *   #include <new>
+    {{{
+        #include <new>
+        char buffer[500];
+        int main()
+        {
+            int *p1;
+            int *p2;
+            p1 = new int[20];       // normal, place structure in heap
+            p2 = new (buffer) int[20];  // place structure in buffer
+            
+            delete [] p1;   // OK
+            delete [] p2;   // ERROR, 不能通过Delete释放
+        }
+    }}}
+}
+*   namespace   名称空间， 减少名称冲突
+    *   using std::cout         //  using声明,  类似在该作用域声明一个变量
+    *   using namespace std     //  using编译指令， 导入一个名称空间
