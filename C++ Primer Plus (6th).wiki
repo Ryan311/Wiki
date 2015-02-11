@@ -180,19 +180,23 @@
         *   U'C'    前缀U表示char32_t的字符常量和字符串常量
         *   R"Hello\n"    前缀R表示原始字符串, 显示时不进行字符串解析， 即\n不会表示换行
         *   R"+*"(Who are your?)", she whispered+*"      "+*...*+" 是自定义边界
-*   数组初始化新增功能
-    *   初始化数组， 可省略等号
-        *   int arr[4] {2,3,4,5}
-    *   可不在大括号内包含任何东西， 这将所有元素都设为零
-        *   float blance[100] {};
-    *   列表初始化禁止缩窄转换
-        *   char slifs[4] { 'h', 4, 111210, '\0'}   Error, 111210超过Char取值范围
-*   字符串初始化
-    *   字符数组是用于存储字符串的存储单元， 而string类变量是一个表示字符串的对象， 包含了字符串相关操作
-    *   char first_date[] = {"Le Chapon Dodu"};
-    *   char second_date[] {"The Elegant Plate"};
-    *   string third_date = {"The Bread Bowl"};
-    *   string fourth_date {"Hank's Fine Eats"};
+*   列表初始化
+    *   数组初始化新增功能
+        *   初始化数组， 可省略等号
+            *   int arr[4] {2,3,4,5}
+        *   可不在大括号内包含任何东西， 这将所有元素都设为零
+            *   float blance[100] {};
+        *   列表初始化禁止缩窄转换
+            *   char slifs[4] { 'h', 4, 111210, '\0'}   Error, 111210超过Char取值范围
+    *   字符串初始化
+        *   字符数组是用于存储字符串的存储单元， 而string类变量是一个表示字符串的对象， 包含了字符串相关操作
+        *   char first_date[] = {"Le Chapon Dodu"};
+        *   char second_date[] {"The Elegant Plate"};
+        *   string third_date = {"The Bread Bowl"};
+        *   string fourth_date {"Hank's Fine Eats"};
+    *   类的初始化
+        *   Bozo fufu{"fufu", "hehe"};
+        *   Bozo *pc = new Bozo{"PoPo", "haha"};
 *   作用域内枚举
 *   Array
     *   C++98新增的标准模板库(STL)提供了模板类vector, 它是动态数组的替代品。 功能强大， 效率低。
@@ -219,6 +223,16 @@
 *   auto    自动类型推断 
 *   constexpr   创建常量表达式  ？？？
 *   thread_local    用于多线程编程  ？？？
+*   作用域内枚举
+    {{{
+       enum egg{ Small, Medium, Large, Jumbo};
+       enum t_shirt{ Small, medium， Large， Jumbo};    // Error, Small is redefinition
+    
+       enum class egg{ Small, Medium, Large, Jumbo};
+       enum class t_shirt{ Small, medium， Large， Jumbo};  // OK, egg::Small and t_shirt::Small
+       
+       enum class :short pizza{Small, Medium, Large, Jumbo};    //将enum底层类型指定为short， 默认是int
+    }}}
        
 
 == C++ > C ==
@@ -291,3 +305,95 @@
 *   namespace   名称空间， 减少名称冲突
     *   using std::cout         //  using声明,  类似在该作用域声明一个变量
     *   using namespace std     //  using编译指令， 导入一个名称空间
+*   Class
+    *   访问控制
+        *   private     只能通过公共成员访问的类成员， 实现数据隐藏
+        *   public      组成类的公共接口的类成员， 实现抽象
+        *   protected   在继承中用到 
+        *   类成员访问类型默认是private, 而在C++中，Struct结构成员默认的是public
+    *   内联方法
+        *   定义位于类声明中的函数都将自动成为内联函数， 通常将短小的成员函数作为内联函数。
+        *   也可以在函数声明之外将成员函数定义为内联， 使用关键字inline
+    *   客户/服务器模型
+        *   客户 -->  类的使用者， 只需要了解接口， 通过接口使用服务器
+        *   服务器  --> 类， 服务器设计者要确保接口可靠准确执行， 只能修改类设计的实现细节， 不能修改接口
+    *   数据成员命名规则， 使用m_前缀
+    *   const成员函数
+        *   只要类方法不修改调用对象， 就应将其声明为const
+        *   声明    void stock::show() const;
+    *   this指针    每个成员函数（包括构造函数和析构函数）都有一个this指针， 指向调用对象。
+    {{{
+        const Stock & Stock::topval(const Stock & s) const
+        {
+            if (s.total_val > total_val)
+                return s;
+            else
+                return *this;   //返回对象本身， 返回类型定义为const &， 则不能修改这个对象
+        }
+    }}}
+*   Smart Pointer       智能指针模板， 属于std namespace， #include <memory>
+    *   auto_ptr        C++98引入， C++11废弃， 有缺陷 
+    *   shared_ptr      c++11,  如果程序要使用多个指向同一个对象的指针， 使用该它  
+    *   unique_ptr      c++11,  如果程序不需要使用多个指向同一个对象的指针，使用它
+    *   week_ptr        c++11, 
+    *   以上三个是智能指针模板， 定义了类似指针的对象， 可以将new获得的地址赋给这种对象， 当智能指针过期时， 其析构使用delete释放内存。
+    *   所有智能指针都重载了“operator->”操作符，直接返回对象的引用，用以操作对象
+*   C++的四种强制类型转换
+    *   新类型的强制转换(相比于C的强制转换) 可以提供更好的控制强制转换过程，允许控制各种不同种类的强制转换。C++中风格是 static_cast<type>(content)。
+    *   C++风格的强制转换其他的好处是，它们能更清晰的表明它们要干什么。程序员只要扫 一眼这样的代码，就能立即知道一个强制转换的目的。
+    *   static_cast:    可以实现C++中内置基本数据类型之间的相互转换。
+            *   int c=static_cast<int>(7.987);
+            *   如果涉及到类的话，static_cast只能在有相互联系的类型中进行相互转换,不一定包含虚函数。
+    *   const_cast:     
+            *   const_cast操作不能在不同的种类间转换。相反，它仅仅把一个它作用的表达式转换成常量。
+            *   可以使一个本来不是const类型的数据转换成const类型的，或者把const属性去掉。
+    *   reinterpret_cast:       powerful
+            *   有着和C风格的强制转换同样的能力。它可以转化任何内置的数据类型为其他任何的数据类型，也可以转化任何指针类型为其他的类型。
+            *   它甚至可以转化内置的数据类型为指针，无须考虑类型安全或者常量的情形。不到万不得已绝对不用。
+    *   dynamic_cast:
+            *   其他三种都是编译时完成的，dynamic_cast是运行时处理的，运行时要进行类型检查。
+            *   不能用于内置的基本数据类型的强制转换。
+            *   dynamic_cast转换如果成功的话返回的是指向类的指针或引用，转换失败的话则会返回NULL。
+            *   使用dynamic_cast进行转换的，基类中一定要有虚函数，否则编译不通过。
+            *   在类的转换时，在类层次间进行上行转换时，dynamic_cast和static_cast的 效果是一样的。
+            *   在进行下行转换时，dynamic_cast具有类型检查的功能，比static_cast更安全。
+            *   向下转换的成功与否与将要转换的类型有关，即要转换的指针指向的对象的实际类型与转换以后的对象类型一定要相同，否则转换失败。
+            *   向上转换即为指向子类对象的向下转换，即将父类指针转化子类指针。  ???
+            {{{
+                class A
+                {
+                public:
+                    virtual void f() { cout << "hello A" << endl; }
+                };
+
+                class B: public A
+                {
+                public:
+                    void f() { cout << "hello B" << endl; }
+                };
+
+                A * a1 = new B;//a1是A类型的指针指向一个B类型的对象
+                A * a2 = new A;//a2是A类型的指针指向一个A类型的对象
+                B * b;
+                
+                b = dynamic_cast<B*>(a1);//结果为not null，向下转换成功，a1之前指向的就是B类型的对象，所以可以转换成B类型的指针。
+                b = dynamic_cast<B*>(a2);//结果为null，向下转换失败
+            }}}
+*   运算符重载
+    *   operator op(argument list)
+    *   重载后的运算符必须至少有一个操作数是用户定义的类型， 防止用户为标准类型重载运算符
+    *   使用运算符时不能违反运算符的句法规则
+    *   不能创建新的运算符
+    *   并不是所有运算符都能重载
+    *   运算符重载可以作为成员函数， 也可以用非成员函数， 对应相同的运算符表达式， 所以不能两个都实现
+    {{{
+        Time operator+(const Time & t) const;   //成员函数重载运算符
+        friend operator+(const Time & t1, const Time & t2);//非成员函数重载运算符， 要声明为友元， 且比成员函数重载多一个参数
+    }}}
+*   友元    
+    *   类型：
+        *   友元函数
+        *   友元类
+        *   友元成员函数
+    *   通过让函数成为友元函数， 可以赋予函数与类的成员函数相同的访问权限
+    *   一般用友元函数实现运算符重载
