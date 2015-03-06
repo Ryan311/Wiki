@@ -2,6 +2,21 @@
 
 = [[http://blogs.msdn.com/b/iliast/archive/2007/10/06/driver-driver-and-driver-application-communication.aspx|Driver-Driver and Driver-Application Communication]] =
 
+= Device and Driver Installation =
+*   Document:
+    *   [[http://blogs.msdn.com/b/iliast/archive/2008/03/10/why-do-we-need-wdf-coinstallers.aspx|Why Do We Need WDF Coinstallers?]]
+        *   Why are the coinstallers so big
+        *   How can you verify that what I'm saying is correct
+        *   Why not use an msi:  current install
+        *   Why not use a different update mechanism
+    *   [[http://blogs.msdn.com/b/iliast/archive/2009/06/09/analyzing-the-installation-of-wdf-1-7-and-1-9-drivers.aspx|Analyzing the Installation of WDF 1.7 and 1.9 drivers]]
+        *   What the co-installer do in install state
+*   Driver package can include various software components, such as a co-installer or class installer, that can enhance and extend
+*   device and driver installations. For example, a co-installer can do the following:
+    *   Perform additional device installation tasks that the INF file cannot handle. For example, a co-installer could write additional device-specific information to the registry.
+    *   Provide *finish-install Wizard pages* to display additional wizard pages to the user after your device is installed.
+    *   Provide *finish-install action* to start an installation program that can only run in an interactive user context.
+
 = [[http://msdn.microsoft.com/en-us/library/windows/hardware/ff544200%28v=vs.85%29.aspx|Driver Support Routines]] =
 *   INF:    Device Information File     https://msdn.microsoft.com/en-us/library/windows/hardware/ff547402%28v=vs.85%29.aspx
     *   是Microsoft公司为硬件设备制造商发布其驱动程序推出的一种文件格式，INF文件中包含硬件设备的信息或脚本以控制硬件操作。

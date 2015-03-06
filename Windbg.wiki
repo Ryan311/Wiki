@@ -1,6 +1,25 @@
 %toc
 
 ==  Windows Debugging and Troubleshooting ==
+*   RCDRKD(short form of recorder kd) Extensions   https://msdn.microsoft.com/en-us/library/windows/hardware/hh920376%28v=vs.85%29.aspx
+    *   This section describes the RCDRKD debugger extension commands. These commands display WPP trace messages created by drivers. 
+    *   *Starting with Windows 8, you no longer need a separate trace message format (TMF) file to parse WPP messages*. The TMF information
+    *   is stored in the regular symbol file (PDB file). Also starting in Windows 8, drivers can use the WPP Recorder API to write trace 
+    *   messages to a circular buffer that is always available, regardless of whether WPP tracing has been explicitly enabled for the driver. 
+    *   The RCDRKD commands read messages from the circular buffers, format the messages, and display the messages in the debugger. 
+    *   For more information, see Part 2 of the USB Debugging Innovations in Windows 8 video.
+    *   从Win8开始， 不用再通过单独的tmf文件解析wpp message了， 信息都包含在PDB中
+    *   从Win8开始， 驱动使用WPP Recorder API将log写到循环缓冲区中， 不管wpp是否enable， 它都有效
+    *   read the IFR log of wdftester (!rcdrkd.rcdrlogdump wdftester)
+    *   read the IFR log of winusb (!rcdrlogdump winusb)
+    *   read the IFR logs in the framework(!wdfkd.wdflogdump <drivername>)
+*   the Framework's Event Logger
+    *   WDF includes an internal trace logger, sometimes called the framework's In-flight Recorder (IFR). 
+    *   The WDF logger creates a trace log that contains a recent history of events for each WDF driver. 
+    *   The trace logs track the progress of I/O request packets (IRPs) through the framework and the corresponding requests through a driver. 
+    *   Each Kernel-Mode Driver Framework (KMDF) and User-Mode Driver Framework (UMDF) driver has its own log.
+    *   The WDF logger is always enabled. For each trace log, the logger stores event records in a circular memory buffer. 
+    
 === Ntdebugging ===
 *   [[http://blogs.msdn.com/b/ntdebugging/default.aspx?PageIndex=1|msdn blog -> debugging]]
 

@@ -238,49 +238,59 @@
 == C++ > C ==
 *   C++包含完整的C标准库函数， 头文件在C头文件基础上加c， 包含在std中。 如cctype.h
 *   引用
-*   函数默认参数
-    *   对于带参数列表的函数， 必须从右向左添加默认值， 即要为某个参数添加默认值， 必须为其右边所有参数添加。
-    *   实参按从左向右的顺序依次向形参赋值， 不能跳过任何参数
-*   函数重载：仅当函数基本上执行相同的任务， 但使用不同形式的数据时才使用重载。
-    *   名称修饰：  实现重载的关键
-*   函数模板， 使用泛型来定义函数， 其中的泛型可使用具体的类型来代替
-    *   模板并不创建函数， 只是告诉编译器如何定义函数
-    {{{
-        //template和typename是关键字
-        template <typename T>
-        void Swap(T &a, T &b)
-        {
-            T temp;
-            temp = b;
-            b = a;
-            a = temp;
-        }
-    }}}
-    *   具体化      得到模板实例， 即包含具体类型的函数定义
-        *   隐式实例化  最初只能使用该方式
-        *   显示实例化  前缀template， 显示让编译器创建特定函数实例
-        *   显示具体化  前缀template <>， 不使用模板来生成函数定义， 而应使用专门为该类型显式地定义的函数定义
+*   函数
+    *   函数默认参数
+        *   对于带参数列表的函数， 必须从右向左添加默认值， 即要为某个参数添加默认值， 必须为其右边所有参数添加。
+        *   实参按从左向右的顺序依次向形参赋值， 不能跳过任何参数
+    *   函数重载：仅当函数基本上执行相同的任务， 但使用不同形式的数据时才使用重载。
+        *   名称修饰：  实现重载的关键
+    *   函数模板， 使用泛型来定义函数， 其中的泛型可使用具体的类型来代替
+        *   模板并不创建函数， 只是告诉编译器如何定义函数
         {{{
-            template <class T>
-            void Swap (T &, T &);   //template prototype
-
-            template <> void Swap<job> (job &, job &);  // explicit specialization for job
-
-            int main(void)
+            //template和typename是关键字
+            template <typename T>
+            void Swap(T &a, T &b)
             {
-                template void Swap<char> (char &, char &);  // explicit instantiation for char
-
-                short a, b;
-                Swap(a, b);     // implicit template instatiation for short
-
-                job n, m;
-                Swap(n,m);      // use explicit specialization for job          job is a struct
-                
-                char g, h;
-                Swap(g,h);      // use explicit template instatitiation for char
+                T temp;
+                temp = b;
+                b = a;
+                a = temp;
             }
-
         }}}
+        *   具体化      得到模板实例， 即包含具体类型的函数定义
+            *   隐式实例化  最初只能使用该方式
+            *   显示实例化  前缀template， 显示让编译器创建特定函数实例
+            *   显示具体化  前缀template <>， 不使用模板来生成函数定义， 而应使用专门为该类型显式地定义的函数定义
+            {{{
+                template <class T>
+                void Swap (T &, T &);   //template prototype
+
+                template <> void Swap<job> (job &, job &);  // explicit specialization for job
+
+                int main(void)
+                {
+                    template void Swap<char> (char &, char &);  // explicit instantiation for char
+
+                    short a, b;
+                    Swap(a, b);     // implicit template instatiation for short
+
+                    job n, m;
+                    Swap(n,m);      // use explicit specialization for job          job is a struct
+                    
+                    char g, h;
+                    Swap(g,h);      // use explicit template instatitiation for char
+                }
+
+            }}}
+    *   特殊成员函数
+        *   C++自动提供下面的这些成员函数：
+            *   默认构造函数， 如果没有定义构造函数, 编译器提供无参数， 无任何操作的构造函数
+            *   默认析构函数， 如果没有定义
+            *   复制构造函数， 如果没有定义
+            *   赋值运算符， 如果没有定义
+            *   地址运算符， 如果没有定义
+            *   移动构造函数(C++11)
+            *   移动赋值运算符(C++11)
 *   语言链接性
     *   extern "C" void spiff(int);     // use C protocol for name look-up , _spiff
     *   extern void spiff(int);         // use C++ protocol , _spiff_i  , default
