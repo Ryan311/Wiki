@@ -19,7 +19,7 @@
 *   [[Algorithms]]
 *   [[Programming]] [[C_C++]] [[Python]] [[Python3]] [[Cython]] [[Erlang]] [[JavaScript]] [[Object-C]]
 *   [[QT]]
-*   [[IPython]] [[Canopy]] [[Anaconda]] [[Conda]]
+*   [[IPython]] [[Canopy]] [[Anaconda]] [[Sage]]
 *   GCC MSVC [[Clang]]
 *   [[DataBase]]
 *   [[Vim]] [[Eclipse]] [[VS]] [[Vimer]] [[Sumblime]] [[QtCreator]]

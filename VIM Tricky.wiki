@@ -399,3 +399,8 @@
 *   Wiki auto convert to HTML
     *   Add autocmd to plugin/vimwiki.vim
     <br>_autocmd! bufwritepost *.wiki Vimwiki2HTML_
+-------------------------------------------------------------------------------------------------------------------
+*   Ubuntu gvim下复制粘贴到系统剪贴板
+    *   复制    Visual Mode -->  "+y
+    *   粘贴    ESC Mode --> "+p
+    *           Insert Mode --> Shift+Insert

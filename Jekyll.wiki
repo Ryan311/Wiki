@@ -7,5 +7,3 @@
 *   sudo gem install rdoc
 *   sudo gem install jekyll
 *   sudo gem install kramdown
-
-

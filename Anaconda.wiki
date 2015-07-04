@@ -2,5 +2,34 @@
 
 == Continuums Anaconda ==
 *   http://continuum.io/
+*   http://conda.pydata.org/
+*   http://conda.pydata.org/miniconda.html
 *   Completely free enterprise-ready Python distribution for large-scale data processing, predictive analytics, and scientific computing
 
+== Ubuntu Install & Uninstall ==
+*   http://continuum.io/downloads
+*   bash Anaconda-2.3.0-Linux-x86_64.sh
+*   rm -rf ~/anaconda
+*   Update
+    *   conda update conda
+    *   conda update anaconda
+
+== Conda ==
+*   Conda is a package manager application that quickly installs, runs, and updates packages and their dependencies. 
+*   A conda environment is a directory that contains a specific collection of conda packages that you have installed.
+
+=== How to use it ===
+*   conda update --help     //see how to use conda update
+*   conda --version
+*   conda update conda      //update conda
+*   Managing environments   
+    *   conda create --name snowflakes biopython    //create a new environment named /envs/snowflakes with the program Bippython
+    *   source activate snowflakes  //activate the new enviroment
+    *   conda info --envs   //list all environments
+    *   source deactivate   //change path from the current env back to root
+    *   conda create --name flowers --clone snowflakes  //clone an env
+    *   conda remove --name flowers --all   //delete an env
+    *   conda list  //view a list of packages and versions installed
+    *   conda search beautiful-soup //search for a package
+    *   conda install --name bunnies beautiful-soup // install a new package
+*   rm -rf ~/anaconda   // remove conda

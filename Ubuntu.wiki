@@ -169,5 +169,13 @@
     *   http://www.ibm.com/developerworks/cn/linux/l-script-linux-desktop-1/
 *   "Language support" icon missing in System Settings 
     *   sudo apt-get install language-selector-gnome 
-
+*   Install Java
+    *   如果你在 Ubuntu 软件中心安装过 OpenJDK，请先使用如下命令将其删除：
+        *   sudo apt-get purge openjdk*
+    *   sudo add-apt-repository ppa:webupd8team/java
+    *   sudo apt-get update
+    *   sudo apt-get install oracle-java9-installer
+*   Could not get lock /var/lib/dpkg/lock     
+    *   sudo rm /var/cache/apt/archives/lock
+    *   sudo rm /var/lib/dpkg/lock
 ---------------------------------------------------------------------------
