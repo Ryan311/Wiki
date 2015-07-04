@@ -13,7 +13,7 @@
 
 === Learning road ===
 *   [[Windows]] [[WindowsEmbeded]] [[Visual Studio]] [[Windbg]] [[WindowsProgram]]
-*   [[Linux]]
+*   [[Linux]] [[Ubuntu]]
 *   [[OpenStack]]
 *   [[Wiki]] [[Jekyll]] [[BootStrap]] [[DISQUS]]
 *   [[Algorithms]]
