@@ -1,10 +1,13 @@
 %toc
 = Virsual Machime =
+
 == Virsual Box ==
 
 === Introduction ===
+
 === Install ===
 [[https://www.virtualbox.org/wiki/Downloads|Download]]
+
 === Share fold with Host ===
 # In Host, add /usr/share/virsualbox/VBoxGuestAdditions.iso to Settings->Storage->CD/DVD
 # In Guest(Ubuntu12.04 Server), need to install build-essential and dkms first.<br> sudo apt-get update <br> sudo apt-get install build-essential
@@ -12,3 +15,47 @@
 # In Guest  <br> sudo ./VBoxLinuxAdditions.run
 # Add Share Folder in Settings->Shared Folders->Add
 # Restart Guest, then <br> sudo mount -t vboxsf Host /mnt
+
+
+=== VirtualBox的四种网络连接方式 ===
+VirtualBox中有4中网络连接方式：
+#   NAT     Network Address Translation，网络地址转换
+    {{{
+        NAT模式是最简单的实现虚拟机上网的方式，你可以这样理解：
+            Guest访问网络的所有数据都是由主机提供的，Guest并不真实存在于网络中，主机与网络中的任何机器都不能查看和访问到Guest的存在。
+        Guest可以访问主机能访问到的所有网络，但是对于主机以及主机网络上的其他机器，Guest又是不可见的，甚至主机也访问不到Guest。
+
+        虚拟机与主机的关系：只能单向访问，虚拟机可以通过网络访问到主机，主机无法通过网络访问到虚拟机。
+        虚拟机与网络中其他主机的关系：只能单向访问，虚拟机可以访问到网络中其他主机，其他主机不能通过网络访问到虚拟机。
+        虚拟机与虚拟机的关系：相互不能访问，虚拟机与虚拟机各自完全独立，相互间无法通过网络访问彼此。   
+    }}}
+#   Bridged Adapter
+    {{{
+        它是通过主机网卡，架设了一条桥，直接连入到网络中了。因此，它使得虚拟机能被分配到一个网络中独立的IP，所有网络功能完全和在网络中的真实机器一样。
+        网桥模式下的虚拟机，你把它认为是真实计算机就行了。
+
+        虚拟机与主机的关系：可以相互访问，因为虚拟机在真实网络段中有独立IP，主机与虚拟机处于同一网络段中，彼此可以通过各自IP相互访问。
+     虚拟机于网络中其他主机的关系：可以相互访问，同样因为虚拟机在真实网络段中有独立IP，虚拟机与所有网络其他主机处于同一网络段中，彼此可以通过各自IP相互访问。
+        虚拟机与虚拟机的关系：可以相互访问，原因同上。
+    }}}
+#   Internal         // 比Vmware多的一种， 其它三个一样
+    {{{
+        内网模式，顾名思义就是内部网络模式：
+            虚拟机与外网完全断开，只实现虚拟机于虚拟机之间的内部网络模式。
+
+        虚拟机与主机的关系：不能相互访问，彼此不属于同一个网络，无法相互访问。
+        虚拟机与网络中其他主机的关系：不能相互访问，理由同上。
+        虚拟机与虚拟机的关系：可以相互访问，前提是在设置网络时，两台虚拟机设置同一网络名称。如上配置图中，名称为intnet。
+    }}}
+#   Host-only Adapter 
+    {{{
+        主机模式，这是一种比较复杂的模式，需要有比较扎实的网络基础知识才能玩转。可以说前面几种模式所实现的功能，
+        在这种模式下， 通过虚拟机及网卡的设置都可以被实现。 我们可以理解为Guest在主机中模拟出一张专供虚拟机使用的网卡，
+        所有虚拟机都是连接到该网卡上的，我们可以通过设置这张网卡来实现上网及其他很多功能，比如（网卡共享、网卡桥接等）。 
+                
+        虚拟机与主机的关系：默认不能相互访问，双方不属于同一IP段，host-only网卡默认IP段为192.168.56.X 子网掩码为255.255.255.0，后面的虚拟机被分配到的也都是这个网段。通过网卡共享、网卡桥接等，可以实现虚拟机于主机相互访问。 
+        虚拟机与网络主机的关系：默认不能相互访问，原因同上，通过设置，可以实现相互访问。
+        虚拟机与虚拟机的关系：默认可以相互访问，都是同处于一个网段。
+    }}}
+
+

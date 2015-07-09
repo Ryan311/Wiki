@@ -1,3 +1,15 @@
 %toc
 
+== Intro ==
+*   Sage 是一个免费的、开源的数学软件系统，采用GPL协议。它整合了许多开源Python包，采用Python语言编写，但也支持其他语言。它的目标是创造一个可变的开源软件以替代Magma、Maple、Mathematica和Matlab。Sage不仅是一个软件，也是一个编程环境，提供命令行模式、笔记本模式，可以编写编译型程序和解释型程序。目前Sage支持Linux、Mac OS X、BSD、Solaris平台。
+*   http://www.sagemath.org/    //官网
+*   https://cloud.sagemath.com/projects //在线的Sage Math, 注册就可以使用, persnail
 
+== tutorial ==
+*   http://doc.sagemath.org/html/en/tutorial/index.html     //Document 
+*   http://forum.ubuntu.org.cn/viewtopic.php?p=1183988  //中文翻译
+
+== Usage ==
+*   Download the package and extract
+*   Add path to .bashrc
+*   sage

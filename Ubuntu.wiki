@@ -2,6 +2,7 @@
 
 == Ubuntu ==
 === Tricks ===
+*   查看Ubuntu版本  >lsb_release -d
 *   显示或隐藏文件管理器侧边栏      F9 toggle/
 *   ubuntu unity, 已挂载的磁盘不显示在左边侧栏（启动器）
 {{{
@@ -55,9 +56,11 @@
       <br> chmod +x back.sh
       <br> ./back.s
 *   [[http://www.cnblogs.com/vimmer/articles/2645734.html|GoldenDict]]
-    *   sudo apt-get install goldendict
-    *   download dictionaries and unzip to a dir
+    *   sudo apt-get install goldendict goldendict-wordnet
+    *   download dictionaries and unzip to a dir    http://abloz.com/huzheng/stardict-dic/zh_CN/
     *   open goldendict -> edit this group -> add online dict and local dict
+    *   有道网页        http://dict.youdao.com/search?q=%GDWORD%&ue=utf8
+    *   本地词典        放到百度云里 ？？？
 *   Ubuntu加速
     *   Preload, 可以预先加载程序使用的库或二进制文件进内存，加快程序启动速度
         *   sudo apt-get install preload
