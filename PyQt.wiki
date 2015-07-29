@@ -1,0 +1,16 @@
+%toc
+
+http://www.riverbankcomputing.com/news
+
+== Install ==
+*   Manu:   http://my.oschina.net/quanpower/blog/307140
+*   Auto:   sudo apt-get install pyqt5-dev pyqt5-examples pyqt5-tools
+    *   安装完成后， examples在/usr/share/doc/pyqt5-examples目录下
+
+== Qt Designer ==
+*   可使用Qt的Designer来设计界面, 生成文件*.ui
+*   将*.ui转换成*.py:   
+    *   *pyuic5 DialogUI.ui -o qtDialog.py*
+    *   pyuic5 DialogUI.ui -o qtDialog.py -p    // Preview
+    *   pyuic5 DialogUI.ui -o qtDialog.py -x    // generate extra code to test and display the class
+*   将生成的.py文件导入即可使用UI界面

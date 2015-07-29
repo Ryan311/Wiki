@@ -1,5 +1,5 @@
 %toc
-= Python Library =
+= Python Build-in Library =
 ==  Build-in Types ==
 *   The principal built-in types are __numerics, sequences, mappings, files, classes, instances and exceptions__
 *   
@@ -48,3 +48,18 @@
 *   random.sample(x, k)    -> 在序列对象x中取出k个样本
 *   random.random()     -> 返回下一个随机数[0,1)之间
 *   random.uniform(a,b) -> 返回下一个在[a,b]之间的随机数
+
+
+= Third Party =
+== hachoir ==
+*   https://bitbucket.org/haypo/hachoir/wiki/Home
+    *   能够解析Mp3、jpeg等等文件的MetaData并打印出来， 对二进制文件的字节处理
+*   Install
+    {{{
+        sudo apt-get install    python-hachoir-core python-hachoir-metadata python-hachoir-parser 
+                                python-hachoir-urwid python-hachoir-subfile python-hachoir-regex 
+                                python-hachoir-wx 
+    }}}
+*   Example
+    *   https://bitbucket.org/haypo/hachoir/wiki/hachoir-metadata/code
+    *   http://www.thehackeruniversity.com/2014/02/02/python-hachoir-tutorial

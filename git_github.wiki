@@ -75,3 +75,6 @@ git clone git://git.kernel.org/pug/scm/git/git.git
 *   http://www.worldhello.net/gotgithub/06-side-projects/gist.html
 *   可以将代码片断插入到网页中
 
+----------------------------------------------------------------------------------------------------------------------------------------
+= gitflow =
+*   [[http://blog.jobbole.com/76867/|Git工作流指南：Gitflow工作流]]

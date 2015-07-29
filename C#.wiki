@@ -1,0 +1,5 @@
+%toc
+
+== Mono ==
+*   sudo apt-get install mono-complete
+*   Mono是Xamarin公司C#和CLR的ECMA标准基于开发的一个开源的.NET实现版本，它是Linux平台上开发.NET应用程序首选。同时其也提供了Xamarin.IOS和Xamarin.Andriod，是我们可以直接使用C#开发IOS和Andriod手机开发。

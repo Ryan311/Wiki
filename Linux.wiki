@@ -66,6 +66,8 @@
     *   dmesg | grep -i usb             搜索包含特定字符串的被检测到的硬件
     *   dmesg -c                        清空dmesg缓冲区日志
     *   watch "dmesg | tail -20"        实时监控dmesg日志输出
+*   删除文件名中带空格的文件
+    *   rm -rf "git github.wiki"
 *   Ubuntu终端Terminal常用快捷键     
     *   Tab 自动补全
     *   Ctrl+a 光标移动到开始位置

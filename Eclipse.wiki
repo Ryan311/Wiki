@@ -3,6 +3,13 @@
 *   Plugins
     *   CDT for C/C++ project
     *   Pydev for python project
+        *   Project Address:     http://sourceforge.net/projects/pydev/files/
+            *   下载最新版本的PyDev， 解压将Copy到Eclipse目录
+        *   Install Location from Eclipse:    http://pydev.org/updates
+        *   PyQt5加入到Build_in模块中， 这样在使用时不会显示错误
+            *   在PyDev->Python Interpreter->Libraries中加入PyQt5库， /usr/lib/python3/dist-packages/PyQt5
+            *   在PyDev->Python Interpreter->Force Buildins, News:  Add [PyQt5.Qt, PyQt5.QtGui ......], 
+            *   上面的列表内容：  python ->  import PyQt5  ->  help(PyQt5)  : PACKAGE CONTENTS
     *   Erlide for Erlang project
     *   vrapper for Vimer in eclipse
 *   Show eclipse icon in the Unity launcher

@@ -4,7 +4,7 @@
 === 字符类型 ===
 *   char, wchar_t, CHAR, WCHAR, TCHAR, UCHAR, BYTE, TBYTE
     char            是C语言标准数据类型，字符型。通常由编译器决定一个char对象有多少个字节组成，一般是一字节。
-    wchar_t         是char的Unicode版本。相当于 unsigned short。一般两个字节。
+    wchar_t         是char的Unicode版本。相当于 unsigned short。一般两个字节。 linux下有时4字节， sizeof(wchar_t) = 4
     CHAR            参照定义： typedef char CHAR;
     WCHAR           参照定义： typedef wchar_t WHAR;
     TCAHR           通用版字符类型：在ANSI编译方式下为 char ， 在Unicode 编译方式下为 wchar_t。

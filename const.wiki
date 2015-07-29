@@ -1,0 +1,51 @@
+%toc
+
+== const ==
+#   If you want to make sure that ptr cannot point to any other memory location
+    (i.e., cannot store a different address), you can write it one of two ways:
+    {{{
+        Type* const ptr = &vbl;
+        Type* const ptr(&vbl);
+        
+        The pointer is a const , but the addressed object can be changed.
+    }}}
+#   If you want to make sure that the value of vbl cannot be changed by dereferencing ptr , you can write it in two ways:
+    {{{
+        const Type* ptr = &vbl;
+        const Type* ptr(&vbl);
+        
+        In this case, the addressed object is a constant, but the pointer is not.
+    }}}
+#   If you want to impose both kinds of protection, you can write
+    {{{
+        const Type* const ptr = &vbl;
+        const Type* const ptr(&vbl);
+    }}}
+#   Here is a good way to remember which is which: Read each of the following definitions from right to left (starting with the defined variable).
+    {{{
+        const char* x = &p;             /* x is a pointer to const char */
+        char* const y = &q;             /* y is a const pointer to char */
+        const char* const z = &r;       /* z is a const pointer to a const char */
+    }}}
+
+=== const Member Functions ===
+*   C++
+*   The const keyword has a special meaning when it is applied to a (non- static ) class member function. 
+*   Placed after the parameter list, const becomes part of the function signature and guarantees that the function will not change the state of the host object.
+
+
+== volatile ==
+*   It can be used in the same places that const can be used. volatile can be thought of as almost the opposite of const : 
+*   It marks something that can be modified at any time, perhaps by another program or another thread. 
+*   It is a hint to the compiler that there should be no optimization during access to it.
+*   It can be used for variables, but more commonly, it is used for pointers. Like const , it can be applied to the pointer or the addressed memory. 
+    {{{
+        To declare a regular pointer to volatile memory, use this form:
+            volatile char* vcharptr;
+        To declare a volatile pointer to regular memory, use this form:
+            char* volatile vptrchar;
+    }}}
+    
+== mutable ==
+    
+

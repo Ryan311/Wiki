@@ -181,4 +181,56 @@
 *   Could not get lock /var/lib/dpkg/lock     
     *   sudo rm /var/cache/apt/archives/lock
     *   sudo rm /var/lib/dpkg/lock
+*   为知笔记
+    *   从官方PPA仓库安装：
+    {{{
+        $ sudo add-apt-repository ppa:wiznote-team
+        $ sudo apt-get update
+        $ sudo apt-get install wiznote
+    }}}
+*   Ubuntu/Debian 修改文件关联打开程序
+    {{{
+        Ubuntu/Debian设置里面没有windows下的“文件夹选项”，不能直接修改文件关联。
+        如果对系统默认的打开程序不满意，想按文件类型MIME TYPE修改文件的默认打开
+        程序，需要手动修改下面的配置文件。 保存全局打开方式的文件：/etc/gnome/defaults.list
+        用户自定义的配置文件：~/.local/share/applications/mimeapps.list
+        全局配置无需修改，只要将相关内容复制到用户自定义文件修改即可。
+        
+        QtCreator
+        1)  已经存在的文件   .local/share/application/DigiaQt-qtcreator-community.desktop     
+        2)  修改文件     .local/share/application/mimeapps.list 2) 修改文件  .local/share/application/mimeapps.list 
+        3)  在文件尾部加入 
+            application/x-designer=DigiaQt-qtcreator-community.desktop
+            application/vnd.qt.qmakeprofile=DigiaQt-qtcreator-community.desktop
+            application/vnd.qt.xml.resource=DigiaQt-qtcreator-community.desktop
+            text/x-qml=DigiaQt-qtcreator-community.desktop
+            text/x-qt.qml=DigiaQt-qtcreator-community.desktop
+            text/x-qt.qbs=DigiaQt-qtcreator-community.desktop
+    }}}
+*   Ubuntu在Applications中显示的图标与程序的关联
+    *   ~/.local/share/application/*.desktop    本地的应用图标， 这些文件包含图标与程序的对应信息
+    *   /usr/share/applications/*.desktop       系统应用图标
+    *   如果遇到图标存在但是打不开程序， 在这里查看一下对应的文件中程序的路径是否正确
+    *   创建.desktop文件， 可以手动创建， 也可以用工具：
+        *   安装gnome-panel:     sudo apt-get install gnome-panel 
+        *   使用gnome-panel:     gnome-desktop-item-edit [选线] [路径] [指令]
+*   Unity and Compiz
+    *   重置Compiz      dconf reset -f /org/compiz
+    *   重启Unity       setsid unity
+*   硬件信息
+    *   查看USB设备，使用lsusb命令
+    *   查看本机硬件信息， hardinfo
+        *   sudo apt-get install hardinfo
+    *   sysinfo     同hardinfo, 轻量级
+        *   sudo apt-get install sysinfo
+    *   lspci   显示系统中所有PCI总线设备或连接到该总线上的所有设备的工具
+        *   lspci -v
+        *   lspci -vv
+        *   lspci -vvv
+        *   man lspci
+*   3D特效
+    *   安装CCSM设置管理器, 在软件中心输入"compiz"， Install “CompizConfig Settings Manager“
+    *   安装compiz特效插件： sudo apt-get install compiz-plugins-extra
+*   中文输入法 fcitx
+    *   https://fcitx-im.org/wiki/Install_%28Ubuntu%29
 ---------------------------------------------------------------------------

@@ -16,6 +16,18 @@
         *   #pragma alloc_text(INIT, DriverEntry)           如果某些代码在驱动程序完成初始化后不再需要，可以直接把它插入到INIT段
         *   #pragma alloc_text(PAGE, a)                     表示函数a运行在分页内存中
 
+== VS集成Qt环境搭建 ==
+*   http://blog.sina.com.cn/s/blog_a6fb6cc90101gynd.html
+*   下载Qt5.*安装包（qt-windows-opensource）与Qt插件（Visual Studio Add-in）
+*   配置开发环境
+    *   选择：Qt5->Qt Options->Add，配置VS的开发环境。
+*   添加环境变量, 否则丢失*.dll的提示信息
+    *   右键计算机->属性->高级系统设置->高级->环境变量，添加环境变量（推荐）
+    *   QTDIR：D:\Software\Qt\Qt5.5.0\5.5\msvc2013
+    *   PATH：%QTDIR%\bin
+*   编码时， 找不到QT的内容
+    *   Assist的Option中， C/C++ 选项 -> Customer -> other include -> 包含QT的Include， 然后重启即可
+
 == VC ==
 *   [[Query Register and Convert 64 int to String]]
 *   [[file operation in kernal mode]]
@@ -122,6 +134,31 @@ section, 在img被装载到内存时，该section不一定会存在（被paged o
     *   vcxproj文件中保存了编译链接的所有信息， 有出现类似问题可以查看该文件
 
 
+== VS2012 ==
+*   VS2012 Config
+    *   Turn off Unicode in VC++ Project
+        *   Project Properties -> General -> Project Defaults -> *Character Set*
+    *   .sdf and ipch
+        *   Visual Studio用来保存预编译的头文件和Intellisense用的
+        *   不在当前工程中生成这些文件, VS用临时文件夹保存这些文件
+        {{{
+        Tools->Options  Text Editor -> C/C++ -> Advanced
+        Fallback Location:  Always use Fallback Location -> Set True
+                            Do Not Warn if Fallback Location Used  -> Set True
+        }}}
+*   [[https://github.com/jaredpar/VsVim|VsVim]] vim extension in VS2012
+    *   Tools -> Extensions and Updates -> Search VsVim and Install -> Restart VS2012
+    *   Config Key mappings
+    *   :set vimrc          -> Show the vimrc which VsVim read
+*   VS2012 静态编译c c++运行库
+    *   Win8上编译的程序在Win7上有可能不能运行，原因是它们使用的C运行库不一样，好的解决方法是在编译时将运行库编译进程序，随程序一起发布
+    *   在VS2012中修改设置：Project Property->Configuration Properties->C/C++->Code Generation->Runtime Library->修改选项为"Mutiple-threaded(/MT)"
+*   VS里面非常好用的功能，在build之前或之后可以完成一些动作，比如文件Copy，但是在Copy时注意命令的写法：(nonpnp sample in e:\work\sampledriver)
+{{{//不能想当然的写相对路径，要使用VS定义的宏来指明路径，在调用该cmd时会解析成完整路径
+Error   copy "..\..\wdf\x86\WdfCoInstaller01011.dll" ".\bin"
+Right   copy "$(SolutionDir)..\..\wdf\x86\WdfCoInstaller01011.dll" "$(SolutionDir)bin\"
+}}}
+
 === VS2012 写DLL ===
 *   File->New->Project  ==> 
     *   New Project:    Win32 -> Win32 Project -> Name & Location   ==> Next 
@@ -161,4 +198,3 @@ Note:   这里之所以创建空的项目，是因为我想用.c文件而不是.
     *   可能用工具dumpbin.exe(VS自带,分析PE文件格式)来调试这种链接错误
     *   dumpbin.exe -exports LEGap.dll      //查看dll的导出函数
     *   dumpbin.exe -imports LEGapTest.exe  //查看exe中导入的函数
-

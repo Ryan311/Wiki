@@ -1,0 +1,16 @@
+%toc
+
+== Build ==
+*   下载Source Code并解压
+*   在解压目录下运行如下, 如果出现错误可在config.log里面找原因， 一般是依赖的包没有安装， 用apt-get安装即可
+    {{{
+        ./configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var --enable-experimental --with-systemdsystemunitdir=/lib/systemd/system --with-systemduserunitdir=/usr/lib/systemd
+    }}}
+*   make
+*   make install
+    
+== Tools ==
+*   hciconfig
+*   hcidump
+*   hcitool
+*   hciattach

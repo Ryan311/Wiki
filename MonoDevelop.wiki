@@ -1,0 +1,5 @@
+%toc
+
+== Install ==
+*   sudo apt-get install mono-complete
+*   sudo apt-get install monoDevelop

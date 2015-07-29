@@ -17,13 +17,13 @@
 *   [[Programming]] 
     *   [[Algorithms]]
     *   [[Scratch]]
-    *   [[C_C++]] [[QT]] [[Object-C]]
-    *   [[Python]] [[Python3]] [[Cython]] [[IPython]] [[Canopy]] [[Anaconda]] [[Sage]]
+    *   [[C_C++]] [[QT]] [[Object-C]] [[C#]]
+    *   [[Python]] [[Python3]] [[PyQt]] [[Cython]] [[IPython]] [[Canopy]] [[Anaconda]] [[Sage]]
     *   [[Erlang]] [[JavaScript]] 
     *   [[HTML]] [[JavaScript]] [[CSS]] [[LAMP]]
     *   [[Mono]]
 *   Tools
-    *   [[Vim]] [[Eclipse]] [[VS]] [[Vimer]] [[Sumblime]] [[QtCreator]]
+    *   [[Vim]] [[Eclipse]] [[Vimer]] [[Sumblime]] [[QtCreator]] [[MonoDevelop]]
     *   [[Visual Studio]] [[Windbg]] [[Visual Code Studio]]
     *   [[Wiki]] [[Jekyll]] [[BootStrap]] [[DISQUS]]
     *   GCC MSVC [[Clang]]
@@ -39,6 +39,8 @@
     *   [[Cloud Compute]]  [[OpenStack]]
     *   [[Security]]
     *   [[TCP_IP]]
+    *   [[BlueZ]] [[DBUS]] 
+    *   [[Charset]]
 
 
 === As a programmer ===
