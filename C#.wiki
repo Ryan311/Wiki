@@ -1,5 +1,597 @@
 %toc
 
-== Mono ==
-*   sudo apt-get install mono-complete
-*   Mono是Xamarin公司C#和CLR的ECMA标准基于开发的一个开源的.NET实现版本，它是Linux平台上开发.NET应用程序首选。同时其也提供了Xamarin.IOS和Xamarin.Andriod，是我们可以直接使用C#开发IOS和Andriod手机开发。
+== Online tutorial ==
+*   http://csharp.net-tutorials.com
+*   https://msdn.microsoft.com/en-us/library/aa287558%28v=vs.71%29.aspx
+
+== Features ==
+The following reasons make C# a widely used professional language:
+#   Modern, general-purpose programming language
+#   Object oriented.
+#   Component oriented.
+#   Easy to learn.
+#   Structured language.
+#   It produces efficient programs.
+#   It can be compiled on a variety of computer platforms.
+#   Part of .Net Framework.
+
+=== Features ===
+*   Nullables
+    *   <data_type> ? <variable_name> = null;
+    {{{
+        出于对数据库访问的需要，C#中定义了一种类型，称为nullable类型。比如，在访问数据库时，需要返回某个整型字段的值。
+        但是，当数据库中不存在符合条件的纪录时，返回的将是null。这样，以下这段代码便是非法：
+        
+                int result = aDbCmd.ExecuteScalar(); // aDbCmd.ExecuteScalar() returns null to indicate no result fetched.
+
+        MS提到了普遍使用的三种解决方法：
+        1、用一个特殊值来表示。缺点在于你需要确定确实有一个值，除了用来指示是否为空外永远不会被用到；
+        2、使用一个bool型的字段或者变量来指示。缺点在于难于作为参数和返回值使用；
+        3、定义一个自定义的可空类型。但只能用于一个封闭的，无法拓展的类型集合。
+
+        于是MS使用了nullable类型。其实在我看来，MS只不过是利用了它对C#的控制，扩充了第三种解决方法，将某种东西附加到每个nonnullable的类型上。
+        在C#中，nullable的表示是在类型之后加上“?”。可以认为以下两种定义是等价的： T?等价于
+        struct nullable
+        {
+            private T value;
+            private bool nullIndicator;
+            public T Value
+            {
+                get
+                {
+                    if (!nullIndicator)
+                        throw new InvalidOperationException();
+                    return value;
+                }
+            }
+            public bool HasValue
+            {
+               get { return nullIndicator; }
+            }
+            public nullable(T aValue)
+            {
+               value = aValue;
+               nullIndicator = true;
+            }
+            public nullable()
+            {
+               value = UnInitializedT;
+               nullIndicator = false;
+            }
+            // ...
+        }
+    }}}
+
+*   Arrays
+    *   datatype[] arrayName;
+    *   int [] marks = new int[5] { 99, 98, 92, 97, 95};
+    *   foreach (int j in marks )   ;  遍历数组
+    *   Multi-dimensional arrays
+        *   string [,] names;   // 2-dimensional array
+        *   int [,,] m;     // 3-dimensional array
+        {{{
+            int[,] a = new int[5, 2] {{0,0}, {1,2}, {2,4}, {3,6}, {4,8} };
+            int i, j;
+            /* output each array element's value */
+            for (i = 0; i < 5; i++)
+            {
+                for (j = 0; j < 2; j++)
+                {
+                    Console.WriteLine("a[{0},{1}] = {2}", i, j, a[i,j]);
+                }
+            }
+        }}}
+    *   Jagged Arrays:  A Jagged array is an array of arrays
+        *   int [][] scores;
+        {{{
+            int[][] scores = new int[5][];
+            for (int i = 0; i < scores.Length; x++)
+            {
+                scores[i] = new int[4];
+            }
+            
+            int[][] scores = new int[2][]{new int[]{92,93,94},new int[]{85,66,87,88}};
+            
+            int i, j;
+            /* output each array element's value */
+            for (i = 0; i < 5; i++)
+            {
+                for (j = 0; j <; 2; j++)
+                {
+                    Console.WriteLine("a[{0}][{1}] = {2}", i, j, scores[i][j]);
+                }
+            }
+        }}}
+
+*   Polymorphism
+    *   C# provides two techniques to implement static polymorphism. These are:
+        *   Function overloading
+        *   Operator overloading 
+        {{{
+            // Overload + operator to add two Box objects.
+            public static Box operator+ (Box b, Box c)
+            {
+                Box box = new Box();
+                box.length = b.length + c.length;
+                box.breadth = b.breadth + c.breadth;
+                box.height = b.height + c.height;
+                return box;
+            }
+        }}}
+    *   Dynamic polymorphism is implemented by abstract classes and virtual functions.
+        {{{
+            using System;
+            namespace PolymorphismApplication
+            {
+                abstract class Shape
+                {
+                    public abstract int area();
+                }
+                
+                class Rectangle: Shape
+                {
+                    private int length;
+                    private int width;
+                    public Rectangle( int a=0, int b=0)
+                    {
+                        length = a;
+                        width = b;
+                    }
+                    public override int area ()
+                    {
+                        Console.WriteLine("Rectangle class area :");
+                        return (width * length);
+                    }
+                }
+                class RectangleTester
+                {
+                    static void Main(string[] args)
+                    {
+                        Rectangle r = new Rectangle(10, 7);
+                        double a = r.area();
+                        Console.WriteLine("Area: {0}",a);
+                        Console.ReadKey();
+                    }
+                }
+            }
+        }}}
+        *   When you have a function defined in a class that you want to be implemented in an inherited class(es), you use virtual functions.
+        {{{
+            using System;
+            namespace PolymorphismApplication
+            {
+                class Shape
+                {
+                    protected int width, height;
+                    public Shape( int a=0, int b=0)
+                    {
+                        width = a;
+                        height = b;
+                    }
+                    public virtual int area()
+                    {
+                        Console.WriteLine("Parent class area :");
+                        return 0;
+                    }
+                }
+                
+                class Rectangle: Shape
+                {
+                    public Rectangle( int a=0, int b=0): base(a, b)
+                    {
+                    }
+                    
+                    public override int area ()
+                    {
+                        Console.WriteLine("Rectangle class area :");
+                        return (width * height);
+                    }
+                }
+                
+                class Triangle: Shape
+                {
+                    public Triangle(int a = 0, int b = 0): base(a, b)
+                    {
+                    }
+                    
+                    public override int area()
+                    {
+                        Console.WriteLine("Triangle class area :");
+                        return (width * height / 2);
+                    }
+                }
+                
+                class Caller
+                {
+                    public void CallArea(Shape sh)
+                    {
+                        int a;
+                        a = sh.area();
+                        Console.WriteLine("Area: {0}", a);
+                    }
+                }
+                
+                class Tester
+                {
+                    static void Main(string[] args)
+                    {
+                        Caller c = new Caller();
+                        Rectangle r = new Rectangle(10, 7);
+                        Triangle t = new Triangle(10, 5);
+                        c.CallArea(r);
+                        c.CallArea(t);
+                        Console.ReadKey();
+                    }
+                }
+            }
+        }}}
+*   Interface
+    *   Interfaces define properties, methods and events, which are the members of the interface. Interfaces contain only the declaration of the members.
+    *   It is the responsibility of the deriving class to define the members. It often helps in providing a standard structure that the deriving classes would follow.
+    {{{
+        public interface ITransactions
+        {
+            // interface members
+            void showTransaction();
+            double getAmount();
+        }
+    }}}
+
+*   C# I/O Classes
+    *   The System.IO namespace has various class that are used for performing various operation with files,
+    *   The FileStream Class
+    {{{
+        using System;
+        using System.IO;
+        namespace FileIOApplication
+        {
+            class Program
+            {
+                static void Main(string[] args)
+                {
+                    FileStream F = new FileStream("test.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                    for (int i = 1; i <= 20; i++)
+                    {
+                        F.WriteByte((byte)i);
+                    }
+                    F.Position = 0;
+                    for (int i = 0; i <= 20; i++)
+                    {
+                        Console.Write(F.ReadByte() + " ");
+                    }
+                    F.Close();
+                    Console.ReadKey();
+                }
+            }
+        }
+    }}}
+    *   The StreamReader and StreamWriter classes are used for reading from and writing data to text files.
+    {{{
+        using System;
+        using System.IO;
+        namespace FileApplication
+        {
+            class Program
+            {
+                static void Main(string[] args)
+                {
+                    try
+                    {
+                        // Create an instance of StreamReader to read from a file.
+                        // The using statement also closes the StreamReader.
+                        using (StreamReader sr = new StreamReader("c:/jamaica.txt"))
+                        {
+                            string line;
+                            // Read and display lines from the file until
+                            // the end of the file is reached.
+                            while ((line = sr.ReadLine()) != null)
+                            {
+                                Console.WriteLine(line);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        // Let the user know what went wrong.
+                        Console.WriteLine("The file could not be read:");
+                        Console.WriteLine(e.Message);
+                    }
+                    Console.ReadKey();
+                }
+            }
+        }
+    }}}
+    *   The BinaryReader and BinaryWriter classes are used for reading from and writing to a binary file.
+    *   The DirectoryInfo class is derived from the FileSystemInfo class. It has various methods for creating, moving, and browsing through directories and subdirectories.
+    *   The FileInfo class is derived from the FileSystemInfo class. It has properties and instance methods for creating, copying, deleting, moving, and opening of files, and helps in the creation of FileStream objects.
+    {{{
+        using System;
+        using System.IO;
+        namespace WindowsFileApplication
+        {
+            class Program
+            {
+                static void Main(string[] args)
+                {
+                    //creating a DirectoryInfo object
+                    DirectoryInfo mydir = new DirectoryInfo(@"c:\Windows");
+                    
+                    // getting the files in the directory, their names and size
+                    FileInfo [] f = mydir.GetFiles();
+                    foreach (FileInfo file in f)
+                    {
+                        Console.WriteLine("File Name: {0} Size: {1}",
+                        file.Name, file.Length);
+                    }
+                    Console.ReadKey();
+                }
+            }
+        }
+    }}}
+                
+*   Attribute
+    *   Attributes are used for adding metadata, such as compiler instruction and other information such as comments, description, methods and classes to a program. 
+    *   The .Net Framework provides two types of attributes: the pre-defined attributes and custom built attributes.
+    *   The .Net Framework provides three pre-defined attributes:
+        *   AttributeUsage
+        *   Conditional
+        *   Obsolete
+
+*   Properties
+    *   Properties are named members of classes, structures and interfaces. Member variables or methods in a class or structures are called Fields.
+    *   The accessor of a property contains the executable statements that helps in getting (reading or computing) or setting (writing) the property.
+    {{{
+        public string Code
+        {
+            get
+            {
+                return code;
+            }
+            set
+            {
+                code = value;
+            }
+        }
+    }}}
+
+*   Indexers
+    *   An indexer allows an object to be indexed like an array. When you define an indexer for a class, this class behaves like a virtual array.
+    {{{
+        A one dimensional indexer has the following syntax:
+        element-type this[int index]
+        {
+            // The get accessor.
+            get
+            {
+                // return the value specified by index
+            }
+            // The set accessor.
+            set
+            {
+                // set the value specified by index
+            }
+        }
+    }}}
+    
+    {{{
+        class IndexedNames
+        {
+            private string[] namelist = new string[size];
+            static public int size = 10;
+            public IndexedNames()
+            {
+                for (int i = 0; i < size; i++)
+                {
+                    namelist[i] = "N. A.";
+                }
+                
+                public string this[int index]
+                {
+                    get
+                    {
+                        string tmp;
+                        if( index >= 0 && index <= size-1 )
+                        {
+                            tmp = namelist[index];
+                        }
+                        else
+                        {
+                            tmp = "";
+                        }
+                        return ( tmp );
+                    }
+                    
+                    set
+                    {
+                        if( index >= 0 && index <= size-1 )
+                        {
+                            namelist[index] = value;
+                        }
+                    }
+                }
+                
+                public int this[string name]
+                {
+                    get
+                    {
+                        int index = 0;
+                        while(index < size)
+                        {
+                            if (namelist[index] == name)
+                            {
+                                return index;
+                            }
+                            index++;
+                        }
+                        return index;
+                    }
+                }
+            }
+        }
+    }}}
+
+*   Delegates   委托
+    *   http://www.cnblogs.com/michaelxu/archive/2008/03/31/1131500.html
+    *   为什么要用委托: 　　使用委托使程序员可以将方法引用封装在委托对象内。然后可以将该委托对象传递给可调用所引用方法的代码，而不必在编译时知道将调用哪个方法。
+    *   C# delegates are similar to pointers to functions in C or C++.  // 类似函数指针, 但是委托是类型安全的
+    *   A delegate is a reference type variable that holds the reference to a method. 
+    *   The reference can be changed at runtime.  
+    *   Delegates are especially used for implementing events and the call-back methods. 
+    *   All delegates are implicitly derived from the System.Delegate class.
+    *   Syntax for delegate declaration is:     delegate <return type> <delegate-name> <parameter list>
+    *   Delegate objects can be composed using the "+" operator. A composed delegate calls the two delegates it was composed from. Only delegates of the same type can be composed. The "-" operator can be used to remove a component delegate from a composed delegate.
+    {{{
+        using System;
+        
+        delegate int NumberChanger(int n);
+        namespace DelegateAppl
+        {
+            class TestDelegate
+            {
+                static int num = 10;
+                public static int AddNum(int p)
+                {
+                    num += p;
+                    return num;
+                }
+                
+                public static int MultNum(int q)
+                {
+                    num *= q;
+                    return num;
+                }
+                
+                public static int getNum()
+                {
+                    return num;
+                }
+                
+                public static void showNum(NumberChanger nc)
+                {
+                    nc(10);
+                    Console.WriteLine("Value of Num: {0}", getNum());
+                }
+                
+                static void Main(string[] args)
+                {
+                    //create delegate instances
+                    NumberChanger nc;
+                    NumberChanger nc1 = new NumberChanger(AddNum);
+                    NumberChanger nc2 = new NumberChanger(MultNum);
+                    //calling the methods using the delegate objects
+                    nc1(25);
+                    Console.WriteLine("Value of Num: {0}", getNum());
+                    nc2(5);
+                    Console.WriteLine("Value of Num: {0}", getNum());
+                    
+                    nc = nc1;
+                    nc += nc2;
+                    nc(5);  // equal to nc1(5) + nc2(5)
+                    Console.WriteLine("Value of Num: {0}", getNum());
+                    
+                    showNum(nc1);
+                    showNum(nc2);
+                    Console.ReadKey();
+                }
+            }
+        }
+    }}}
+    
+*   Events
+    *   E vents are basically a user action like key press, clicks, mouse movements, etc., or some occurrence like system generated notifications.
+    *   Applications need to respond to events when they occur.
+    *   Events use the publisher-subscriber model.
+        *   A publisher is an object that contains the definition of the event and the delegate
+        *   A subscriber is an object that accepts the event and provides an event handler
+    *   Event关键字给对象赋予了有限制范围的能力，而delegate是无限权力的。
+
+*   Collections
+    *   ArrayList
+    *   Hashtable
+    *   SortedList
+    *   Stack
+    *   Queue
+    *   BitArray
+    *   using System.Collections
+
+*   Generics
+    *   generics allow you to write a class or method that can work with any data type.     类似模板
+    *   using System.Collections.Generic;
+    {{{
+        public class MyGenericArray<T>
+        {
+            private T[] array;
+            public MyGenericArray(int size)
+            {
+                array = new T[size + 1];
+            }
+            public T getItem(int index)
+            {
+                return array[index];
+            }
+            public void setItem(int index, T value)
+            {
+                array[index] = value;
+            }
+        } 
+    }}}
+    
+*   Anonymous Methods
+    *   Anonymous methods provide a technique to pass a code block as a delegate parameter. 
+    *   Anonymous methods are basically methods without a name, just the body.
+    {{{
+        delegate void NumberChanger(int n);
+        ...
+        NumberChanger nc = delegate(int x)
+        {// body
+            Console.WriteLine("Anonymous Method: {0}", x);
+        };
+    }}}
+
+
+*   Unsafe Codes
+    *   The unsafe code or the unmanaged code is a code block that uses a pointer variable
+    *   using unsafe to code block that using pointer
+    {{{
+        public unsafe void swap(int* p, int *q) 
+        { 
+            int temp = *p; 
+            *p = *q; 
+            *q = temp
+        }
+    }}}
+    *   For compiling unsafe code, you have to specify the /unsafe command-line switch with command-line compiler
+        *   csc /unsafe prog1.cs
+
+
+*   Multithreading
+    *   the System.Threading.Thread class is used for working with threads
+    {{{// Main thread
+        using System;
+        using System.Threading;
+        namespace MultithreadingApplication
+        {
+            class ThreadCreationProgram
+            {
+                public static void CallToChildThread()
+                {
+                    Console.WriteLine("Child thread starts");
+                }
+                
+                static void Main(string[] args)
+                {
+                    Thread th = Thread.CurrentThread;   // Get Current thread
+                    th.Name = "MainThread";
+                    Console.WriteLine("This is {0}", th.Name);
+                   
+                    ThreadStart childref = new ThreadStart(CallToChildThread);  // Create new thread
+                    Console.WriteLine("In Main: Creating the Child thread"); 
+                    Thread childThread = new Thread(childref); 
+                    childThread.Start();
+                    
+                    Console.ReadKey();
+                }
+            }
+        } 
+    }}}
+    *   The Abort() method is used for destroying threads

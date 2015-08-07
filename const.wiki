@@ -30,9 +30,22 @@
 
 === const Member Functions ===
 *   C++
-*   The const keyword has a special meaning when it is applied to a (non- static ) class member function. 
-*   Placed after the parameter list, const becomes part of the function signature and guarantees that the function will not change the state of the host object.
+*   Placed after the parameter list, const becomes part of the function signature and guarantees that the function will not change the state of the host object.    const member function不能修改data member的值
 
+
+=== const modify function parameter ===
+*   const修饰函数参数是它最广泛的一种用途，它表示在函数体中不能修改参数的值(包括参数本身的值或者参数其中包含的值)：
+    *   void function(const int Var);     //传递过来的参数在函数内不可以改变(无意义，该函数以传值的方式调用)
+    *   void function(const char* Var);   //参数指针所指内容为常量不可变
+    *   void function(char* const Var);   //参数指针本身为常量不可变(也无意义，var本身也是通过传值的形式赋值的)
+    *   void function(const Class& Var); //引用参数在函数内不可以改变
+*   参数const通常用于参数为指针或引用的情况，若输入参数采用“值传递”方式，由于函数将自动产生临时变量用于复制该参数，该参数本就不需要保护，所以不用const修饰。
+
+=== const修饰成员函数的返回值 ===
+1、一般情况下，函数的返回值为某个对象时，如果将其声明为const时，多用于操作符的重载。通常，不建议用const修饰函数的返回值类型为某个对象或对某个对象引用的情况。原因如下：如果返回const对象，或返回const对象的引用，则返回值具有const属性，返回实例只能访问类A中的公有（保护）数据成员和const成员函数，并且不允许对其进行赋值操作，这在一般情况下很少用到。
+2、如果给采用“指针传递”方式的函数返回值加const修饰，那么函数返回值（即指针所指的内容）不能被修改，该返回值只能被赋给加const 修饰的同类型指针。
+3、函数返回值采用“引用传递”的场合不多，这种方式一般只出现在类的赙值函数中，目的是为了实现链式表达。
+   
 
 == volatile ==
 *   It can be used in the same places that const can be used. volatile can be thought of as almost the opposite of const : 
@@ -46,6 +59,37 @@
             char* volatile vptrchar;
     }}}
     
+*   volatile的本意是“易变的”
+    *   volatile关键字是一种类型修饰符，用它声明的类型变量表示可以被某些编译器未知的因素更改，比如操作系统、硬件或者其它线程等。
+    *   遇到这个关键字声明的变量，编译器对访问该变量的代码就不再进行优化，从而可以提供对特殊地址的稳定访问。 
+    *   当要求使用volatile 声明的变量的值的时候，系统总是重新从它所在的内存读取数据，即使它前面的指令刚刚从该处读取过数据。而且读取的数据立刻被寄存。 
+
 == mutable ==
-    
+*   mutalbe的中文意思是“可变的，易变的”，跟constant（既C++中的const）是反义词。
+*   在C++中，mutable也是为了突破const的限制而设置的。被mutable修饰的变量(mutable只能由于修饰类的非静态数据成员)，将永远处于可变的状态，即使在一个const函数中。 
+    {{{
+        class ClxTest
+        {
+        public:
+        　　ClxTest();
+        　　~ClxTest();
+        　　void Output() const;
+        private:
+        　　mutable int m_iTimes;
+        };
+
+        ClxTest::ClxTest()
+        {
+            m_iTimes = 0;
+        }
+
+        ClxTest::~ClxTest()
+        {}
+
+        void ClxTest::Output() const
+        {
+            cout << "Output for test!" << endl;
+            m_iTimes++;
+        } 
+    }}}
 

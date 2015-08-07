@@ -3,3 +3,121 @@
 == Install ==
 *   http://sourceforge.net/projects/mingwbuilds/files/external-binary-packages/Qt-Builds/
 *   http://www.qt.io/download/
+
+== QT 模块 ==
+*   Qt5和Qt4最大的区别之一是底层架构有了修改， Qt5引入了模块化的概念， 将众多功能细分到几个模块之中
+*   Qt5模块分为Essential Modules和Add-on Modules
+    *   Essential Modules   基础模块， 在所有平台上都可用
+    *   Add-on Modules  扩展模块， 建立在基础的基础上， 在能够运行QT的平台上可酌情引入
+*   Qt 基础模块
+    *   Qt Core     提供核心的非GUI功能， 所有模块都需要
+    *   Qt Gui      提供GUI程序的基本功能， 窗口集成、事件处理， OpenGL等等
+    *   Qt Multimedia   提供视频、音频、收音机及摄像头等功能
+    *   Qt Network  提供跨平台的网络功能
+    *   Qt Qml      提供QML使用的C++ API
+    *   Qt Quick    允许在Qt/C++中购入Qt Quick
+    *   Qt SQL  允许使用SQL访问数据库
+    *   Qt Test     提供Qt程序的单元测试功能
+    *   Qt Webkit   基于WebKit2的实现以及一套全新的QML API
+*   Qt扩展模块
+    *   Qt 3D
+    *   Qt Bluetooth
+    *   Qt D-Bus
+    *   Qt OpenGL
+    *   Qt Widgets      // Qt4中QtGui相关于Qt5的QtGui+QtWidgets
+    
+
+== Features ==
+*   Signal & Slot       
+    *   信号和槽不是GUI模块提供的， 而是QT的核心特性之一
+    *   不再使用QT4的两个宏SLOT和SIGNAL
+*   Connect
+    {{{
+        QMetaObject::Connection connect(const QObject *, const char *,
+                                        const QObject *, const char *,
+                                        Qt::ConnectionType);
+ 
+        
+        QMetaObject::Connection connect(const QObject *, const QMetaMethod &,
+                                        const QObject *, const QMetaMethod &,
+                                        Qt::ConnectionType);
+
+        QMetaObject::Connection connect(const QObject *, const char *,
+                                        const char *,
+                                        Qt::ConnectionType) const;      // this as receiver
+                                        
+        QMetaObject::Connection connect(const QObject *, PointerToMemberFunction, 
+                                        const QObject *, PointerToMemberFunction, 
+                                        QT::ConnectionType);            
+                                        
+        QMetaObject::Connection connect(const QObject *, PointerToMemberFunction, 
+                                        Function);      // Function:    static function \ globle function \ lambda statement
+
+    }}}
+*   Generic containers
+    *   QList<T>
+    *   QStringList  ==   QList<QString>
+    *   QLinkedList<T>
+    *   QVector<T>
+    *   QStack<T>
+    *   QMap<Key, T>
+    *   QHash<Key, T>
+    *   QMultiMap<Key, T>
+    *   QCashe<Key, T>
+    *   QSet<T>
+
+*   Iterators:  Qt supports the following styles of iteration:
+    *   Qt style foreach loops, similar to Perl and Python
+    *   Java 1.2 style Iterator , which always points between elements
+    *   Standard Library style ContainerType ::iterator
+    *   Hand-made while or for loops that use the getters of the container
+    *   QDirIterator , for iterating through entries in a directory structure
+    {{{
+        QString winter = "December, January, February";
+        QString sprint = "March, April, May";
+        QString summer = "June, July, August";
+        QString fall = "September, October, November";
+        
+        QStringList list;
+        list << winter;
+        list += spring;
+        list.append(summer);
+        list << fall;
+        
+        QString allmonths = list.join(", ");
+        qDebug() << allmonths;
+        QStringList list2 = allmonths.split(", ");
+        qDebug() << list2;
+        /* Split is the opposite of join. Each month will have its own element. */
+        
+        // Foreach
+        foreach (const QString &str, list) 
+        {
+            qDebug() << QString(" [%1] ").arg(str);
+        }
+        
+        // C++ stype iteration
+        for (QStringList::iterator it = list.begin(); it != list.end(); ++it) 
+        {
+            QString current = *it;
+            qDebug() << "[[" << current << "]]";
+        }
+        
+        // Java stype iteration
+        QListIterator<QString> itr (list2);
+        while (itr.hasNext()) 
+        {
+            QString current = itr.next();
+            qDebug() << "{" << current << "}";
+        }
+            
+    }}}
+*   Lambda
+
+
+== Modules ==
+*   Qt DBUS
+*   Qt OpenGL
+*   Qt 3D
+*   Qt bluetooth
+*   Qt QML
