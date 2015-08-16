@@ -5,6 +5,7 @@
 *   [[c运行库_C标准库_windowsAPI]]
 *   [[Visual C++中C_C++格式化输出]]
 *   [[const]]
+*   类的访问权限
 
 
 ==  Bugs ==

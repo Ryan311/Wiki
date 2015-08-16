@@ -1,5 +1,9 @@
 %toc
 
+== Short Cut ==
+*   shift + Alt + Enter     全屏切换
+*   Ctrl+D                  设置控件焦点， MFC做图时有用
+*
 == VC C++ ==
 *   #pragma是C++中最复杂的预处理指令，下面是最常用的几个#pragma指令：
     * #pragma comment(lib,"XXX.lib")    表示链接XXX.lib这个库，和在工程设置里写上XXX.lib的效果一样。

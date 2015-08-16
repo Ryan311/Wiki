@@ -4,6 +4,7 @@
 *   http://csharp.net-tutorials.com
 *   https://msdn.microsoft.com/en-us/library/aa287558%28v=vs.71%29.aspx
 
+
 == Features ==
 The following reasons make C# a widely used professional language:
 #   Modern, general-purpose programming language
@@ -225,6 +226,7 @@ The following reasons make C# a widely used professional language:
                 }
             }
         }}}
+        
 *   Interface
     *   Interfaces define properties, methods and events, which are the members of the interface. Interfaces contain only the declaration of the members.
     *   It is the responsibility of the deriving class to define the members. It often helps in providing a standard structure that the deriving classes would follow.
@@ -336,6 +338,34 @@ The following reasons make C# a widely used professional language:
         *   AttributeUsage
         *   Conditional
         *   Obsolete
+    {{{
+        public class myClass{
+            public readonly string Name;
+            private int intVal;
+
+            public int Val
+            {
+                get
+                {
+                    return intVal;
+                }
+                set
+                {
+                    if(value >=0 && value <= 10)
+                        intVal = value;
+                    else
+                        throw (new ArgumentOutofRangeException("val", value, "Val must be assigned a value between 0 and 10."));
+                }
+            }
+            
+            static void main(string [] args)
+            {
+                myClass myOjb = new myClass("My Object");
+                val = 8;
+                Console.WriteLine("Val is {0}", val);
+            }
+        }
+    }}}
 
 *   Properties
     *   Properties are named members of classes, structures and interfaces. Member variables or methods in a class or structures are called Fields.
@@ -432,6 +462,7 @@ The following reasons make C# a widely used professional language:
 
 *   Delegates   委托
     *   http://www.cnblogs.com/michaelxu/archive/2008/03/31/1131500.html
+    *   委托是一种存储函数引用的类型 
     *   为什么要用委托: 　　使用委托使程序员可以将方法引用封装在委托对象内。然后可以将该委托对象传递给可调用所引用方法的代码，而不必在编译时知道将调用哪个方法。
     *   C# delegates are similar to pointers to functions in C or C++.  // 类似函数指针, 但是委托是类型安全的
     *   A delegate is a reference type variable that holds the reference to a method. 
@@ -498,12 +529,95 @@ The following reasons make C# a widely used professional language:
     }}}
     
 *   Events
-    *   E vents are basically a user action like key press, clicks, mouse movements, etc., or some occurrence like system generated notifications.
+    *   Events are basically a user action like key press, clicks, mouse movements, etc., or some occurrence like system generated notifications.
     *   Applications need to respond to events when they occur.
     *   Events use the publisher-subscriber model.
         *   A publisher is an object that contains the definition of the event and the delegate
         *   A subscriber is an object that accepts the event and provides an event handler
     *   Event关键字给对象赋予了有限制范围的能力，而delegate是无限权力的。
+    *   在定义事件前， 必须首先定义一个委托类型， 以用于该事件， 这个委托类型指定了事件处理方法必须拥有的返回类型和参数
+    {{{
+        namespace EventTest
+        {
+            public delegate void MessageHandler(string messageText);   // 声明委托类型
+
+            public class Connection
+            {
+                public event MessageHandler MessageArrived;     // 声明事件， 事件名称为MessageArrived
+                private Timer pollTimer;
+                
+                ......
+
+                private void CheckForMessage(object source, ElapsedEventArgs e)
+                {
+                    if(MessageArrived != Null)  // 当没有注册事件时， 为NULL
+                        MessageArrived("hello Mum!");       //触发事件， 对应的事件处理函数将被执行
+                }
+            }
+            
+            public class Display
+            {
+                public void DisplayMessage(string message)
+                {
+                    Console.WriteLine("Message Arrived: {0}", message);
+                }
+            }
+            
+            static void main(string[] args)
+            {
+                Connection myConnection = new Connection();
+                Display myDisplay = new Display();
+                myConnection.MessageArrived += new MessageHandler(myDisplay.DisplayMessage);    // 注册事件
+                myConnection.Connect();
+                Console.ReadKey();
+            }
+
+        }
+    }}}
+    *   可以定义自己的事件类型， 也可以使用标准的、无返回类型的委托类型和派生于System.EventArgs的定制事件参数
+    *   还可以使用EventHandler和EventHandler<T>委托类型
+
+*   匿名方法
+    *   在添加事件处理程序的地方直接定义要在引发事件时执行的代码， 需要使用delegate关键字
+    {{{
+        myConnection.MessageArrived += delegate(Connection source, MessageArrivedEventargs e)
+        {
+            Console.WriteLine("Message arrived from:{0}", source.Name);
+            Console.WriteLine("Message text: {0}", e.Message);
+        }
+    }}}
+*   匿名类型
+    *   简化编程
+    {{{
+        Curry curry = new Curry
+        {
+            MainIngredient = "Lamb",
+            Style = "Dhansak",
+            Spiciness = 5
+        };
+        
+        // 使用匿名类型定义curry, 不需要再定义Curry类
+        var curry = new
+        {
+            MainIngredient = "Lamb",
+            Style = "Dhansak",
+            Spiciness = 5
+        };
+    }}}
+*   Lambda
+    *   注册事件处理函数， 将Lambda表达式用于匿名方法
+    {{{
+        myTimer.Elapsed += (source,e) => Console.Write(
+            "Event handler called after {0} milliseconds.",
+            (source as Timer).Interval);
+    }}}
+    *   (source,e)  是参数列表
+    *   =>          是Lambda运算符
+    *   后面是C#语句
+    *   泛型类型
+        *   Action
+        *   Action<>
+        *   Func<>
 
 *   Collections
     *   ArrayList
@@ -595,3 +709,6 @@ The following reasons make C# a widely used professional language:
         } 
     }}}
     *   The Abort() method is used for destroying threads
+
+*   partial class
+    *   

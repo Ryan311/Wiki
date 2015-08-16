@@ -1,0 +1,25 @@
+%toc
+
+== Introduction ==
+*   WinForm是.NET开发平台中对Windows Form的一种称谓。.NET为开发WinForm的应用程序提供了丰富的Class Library（类库）。
+*   这些WinFrom类库支持RAD(快速应用程序开发)，这些类库被封装在一个名称空间之中，这个名称空间就是System.Windows.Forms。
+*   MFC与WinForm对比学习:简单介绍   http://blog.csdn.net/weiwenhp/article/details/8070026
+*   Samples：   
+    *   198个经典C#WinForm实例源码.zip
+    *   WinForms HTML Editor.zip
+*   Windows 窗体 from MSDN   https://msdn.microsoft.com/zh-cn/library/dd30h2yb%28v=vs.110%29.aspx
+
+
+== Features ==
+*   处理和引发事件      委托模型
+    {{{
+        C# Winform 是基于委托事件机制
+        MFC是消息机制
+        win32 api都是两者的基石 
+        
+        委托是 .NET Framework 中通常用于建立事件处理机制的类。 委托大体上相当于 Visual C++ 和其他面向对象语言中常用的函数指针。 
+        但与函数指针不同的是，委托是面向对象的、类型安全的和保险的。 另外，函数指针只包含对特定函数的引用，
+        而委托由对对象的引用以及对该对象内一个或多个方法的引用组成。
+         
+        此事件模型使用“委托”将事件绑定到用来处理它们的方法。 委托允许其他类通过指定处理程序方法来注册事件通知。 当发生事件时，委托会调用绑定的方法。
+    }}}

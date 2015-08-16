@@ -17,11 +17,11 @@
 *   [[Programming]] 
     *   [[Algorithms]]
     *   [[Scratch]]
-    *   [[C_C++]] [[QT]] [[Object-C]] [[C#]]
+    *   [[C_C++]] [[Object-C]] [[C#]]
+    *   [[QT]] [[MFC]] [[WPF]] [[WinForm]] [[cocoa]]
     *   [[Python]] [[Python3]] [[PyQt]] [[Cython]] [[IPython]] [[Canopy]] [[Anaconda]] [[Sage]]
-    *   [[Erlang]] [[JavaScript]] 
+    *   [[Erlang]] 
     *   [[HTML]] [[JavaScript]] [[CSS]] [[LAMP]]
-    *   [[Mono]]
 *   Tools
     *   [[Vim]] [[Eclipse]] [[Vimer]] [[Sumblime]] [[QtCreator]] [[MonoDevelop]]
     *   [[Visual Studio]] [[Windbg]] [[Visual Code Studio]]
@@ -30,6 +30,7 @@
     *   [[git_github]] [[bitbucket]] [[google code]]
     *   [[VirsualBox]]
     *   [[Blender]] [[GIMP]]
+    *   [[Mono]]
 *   Tech
     *   [[DataBase]]
     *   [[wireless]] [[Bluetooth]] [[BLE]] [[USB]] [[ANT]] [[Zigbee]]
