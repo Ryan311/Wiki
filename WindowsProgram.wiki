@@ -1,191 +1,58 @@
 %toc
 
-= [[http://blogs.msdn.com/b/iliast/archive/2007/10/06/driver-driver-and-driver-application-communication.aspx|Driver-Driver and Driver-Application Communication]] =
-
-= Device and Driver Installation =
-*   Document:
-    *   [[http://blogs.msdn.com/b/iliast/archive/2008/03/10/why-do-we-need-wdf-coinstallers.aspx|Why Do We Need WDF Coinstallers?]]
-        *   Why are the coinstallers so big
-        *   How can you verify that what I'm saying is correct
-        *   Why not use an msi:  current install
-        *   Why not use a different update mechanism
-    *   [[http://blogs.msdn.com/b/iliast/archive/2009/06/09/analyzing-the-installation-of-wdf-1-7-and-1-9-drivers.aspx|Analyzing the Installation of WDF 1.7 and 1.9 drivers]]
-        *   What the co-installer do in install state
-*   Driver package can include various software components, such as a co-installer or class installer, that can enhance and extend
-*   device and driver installations. For example, a co-installer can do the following:
-    *   Perform additional device installation tasks that the INF file cannot handle. For example, a co-installer could write additional device-specific information to the registry.
-    *   Provide *finish-install Wizard pages* to display additional wizard pages to the user after your device is installed.
-    *   Provide *finish-install action* to start an installation program that can only run in an interactive user context.
-
-= [[http://msdn.microsoft.com/en-us/library/windows/hardware/ff544200%28v=vs.85%29.aspx|Driver Support Routines]] =
-*   INF:    Device Information File     https://msdn.microsoft.com/en-us/library/windows/hardware/ff547402%28v=vs.85%29.aspx
-    *   是Microsoft公司为硬件设备制造商发布其驱动程序推出的一种文件格式，INF文件中包含硬件设备的信息或脚本以控制硬件操作。
-    *   由Sections和Directives构成
-    *   PnpLockDown     0 or 1. 
-        *   If the PnpLockDown directive is set to 1, PnP prevents applications from directly modifying the files 
-        *   that are copied by INF CopyFiles directives.    防止inf中copy的文件被应用程序删除
-    *   AddReg      添加注册表项的指令， 一般在AddService指令中加入该指令
-        *   HKR     指的是相对路径, 出现在不同的section中代表不同的位置
-        {{{
-            INF Section Containing AddReg Directive	            Registry Key Referenced by HKR
-            -------------------------------------------         ------------------------------
-            INF DDInstall section	                            The device's software key:  ..Class\SetupClassGUID\device-instance-id
-            INF DDInstall.HW section	                        The device's hardware key:  HLM\SYSTEM\ControlSet001\Enum\$(BUS)\$(VID\PID)\$(InstanceID)\Device Parameters
-            INF [service-install-section] section	            The Services key:   HKLM\SYSTEM\CurrentControlSet\$(Driver Service)
-            INF [event-log-install] section	                    The EventLog key
-        }}}
-    *   DelReg      删除注册表项
-*   Run-time routines
-    *   是MSFT提供的通用处理函数供内核Driver调用， 与user mode的ANSI-C库函数相对应
-    *   The so-called run-time library component (prefix Rtl) contains utility routines,  such as list and 
-    *   string-management routines, that kernel-mode drivers can use instead of regular ANSI-standard library routine
-*   Windows生成Kernel dump 
-    *   如同xp，找到“启动和故障恢复”，设置“核心内存转储”即可生成Kernel dump。但到Win7却找不到dump文件，
-    *   原因是Win7默认情况下，每次Crash重启后，MS会弹出个窗口，让我们联机解决，关闭该窗口之后，会自动删除生成的dump文件。
+= Basic =
+*   CWnd与HWND的区别与转换
     {{{
-        设置不自动删除Dump文件：
+        一、区别
+            HWND是句柄，CWnd是MFC窗体类,CWnd中包含HWND句柄成员对象是m_hWnd.
+            HWND是Windows系统中对所有窗口的一种标识，即窗口句柄。这是一个SDK概念。  
+            CWnd是MFC类库中所有窗口类的基类。微软在MFC中将所有窗口的通用操作都封装到了这个类中，如：ShowWindow等等，同时它也封装了窗口句柄即m_hWnd成员。
 
-        [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\CrashControl]
-        "AlwaysKeepMemoryDump"=dword:00000001
+        二、如何得到窗口对象指针CWnd * pCWnd
+            1,在窗体里，直接用 this->，//this就是本窗体的窗口对象指针
+            2,主窗体的类对象指针：AfxGetApp()->m_pMainWnd->,  //AfxGetApp()->m_pMainWnd就是主窗体的窗口对象指针
+            3,pCWnd=GetDlgItem(ID_EDIT_NAME);//GetDlgItem 函数可以得到某个控件的窗口对象指针
+    }}}
+*   句柄和ID
+    {{{
+        句柄是窗口资源的标识，它标识资源在系统中所占用的内存块，应用程序通过窗口句柄对窗口进行操作。
+        窗口ID是窗口在应用程序中的唯一标识，通过窗口ID可以获取窗口句柄。
     }}}
 
-== Unicode String in Driver ==
-*   structure
-{{{  
-    typedef struct _UNICODE_STRING {
-      USHORT Length;
-      USHORT MaximumLength;
-      PWSTR  Buffer;
-    } UNICODE_STRING, *PUNICODE_STRING;
-}}}
-*   DECLARE_CONST_UNICODE_STRING        macro, 定义并初始化一个unicode string
-*   RtlAnsiCharToUnicodeChar
-*   RtlAnsiStringToUnicodeSize
-*   RtlAnsiStringToUnicodeString
-*   RtlAppendUnicodeStringToString
-*   RtlCompareUnicodeString
-*   RtlCopyUnicodeString
-*   RtlInitEmptyUnicodeString
-*   RtlInt64ToUnicodeString
-*   RtlIntegerToUnicodeString
-*   RtlIntPtrToUnicodeString
-*   RtlUpcaseUnicodeChar
-*   RtlUpcaseUnicodeString
-
-= Windows API =
-*   [[http://www.cppblog.com/sunshinealike/archive/2009/03/10/76050.html|Windows 应用程序基本结构]]
-    *   WinMian 函数由三个基本组成部分：函数说明、初始化和消息循环。该函数的功能:
-        *   注册窗口类，建立窗口及执行其他必要的初始化工作
-        *   进入消息循环，根据从应用程序消息队列接受的消息调用相应的处理过程。
-        *   当消息循环检测到 WM_QUIT 消息时终止程序运行。
-    *   消息循环
-        *   Windows 应用程序的运行以消息为核心。 Windows 将产生的消息放入应用程序的消息队列中，
-        *   而应用程序的 WinMain 函数在消息循环中提取队列中的消息，并将其传递给窗口函数的相应过程处理。 
-    *   窗口函数
-        *   窗口函数的主体是消息处理语句，由一系列 case 语句组成。程序员只需要根据窗口可能收到的消息在 case 语句中编写相应的处理程序段即可。
-    *   [[Win32Project]]
-*   [[http://www.cppblog.com/sunshinealike/archive/2009/03/10/76148.html|图形设备接口及windows绘图]]
-*   [[http://www.cppblog.com/sunshinealike/archive/2009/03/11/76242.html|字体设置与输出]]
-*   [[http://www.cppblog.com/sunshinealike/archive/2009/03/12/76346.html|对键盘和鼠标的响应]]
-*   [[http://www.cppblog.com/sunshinealike/archive/2009/03/14/76539.html|资源在Windows编程中的应用]]
-
-= Windows Service =
-*   [[http://msdn.microsoft.com/en-us/library/ms685141%28v=vs.85%29.aspx|What is an service application]]
-{{{ A service application conforms to the interface rules of the Service Control Manager (SCM). 
-    It can be started automatically at system boot, by a user through the Services control panel applet, 
-    or by an application that uses the service functions. Services can execute even when no user is logged on to the system.
-    A driver service conforms to the device driver protocols. It is similar to a service application, but it does not interact with the SCM.
-}}}
-*   [[http://www.codeproject.com/Articles/499465/Simple-Windows-Service-in-Cplusplus|Simple Windows Service in C++]]
-*   Windows Samples:    [[https://code.msdn.microsoft.com/CppInteractiveWindowsServic-c241d080|Interactive Windows Service in C++]] && [[https://code.msdn.microsoft.com/CppWindowsService-cacf4948|A basic Windows service in C++]]
-
-== [[http://msdn.microsoft.com/en-us/library/windows/desktop/ms632590%28v=vs.85%29.aspx|Messages and Message Queues]] ==
-*   Windows-based applications are event-driven, The system passes all input for an application to the various windows in the application. 
-*   Each window has a function, called a window procedure, that the system calls whenever it has input for the window. The window procedure processes the input and returns control to the system
-
-== [[http://msdn.microsoft.com/en-us/library/windows/desktop/aa363224%28v=vs.85%29.aspx|Device Management]] ==
-*   Note
-{{{
-    Device management provides a way to uniformly notify all applications and system features of changes 
-    that may affect their operation or access to resources. Applications and the system use and process 
-    device events to take advantage of new resources when they become available and to prevent loss of data
-    when existing resources become unavailable.
-}}}
-*   The system uses messages to notify applications of device changes and power changes
-    *   Device messages notify applications of device change events
-    *   power messages notify applications of power management events
-    *   Applications and drivers can also define and use custom messages to enable notification of other types of events
-*   Example:   create a win32 project + [[http://msdn.microsoft.com/en-us/library/windows/desktop/aa363432%28v=vs.85%29.aspx|Registering for Device Notification]]
-    *   This example create a GUI and receive windows messages about device changes
-    *   Device Notification 需要通过函数RegisterDeviceNotification注册设备的GUID才能收到通知!!!
-*   [[http://msdn.microsoft.com/en-us/library/windows/desktop/aa362912%28v=vs.85%29.aspx|Bluetooth and WM_DEVICECHANGE Messages]]
-    *   GUID_BLUETOOTH_HCI_EVENT    ACL建立或断开时收到消息
-    *   GUID_BLUETOOTH_L2CAP_EVENT  L2cap Channel建立或断开时收到消息
-    *   GUID_BLUETOOTH_RADIO_IN_RANGE   与远端设备配对或删除配对信息时收到消息， BTServer中使用
-    *   GUID_BLUETOOTH_RADIO_OUT_OF_RANGE   Inquiry相关通知
-{{{
-    // 注册本地BT信息， 如果变化会收到通知
-    BOOL RegisterLocalBtDevChange()
-    {	
-        BOOL bRet = FALSE;
-
-        DEV_BROADCAST_DEVICEINTERFACE NotificationFilter;
-        ZeroMemory( &NotificationFilter, sizeof(NotificationFilter) );
-        NotificationFilter.dbcc_size = sizeof(DEV_BROADCAST_DEVICEINTERFACE);
-        NotificationFilter.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
-        NotificationFilter.dbcc_classguid = GUID_BTHPORT_DEVICE_INTERFACE;
-
-        g_hLocalBtDevNotify = RegisterDeviceNotification(gLeHidServiceStatusHandle, &NotificationFilter, DEVICE_NOTIFY_SERVICE_HANDLE);
-
-        if( !g_hLocalBtDevNotify ) 
-        {
-            RT_DEBUG(TRACE_LEVEL_ERROR, TRACE_FLAG_RTKBLESERV, (_T("LE: RegisterDeviceNotification fail(%d)"), GetLastError()));
-        }
-        return TRUE;
-    }
-
-    // 注册远端配对设备的信息通知
-    BOOL RegisterRemoteBtDviceNotify()
-    {
-        HANDLE hBtDeviceHandle = NULL;
-        TCHAR lpstrFilePath[MAX_PATH + 1] = {0};
-        if(!GetDevicePath((LPGUID)&GUID_BTHPORT_DEVICE_INTERFACE, lpstrFilePath))
-        {
-            RT_DEBUG(TRACE_LEVEL_ERROR, TRACE_FLAG_RTKBLESERV, (_T("LE: GetDevicePath fail(%d)"), GetLastError()));
-            return FALSE;
-        };
-        hBtDeviceHandle = CreateFile(
-            lpstrFilePath,  // drive 
-            GENERIC_READ|GENERIC_WRITE,
-            FILE_SHARE_READ | FILE_SHARE_WRITE,
-            NULL,
-            OPEN_EXISTING,
-            FILE_FLAG_OVERLAPPED,
-            NULL);
-        if (INVALID_HANDLE_VALUE == hBtDeviceHandle)
-        {
-            RT_DEBUG(TRACE_LEVEL_ERROR, TRACE_FLAG_RTKBLESERV, (_T("LE: CreateFile fail(%d)"), GetLastError()));
-            return FALSE;
-        }
-        DEV_BROADCAST_HANDLE dbhZ;
-        ZeroMemory(&dbhZ, sizeof(dbhZ));
-        dbhZ.dbch_size = sizeof dbhZ;  
-        dbhZ.dbch_devicetype = DBT_DEVTYP_HANDLE;  
-        dbhZ.dbch_reserved = 0;  
-        dbhZ.dbch_handle = hBtDeviceHandle;  
-        dbhZ.dbch_hdevnotify = NULL;
-        memcpy(&dbhZ.dbch_eventguid, &GUID_BLUETOOTH_RADIO_IN_RANGE,  sizeof dbhZ.dbch_eventguid);  
-        dbhZ.dbch_nameoffset = 0;  
-        dbhZ.dbch_data[0] = 0;  
-
-        g_hRemoteDeviceNotify = RegisterDeviceNotification(gLeHidServiceStatusHandle, &dbhZ, DEVICE_NOTIFY_SERVICE_HANDLE);
-        if (!g_hRemoteDeviceNotify)
-        {
-            RT_DEBUG(TRACE_LEVEL_ERROR, TRACE_FLAG_RTKBLESERV, (_T("LE: CreateFile fail(%d)"), GetLastError()));
-            CloseHandle(hBtDeviceHandle);
-            return FALSE;
-        }
-        CloseHandle(hBtDeviceHandle);
-        return TRUE;
-    }
-}}}
+= topic =
+== [[http://blogs.msdn.com/b/iliast/archive/2007/10/06/driver-driver-and-driver-application-communication.aspx|Driver-Driver and Driver-Application Communication]] ==
+== [[Windows Driver]] ==
+== [[Windows API]] ==
+== [[Windows Service]] ==
+== [[Windows Hook]] ==
+== [[Tool help Library]] ==
+== Samples ==
+*   监视进程的创建并获得其启动时的命令行参数， 共有三种方法：
+    *   通过CreateRemoteThread得到cmd line  [[CommandLine.cpp]]
+        *   具体实现步骤：
+            1、通过 GetProcAddress 取得 GetCommandLineA(kernel32.dll) 的地址。
+            2、用 CreateRemoteThread 启动远程线程，使远程进程执行 GetCommandLineA 。
+            3、用 WaitForSingleObject 等待远程线程结束。
+            4、用 GetExitCodeThread 取得远程线程退出代码，其实就是远程进程中 GetCommandLineA 函数的返回值，这是远程进程命令行的首地址。
+            5、通过 GetProcAddress 取得 lstrlenA 的地址。
+            6、用 CreateRemoteThread 启动远程线程，使远程进程执行 lstrlenA 。
+            7、用 WaitForSingleObject 等待远程线程结束。
+            8、用 GetExitCodeThread 取得远程线程退出代码，其实就是远程进程中 lstrlenA 函数的返回值，这是远程进程命令行的文本长度。
+            9、使用 ReadProcessMemory 把远程进程的命令行读取出来。
+        
+    *   通过NtQueryInformationProcess获得进程信息， 从而得到cmd line  [[NTProcessInfo.cpp]] [[NTProcessInfo.h]]
+        *   http://www.codeproject.com/Articles/19685/Get-Process-Info-with-NtQueryInformationProcess 
+        *   ntdll.dll中的NtQueryInformationProcess   未文档化的函数
+        *   ReadProcessMemory
+         
+    *   在Driver中监测程序的创建和退出     [[ProcessMonitor.cpp]]
+        *   利用PsSetCreateProcessNotifyRoutineEx注册回调函数， 当有进程创建或退出时会调用回调函数
+        *   CreateProcessNotifyEx该回调函数的第三个参数PPS_CREATE_NOTIFY_INFO， 包含进程的相关信息， ID， CmdLine， ImageFileName等
+        *   Driver必须要用/integryCheck进行Link， 且要签名， 否则PsSetCreateProcessNotifyRoutineEx注册失败
+        *   Print格式控制
+            *   %s, %ls 	NULL终止的ANSI字符串 	char*
+            *   %S, %ws 	NULL终止的宽字符串 	    wchar_t*
+            *   %Z 	        ANSI_STRING字符串 	    ANSI_STRING
+            *   %wZ 	    UNICODE_STRING字符串 	UNICODE_STRING
+    
+    *   

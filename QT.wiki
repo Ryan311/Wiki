@@ -8,7 +8,7 @@
 *   Qt5和Qt4最大的区别之一是底层架构有了修改， Qt5引入了模块化的概念， 将众多功能细分到几个模块之中
 *   Qt5模块分为Essential Modules和Add-on Modules
     *   Essential Modules   基础模块， 在所有平台上都可用
-    *   Add-on Modules  扩展模块， 建立在基础的基础上， 在能够运行QT的平台上可酌情引入
+    *   Add-on Modules      扩展模块， 建立在基础的基础上， 在能够运行QT的平台上可酌情引入
 *   Qt 基础模块
     *   Qt Core     提供核心的非GUI功能， 所有模块都需要
     *   Qt Gui      提供GUI程序的基本功能， 窗口集成、事件处理， OpenGL等等
@@ -16,7 +16,7 @@
     *   Qt Network  提供跨平台的网络功能
     *   Qt Qml      提供QML使用的C++ API
     *   Qt Quick    允许在Qt/C++中购入Qt Quick
-    *   Qt SQL  允许使用SQL访问数据库
+    *   Qt SQL      允许使用SQL访问数据库
     *   Qt Test     提供Qt程序的单元测试功能
     *   Qt Webkit   基于WebKit2的实现以及一套全新的QML API
 *   Qt扩展模块
@@ -36,7 +36,6 @@
         QMetaObject::Connection connect(const QObject *, const char *,
                                         const QObject *, const char *,
                                         Qt::ConnectionType);
- 
         
         QMetaObject::Connection connect(const QObject *, const QMetaMethod &,
                                         const QObject *, const QMetaMethod &,
@@ -121,3 +120,4 @@
 *   Qt 3D
 *   Qt bluetooth
 *   Qt QML
+

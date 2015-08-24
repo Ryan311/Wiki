@@ -18,7 +18,13 @@
 }}}
 
 = Windows Presentation Foundation =
-独立于平台、提供更广泛的应用程序类型
+wpf在msdn中是这样定义的：“WPF是下一代显示系统，用于生成能带给用户震撼视觉体验的Windows客户端应用程序。使用WPF，您可以创建广泛的独立应用程序以及浏览器承载的应用程序。”
+
+Silverlight在msdn中是这样定义的：“Silverlight 是一种跨浏览器、跨平台的 .NET Framework 实现，用于为 Web 生成和提供下一代媒体体验和丰富的交互式应用程序 (RIA)。
+Silverlight 统一了服务器、Web 和桌面的功能，统一了托管代码和动态语言、声明性编程和传统编程以及 Windows Presentation Foundation (WPF) 的功能。”
+
+wpf/silverlight体系架构和运行机制
+http://www.cnblogs.com/windstore/archive/2011/08/28/2156185.html
 
 == Features ==
 *   WPF通过DirectX提供硬件加速功能

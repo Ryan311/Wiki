@@ -1,0 +1,72 @@
+%toc
+
+= Device and Driver Installation =
+*   Document:
+    *   [[http://blogs.msdn.com/b/iliast/archive/2008/03/10/why-do-we-need-wdf-coinstallers.aspx|Why Do We Need WDF Coinstallers?]]
+        *   Why are the coinstallers so big
+        *   How can you verify that what I'm saying is correct
+        *   Why not use an msi:  current install
+        *   Why not use a different update mechanism
+    *   [[http://blogs.msdn.com/b/iliast/archive/2009/06/09/analyzing-the-installation-of-wdf-1-7-and-1-9-drivers.aspx|Analyzing the Installation of WDF 1.7 and 1.9 drivers]]
+        *   What the co-installer do in install state
+*   Driver package can include various software components, such as a co-installer or class installer, that can enhance and extend
+*   device and driver installations. For example, a co-installer can do the following:
+    *   Perform additional device installation tasks that the INF file cannot handle. For example, a co-installer could write additional device-specific information to the registry.
+    *   Provide *finish-install Wizard pages* to display additional wizard pages to the user after your device is installed.
+    *   Provide *finish-install action* to start an installation program that can only run in an interactive user context.
+
+= [[http://msdn.microsoft.com/en-us/library/windows/hardware/ff544200%28v=vs.85%29.aspx|Driver Support Routines]] =
+*   INF:    Device Information File     https://msdn.microsoft.com/en-us/library/windows/hardware/ff547402%28v=vs.85%29.aspx
+    *   是Microsoft公司为硬件设备制造商发布其驱动程序推出的一种文件格式，INF文件中包含硬件设备的信息或脚本以控制硬件操作。
+    *   由Sections和Directives构成
+    *   PnpLockDown     0 or 1. 
+        *   If the PnpLockDown directive is set to 1, PnP prevents applications from directly modifying the files 
+        *   that are copied by INF CopyFiles directives.    防止inf中copy的文件被应用程序删除
+    *   AddReg      添加注册表项的指令， 一般在AddService指令中加入该指令
+        *   HKR     指的是相对路径, 出现在不同的section中代表不同的位置
+        {{{
+            INF Section Containing AddReg Directive	            Registry Key Referenced by HKR
+            -------------------------------------------         ------------------------------
+            INF DDInstall section	                            The device's software key:  ..Class\SetupClassGUID\device-instance-id
+            INF DDInstall.HW section	                        The device's hardware key:  HLM\SYSTEM\ControlSet001\Enum\$(BUS)\$(VID\PID)\$(InstanceID)\Device Parameters
+            INF [service-install-section] section	            The Services key:   HKLM\SYSTEM\CurrentControlSet\$(Driver Service)
+            INF [event-log-install] section	                    The EventLog key
+        }}}
+    *   DelReg      删除注册表项
+*   Run-time routines
+    *   是MSFT提供的通用处理函数供内核Driver调用， 与user mode的ANSI-C库函数相对应
+    *   The so-called run-time library component (prefix Rtl) contains utility routines,  such as list and 
+    *   string-management routines, that kernel-mode drivers can use instead of regular ANSI-standard library routine
+*   Windows生成Kernel dump 
+    *   如同xp，找到“启动和故障恢复”，设置“核心内存转储”即可生成Kernel dump。但到Win7却找不到dump文件，
+    *   原因是Win7默认情况下，每次Crash重启后，MS会弹出个窗口，让我们联机解决，关闭该窗口之后，会自动删除生成的dump文件。
+    {{{
+        设置不自动删除Dump文件：
+
+        [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\CrashControl]
+        "AlwaysKeepMemoryDump"=dword:00000001
+    }}}
+
+== Unicode String in Driver ==
+*   structure
+{{{  
+    typedef struct _UNICODE_STRING {
+      USHORT Length;
+      USHORT MaximumLength;
+      PWSTR  Buffer;
+    } UNICODE_STRING, *PUNICODE_STRING;
+}}}
+*   DECLARE_CONST_UNICODE_STRING        macro, 定义并初始化一个unicode string
+*   RtlAnsiCharToUnicodeChar
+*   RtlAnsiStringToUnicodeSize
+*   RtlAnsiStringToUnicodeString
+*   RtlAppendUnicodeStringToString
+*   RtlCompareUnicodeString
+*   RtlCopyUnicodeString
+*   RtlInitEmptyUnicodeString
+*   RtlInt64ToUnicodeString
+*   RtlIntegerToUnicodeString
+*   RtlIntPtrToUnicodeString
+*   RtlUpcaseUnicodeChar
+*   RtlUpcaseUnicodeString
+

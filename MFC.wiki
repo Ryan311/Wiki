@@ -4,3 +4,5 @@
 *   消息映射是功能简陋，而且容易出错的方式，
 *   唯一优点是性能好
 
+== [[http://www.jizhuomi.com/software/267.html|MFC六大核心机制]] ==
+*   

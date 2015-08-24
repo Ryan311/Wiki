@@ -42,6 +42,7 @@
     *   [[TCP_IP]]
     *   [[BlueZ]] [[DBUS]] 
     *   [[Charset]]
+    *   XML JSON
 
 
 === As a programmer ===

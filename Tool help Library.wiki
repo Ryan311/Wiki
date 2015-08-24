@@ -1,0 +1,16 @@
+%toc
+
+msdn:   https://msdn.microsoft.com/en-us/library/windows/desktop/ms686837%28v=vs.85%29.aspx
+
+== Snapshots of the System ==
+*   Snapshots are at the core of the tool help functions. A snapshot is a read-only copy of the current state of one or more of 
+*   the following lists that reside in system memory: processes, threads, modules, and heaps.
+*   To take a snapshot of the system memory, use the CreateToolhelp32Snapshot function. 
+*   You can control the content of a snapshot by specifying one or more of the following values when calling this function:
+    *   TH32CS_SNAPHEAPLIST
+    *   TH32CS_SNAPMODULE
+    *   TH32CS_SNAPPROCESS
+    *   TH32CS_SNAPTHREAD
+
+== Samples ==
+*   https://msdn.microsoft.com/en-us/library/windows/desktop/ms686701%28v=vs.85%29.aspx

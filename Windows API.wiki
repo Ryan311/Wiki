@@ -1,0 +1,18 @@
+%toc
+
+= Windows API =
+*   [[http://www.cppblog.com/sunshinealike/archive/2009/03/10/76050.html|Windows 应用程序基本结构]]
+    *   WinMian 函数由三个基本组成部分：函数说明、初始化和消息循环。该函数的功能:
+        *   注册窗口类，建立窗口及执行其他必要的初始化工作
+        *   进入消息循环，根据从应用程序消息队列接受的消息调用相应的处理过程。
+        *   当消息循环检测到 WM_QUIT 消息时终止程序运行。
+    *   消息循环
+        *   Windows 应用程序的运行以消息为核心。 Windows 将产生的消息放入应用程序的消息队列中，
+        *   而应用程序的 WinMain 函数在消息循环中提取队列中的消息，并将其传递给窗口函数的相应过程处理。 
+    *   窗口函数
+        *   窗口函数的主体是消息处理语句，由一系列 case 语句组成。程序员只需要根据窗口可能收到的消息在 case 语句中编写相应的处理程序段即可。
+    *   [[Win32Project]]
+*   [[http://www.cppblog.com/sunshinealike/archive/2009/03/10/76148.html|图形设备接口及windows绘图]]
+*   [[http://www.cppblog.com/sunshinealike/archive/2009/03/11/76242.html|字体设置与输出]]
+*   [[http://www.cppblog.com/sunshinealike/archive/2009/03/12/76346.html|对键盘和鼠标的响应]]
+*   [[http://www.cppblog.com/sunshinealike/archive/2009/03/14/76539.html|资源在Windows编程中的应用]]

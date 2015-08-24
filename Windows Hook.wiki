@@ -1,0 +1,154 @@
+%toc
+
+== DLL 注入 ==
+*   将一个DLL注入到另一个进程的地址空间中， 一旦DLL代码进入另一个地址空间， 我们就可以在那个进程中为所欲为。
+    *   使用注册表注入DLL
+    *   使用Windows Hook注入DLL
+    *   使用远程线程注入Dll     创建远程线程， 在线程中调用LoadLibrary加载dll
+
+== 注册表注入DLL ==
+{{{//注册表
+    [HKEY_LOCAL_MACHINT\Software\Microsoft\Windows NT\CurrentVersion\Windows]
+        AppInit_Dlls        REG_SZ      *.dll
+        LoadAppInit_Dlls    DWORD       
+}}}
+*   AppInit_Dlls包含一个或多个DLL的文件名， dll最好放在Windows系统目录
+*   只有LoadAppInit_Dlls为1时， 系统才会使用AppInit_Dlls中的dll
+*   DLL只会被映射到那些使用了User32.dll的进程中， 所有基于GUI的应用程序都使用了User32.dll， 大多数基于CUI的程序没有使用
+*   DLL会被映射到每个基于GUI的应用程序中， 而不能映射到指定进程    --- 缺点
+*   钩子函数存在于user32.dll中, user32.dll是Windows用户界面相关应用程序接口，用于包括Windows处理，基本用户界面等特性，如创建窗口和发送消息
+
+== Hook ==
+*   From MSDN and Web
+    {{{
+        A hook is a point in the system message-handling mechanism where an application can install a subroutine to monitor the message 
+        traffic in the system and process certain types of messages before they reach the target window procedure.
+        
+        钩子(Hook)，是Windows消息处理机制的一个平台,应用程序可以在上面设置子程以监视指定窗口的某种消息，而且所监视的窗口可以是其他进程所创建的。
+        当消息到达后，在目标窗口处理函数之前处理它。钩子机制允许应用程序截获处理window消息或特定事件。钩子实际上是一个处理消息的程序段，通过系统调用，
+        把它挂入系统。每当特定的消息发出，在没有到达目的窗口前，钩子程序就先捕获该消息，亦即钩子函数先得到控制权。这时钩子函数即可以加工处理（改变）该消息，
+        也可以不作处理而继续传递该消息，还可以强制结束消息的传递。
+        
+        HOOK（钩子）的本质是一段用以处理系统消息的程序，通过系统调用，将其挂入到系统。钩子的种类有很多，每一种钩子负责截获并处理相应的消息。
+        钩子机制允许应用程序截获并处理发往指定窗口的消息或特定事件，其监视的窗口既可以是本进程内的也可以是由其他进程所创建的。
+        在特定的消息发出并到达目的窗口之前，HOOK程序先行截获此消息并得到对其的控制权。
+        此时在钩子函数中就可以对截获的消息进行各种修改处理，甚至强行终止该消息的继续传递。
+        
+        在使用钩子时根据其监视范围的不同可以将其分为系统(全局)钩子和线程钩子两大类，
+            *   线程钩子指定某个线程ID（可以是当前线程），只能监视该线程；
+            *   系统钩勾子监视系统中的所有线程的事件消息, 系统钩子要用dll 
+        这里的系统HOOK的本质还是由触发HOOK机制的线程调用自身进程空间中的代码进行处理，所以我们的HOOK子程代码必须映射进该线程所在的进程的地址空间，即通过DLL的方式实现。
+    }}}
+
+*   运行机制
+    {{{
+        
+    }}}
+
+*   Windows消息机制
+    {{{
+        Windows操作系统是建立在事件驱动机制之上的，系统各部分之间的沟通也都是通过消息的相互传递而实现的。
+        但在通常情况下，应用程序只能处理来自进程内部的消息或是从其他进程发过来的消息（借助进程间通信技术，如剪贴板，管道，邮槽等），
+        如果需要对在进程外传递的消息进行拦截处理就必须采取一种称为HOOK的技术。HOOK作为Windows操作系统中非常重要的一种系统接口，
+        用它可以轻松截获并处理在其他应用程序之间传递的消息，并由此可以完成一些普通应用程序难以实现的特殊功能。
+    }}}
+
+*   核心函数
+    {{{
+        使用Windows HOOK所需要的核心函数不多，只有四个：
+            *   SetWindowsHookEx()：    安装一个HOOK
+            *   HOOK 子程：             HOOK的处理函数，如GetMsgProc，KeyboardProc等
+            *   CallNextHookEx()：      调用HOOK链的下一个HOOK子程
+            *   UnhookWindowsHookEx()： 卸载一个HOOK
+    }}}
+
+*   钩子类型
+    {{{
+        每一种类型的Hook可以使应用程序能够监视不同类型的系统消息处理机制。下面描述所有可以利用的Hook类型。
+
+        1、WH_CALLWNDPROC和WH_CALLWNDPROCRET Hooks
+            WH_CALLWNDPROC和WH_CALLWNDPROCRET Hooks使你可以监视发送到窗口过程的消息。系统在消息发送到接收窗口过程之前调用WH_CALLWNDPROC Hook子程，并且在窗口过程处理完消息之后调用WH_CALLWNDPROCRET Hook子程。
+            WH_CALLWNDPROCRET Hook传递指针到CWPRETSTRUCT结构，再传递到Hook子程。CWPRETSTRUCT结构包含了来自处理消息的窗口过程的返回值，同样也包括了与这个消息关联的消息参数。
+
+        2、WH_CBT Hook
+            在以下事件之前，系统都会调用WH_CBT Hook子程，这些事件包括：
+            1. 激活，建立，销毁，最小化，最大化，移动，改变尺寸等窗口事件；
+            2. 完成系统指令；
+            3. 来自系统消息队列中的移动鼠标，键盘事件；
+            4. 设置输入焦点事件；
+            5. 同步系统消息队列事件。
+            Hook子程的返回值确定系统是否允许或者防止这些操作中的一个。
+
+        3、WH_DEBUG Hook
+            在系统调用系统中与其他Hook关联的Hook子程之前，系统会调用WH_DEBUG Hook子程。你可以使用这个Hook来决定是否允许系统调用与其他Hook关联的Hook子程。
+
+        4、WH_FOREGROUNDIDLE Hook
+            当应用程序的前台线程处于空闲状态时，可以使用WH_FOREGROUNDIDLE Hook执行低优先级的任务。当应用程序的前台线程大概要变成空闲状态时，系统就会调用WH_FOREGROUNDIDLE Hook子程。
+
+
+        5、WH_GETMESSAGE Hook
+            应用程序使用WH_GETMESSAGE Hook来监视从GetMessage or PeekMessage函数返回的消息。你可以使用WH_GETMESSAGE Hook去监视鼠标和键盘输入，以及其他发送到消息队列中的消息。
+
+        6、WH_JOURNALPLAYBACK Hook
+            WH_JOURNALPLAYBACK Hook使应用程序可以插入消息到系统消息队列。可以使用这个Hook回放通过使用WH_JOURNALRECORD Hook记录下来的连续的鼠标和键盘事件。只要WH_JOURNALPLAYBACK Hook已经安装，正常的鼠标和键盘事件就是无效的。WH_JOURNALPLAYBACK Hook是全局Hook，它不能象线程特定Hook一样使用。WH_JOURNALPLAYBACK Hook返回超时值，这个值告诉系统在处理来自回放Hook当前消息之前需要等待多长时间（毫秒）。这就使Hook可以控制实时事件的回放。WH_JOURNALPLAYBACK是system-wide local hooks，它們不會被注射到任何行程位址空間。
+
+        7、WH_JOURNALRECORD Hook
+            WH_JOURNALRECORD Hook用来监视和记录输入事件。典型的，可以使用这个Hook记录连续的鼠标和键盘事件，然后通过使用WH_JOURNALPLAYBACK Hook来回放。WH_JOURNALRECORD Hook是全局Hook，它不能象线程特定Hook一样使用。WH_JOURNALRECORD是system-wide local hooks，它們不會被注射到任何行程位址空間。
+
+        8、WH_KEYBOARD Hook
+            在应用程序中，WH_KEYBOARD Hook用来监视WM_KEYDOWN and WM_KEYUP消息，这些消息通过GetMessage or PeekMessage function返回。可以使用这个Hook来监视输入到消息队列中的键盘消息。
+
+        9、WH_KEYBOARD_LL Hook
+            WH_KEYBOARD_LL Hook监视输入到线程消息队列中的键盘消息。
+
+        10、WH_MOUSE Hook
+            WH_MOUSE Hook监视从GetMessage 或者 PeekMessage 函数返回的鼠标消息。使用这个Hook监视输入到消息队列中的鼠标消息。
+
+        11、WH_MOUSE_LL Hook
+            WH_MOUSE_LL Hook监视输入到线程消息队列中的鼠标消息。
+
+        12、WH_MSGFILTER 和 WH_SYSMSGFILTER Hooks
+            WH_MSGFILTER 和 WH_SYSMSGFILTER Hooks使我们可以监视菜单，滚动条，消息框，对话框消息并且发现用户使用ALT+TAB or ALT+ESC 组合键切换窗口。WH_MSGFILTER Hook只能监视传递到菜单，滚动条，消息框的消息，以及传递到通过安装了Hook子程的应用程序建立的对话框的消息。WH_SYSMSGFILTER Hook监视所有应用程序消息。
+            WH_MSGFILTER 和 WH_SYSMSGFILTER Hooks使我们可以在模式循环期间过滤消息，这等价于在主消息循环中过滤消息。
+            通过调用CallMsgFilter function可以直接的调用WH_MSGFILTER Hook。通过使用这个函数，应用程序能够在模式循环期间使用相同的代码去过滤消息，如同在主消息循环里一样。
+
+        13、WH_SHELL Hook
+
+            外壳应用程序可以使用WH_SHELL Hook去接收重要的通知。当外壳应用程序是激活的并且当顶层窗口建立或者销毁时，系统调用WH_SHELL Hook子程。
+            WH_SHELL 共有５钟情況：
+            1. 只要有个top-level、unowned 窗口被产生、起作用、或是被摧毁；
+            2. 当Taskbar需要重画某个按钮；
+            3. 当系统需要显示关于Taskbar的一个程序的最小化形式；
+            4. 当目前的键盘布局状态改变；
+            5. 当使用者按Ctrl+Esc去执行Task Manager（或相同级别的程序）。
+
+            按照惯例，外壳应用程序都不接收WH_SHELL消息。所以，在应用程序能够接收WH_SHELL消息之前，应用程序必须调用SystemParametersInfo function注册它自己
+    }}}
+
+*   Samples
+    *   C#  http://www.dotblogs.com.tw/optimist9266/archive/2011/06/07/27309.aspx
+    *   CPP Windows hook demo   https://code.msdn.microsoft.com/windowsapps/CppWindowsHook-06957865
+    *   C#  Windows hook demo   https://code.msdn.microsoft.com/windowsapps/CSWindowsHook-a578ed12
+    *   CPP C++ Windows Shell copy hook handler https://code.msdn.microsoft.com/windowsapps/CppShellExtCopyHookHandler-120e71c8
+
+== SetWinEventHook ==
+*   SetWinEventHook和SetWindowsHookEx的异同
+{{{
+    SetWinEventHook和SetWindowsHookEx都可以指定钩子函数(hook function)来截取别的进程中的消息，但是他们之间有一些不同。
+
+    1.  SetWindowsHookEx有两种钩子函数，一种是全局钩子(global hook)，另一种是线程钩子(thread hook)。
+            全局钩子能够截取所有线程的消息，但是全局钩子函数必须存在于一个dll中。
+            线程钩子只能截取属于当前进程中的线程的消息，钩子函数不需要放在dll中。
+    
+        SetWinEventHook也有两种钩子函数，一种是进程内钩子(in-context hook)，另一种是进程外钩子(out-of-context hook)。
+            进程内钩子函数必须放在dll中，将被映射到所有进程中。
+            进程外钩子函数不会被映射到别的进程中，所以也不需要被放到dll中。不管进程内或进程外钩子都能截取到所有进程的消息，区别仅是进程内钩子效率更高。
+        
+    2.  SetWindowsHookEx和SetWinEventHook两种方法截取的消息的类型不一样。
+            SetWindowsHookEx能截取所有WM_开头的消息。
+            SetWinEventHook截取的消息都是EVENT_开头的，这些消息所有都是跟对象的状态相关的，所以它无法获取根鼠标键盘相关的消息。
+        
+    3.  SetWindowsHookEx设定的全局钩子必须被注入到别的进程中，所以就无法截取到一些有限制的进程的消息，比如命令行窗口(console window)。而SetWinEventHook的进程外钩子就没有这个限制。
+    
+}}}
+*   MSDN    https://msdn.microsoft.com/en-us/library/windows/desktop/dd373640%28v=vs.85%29.aspx

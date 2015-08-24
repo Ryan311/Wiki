@@ -1,0 +1,9 @@
+﻿%toc
+
+JSON 入门指南 
+http://www.ibm.com/developerworks/cn/web/wa-lo-json/
+
+== Introduction ==
+*   JSON即 JavaScript Object Natation，它是一种轻量级的数据交换格式，非常适合于服务器与JavaScript的交互。
+*   同和XML 一样，JSON 也是基于纯文本的数据格式, JSON 提供了更好的简单性和灵活性。JSON 天生是为JavaScript准备的。
+*   JSON 已经是 JavaScript 标准的一部分。目前，主流的浏览器对 JSON 支持都非常完善。应用 JSON，我们可以从 XML 的解析中摆脱出来。

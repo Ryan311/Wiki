@@ -1,0 +1,186 @@
+{{{
+    // Register Process notification callback
+    PrepareHareware
+    {
+        status = PsSetCreateProcessNotifyRoutineEx(ProcessCreationNotifyEx, FALSE);
+    }
+    
+    =================================================================================
+    //Callback
+    VOID ProcessCreationNotifyEx(
+        _Inout_  PEPROCESS              Process,
+        _In_     HANDLE                 ProcessId,
+        _In_opt_ PPS_CREATE_NOTIFY_INFO CreateInfo
+	)
+    {
+        UNICODE_STRING  EmptyUnicodeString;
+        WDFDEVICE WdfDevice = OsGetDeviceObject();
+        PFILTER_EXTENSION FilterExt = FilterGetData(WdfDevice);
+        RtlInitUnicodeString(&EmptyUnicodeString, L"");
+
+        RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("Process Info: Process(0x%p), ProcessId(0x%p), CreateInfo(0x%p)", Process, ProcessId, CreateInfo));
+        if (CreateInfo)
+        {// Process create
+            RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("Process Created: CreationStatus 0x%x", CreateInfo->CreationStatus));
+            RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("FileObject 0x%p", CreateInfo->FileObject));
+            if (RtlEqualUnicodeString(CreateInfo->ImageFileName, &EmptyUnicodeString, FALSE))
+            {
+                RT_DEBUG(TRACE_LEVEL_ERROR, RTK_HAL, ("ImageFileName is NULL"));
+            }
+            else
+            {
+                RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("The ImageFileName is: %wZ", CreateInfo->ImageFileName));
+            }
+
+            if (RtlEqualUnicodeString(CreateInfo->CommandLine, &EmptyUnicodeString, FALSE))
+            {
+                RT_DEBUG(TRACE_LEVEL_ERROR, RTK_HAL, ("CommandLine is NULL"));
+            }
+            else
+            {
+                RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("The CommandLine is: %wZ", CreateInfo->CommandLine));
+            }
+            ParseCmdLine(FilterExt, CreateInfo, ProcessId);
+        }
+        else
+        {// Process exit
+            RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("Process Exit"));
+            if (FilterExt->EngineProcessID == ProcessId)
+            {
+                FilterExt->bEngine = FALSE;
+                FilterExt->EngineProcessID = 0;
+                RT_DEBUG(TRACE_LEVEL_WARNING, RTK_HAL, ("Engine Process Exit"));
+            }
+            else if (FilterExt->ItemProcessID == ProcessId)
+            {
+                FilterExt->bMonitor = FALSE;
+                FilterExt->ItemProcessID = 0;
+                RT_DEBUG(TRACE_LEVEL_WARNING, RTK_HAL, ("Monitor Process Exit"));
+            }
+            else
+            {
+                RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("Unknown Process Exit"));
+            }
+
+        }
+
+        if (FilterExt->bEngine)
+        {
+            if (0xFF != FilterExt->WhckType)
+            {
+                if (FilterExt->bMonitor)
+                {
+                    RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("Send FC71 cmd to fw, WhckType(%d)", FilterExt->WhckType));
+                    SendWHCKNotificationToFW(WdfDevice, HCI_VENDOR_ENTER_WHCK_MODE, FilterExt->WhckType);
+                }
+                else
+                {
+                    RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("Send FC72 cmd to fw, WhckType(%d)", FilterExt->WhckType));
+                    SendWHCKNotificationToFW(WdfDevice, HCI_VENDOR_EXIT_WHCK_MODE, FilterExt->WhckType);
+                    FilterExt->WhckType = 0xFF;
+                }
+            }
+            else
+            {
+                RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("Whck Type is 0x%x, do nothing", FilterExt->WhckType));
+            }
+        }
+        else
+        {
+            if ( FilterExt->bMonitor && 0xFF != FilterExt->WhckType )
+            {
+                RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("Send FC72 cmd to fw, WhckType(%d)", FilterExt->WhckType));
+                SendWHCKNotificationToFW(WdfDevice, HCI_VENDOR_EXIT_WHCK_MODE, FilterExt->WhckType);
+            }
+            FilterExt->WhckType = 0xFF;
+            FilterExt->bEngine = FALSE;
+            FilterExt->bMonitor = FALSE;
+            FilterExt->ItemProcessID = 0;
+            FilterExt->EngineProcessID = 0;
+        }
+        RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("bEngine(%d), bMonitor(%d), WhckType(%d)", FilterExt->bEngine, FilterExt->bMonitor, FilterExt->WhckType));
+    }
+
+    VOID ParseCmdLine(PFILTER_EXTENSION FilterExt, PPS_CREATE_NOTIFY_INFO CreateInfo, HANDLE ProcessId)
+    {
+        WCHAR FileNameBuf[64] = { 0 };
+        WCHAR CmdLineBuf[128] = { 0 };
+        wcsncpy(FileNameBuf, CreateInfo->ImageFileName->Buffer, (CreateInfo->ImageFileName->Length > 62 ? 62 : CreateInfo->ImageFileName->Length));
+        wcsncpy(CmdLineBuf, CreateInfo->CommandLine->Buffer, (CreateInfo->CommandLine->Length > 126 ? 126 : CreateInfo->CommandLine->Length));
+        if (wcsstr(FileNameBuf, L"DTMAcmEngine.exe"))
+        {
+            FilterExt->bEngine = TRUE;
+            FilterExt->EngineProcessID = ProcessId;
+        }
+        else if (wcsstr(FileNameBuf, L"mjolnir") && wcsstr(FileNameBuf, L".exe"))
+        {
+            FilterExt->bMonitor = TRUE;
+            //Convert to uppercases
+            _wcsupr(CmdLineBuf);
+            if (wcsstr(CmdLineBuf, L"-C SCO_HCT"))
+            {
+                RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("SCO Testing..."));
+                FilterExt->WhckType = 0;
+            }
+            else if (wcsstr(CmdLineBuf, L"-C HCT"))
+            {
+                RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("P2P Testing..."));
+                FilterExt->WhckType = 1;
+            }
+            else if (wcsstr(CmdLineBuf, L"-C BTHLOGO"))
+            {
+                RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("2.1 LOGO Testing..."));
+                FilterExt->WhckType = 2;
+            }
+            else if (wcsstr(CmdLineBuf, L"-C LOGOLE_DUAL"))
+            {
+                RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("LE Dual Mode LOGO Testing..."));
+                FilterExt->WhckType = 4;
+            }
+            else if (wcsstr(CmdLineBuf, L"-C LOGOLE") && wcsstr(CmdLineBuf, L"-C LOGOLE_DUAL"))
+            {
+                RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("LE LOGO Testing..."));
+                FilterExt->WhckType = 3;
+            }
+            else if (wcsstr(CmdLineBuf, L"-M"))
+            {
+                RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("SUT Testing..."));
+                FilterExt->WhckType = 5;
+            }
+            else if (wcsstr(CmdLineBuf, L"-C LOGO_ROO"))
+            {
+                RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("Radio OnOff Testing..."));
+            }
+            else
+            {
+                RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("Unknown WHCK Item, The CommandLine is: %wZ", CreateInfo->CommandLine));
+            }
+            FilterExt->ItemProcessID = ProcessId;
+            
+        }
+        else if (wcsstr(FileNameBuf, L"btserver.exe"))
+        {
+            RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("btserver.exe"));
+        }
+        else if (wcsstr(CmdLineBuf, L"cmd.exe")
+            && wcsstr(CmdLineBuf, L"devfund_sleep_pnp_disableenable_with_io_beforeandafter_wlk_sysfund"))
+        {
+            FilterExt->bMonitor = TRUE;
+            FilterExt->WhckType = 6;
+            FilterExt->ItemProcessID = ProcessId;
+            RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("Cmd with sleep pnp disableenable with io"));
+        }
+        else
+        {
+            RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("Unknown Process, The ImageFileName is: %wZ", CreateInfo->ImageFileName));
+        }
+
+        RT_DEBUG(TRACE_LEVEL_INFORMATION, RTK_HAL, ("bEngine(%d), bMonitor(%d), WhckType(%d)", FilterExt->bEngine, FilterExt->bMonitor, FilterExt->WhckType));
+    }
+    
+    // Unregister Callback
+    ReleaseHareware
+    {
+		status = PsSetCreateProcessNotifyRoutineEx(ProcessCreationNotifyEx, TRUE);
+    }
+}}}
