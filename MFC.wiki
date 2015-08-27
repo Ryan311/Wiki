@@ -5,4 +5,19 @@
 *   唯一优点是性能好
 
 == [[http://www.jizhuomi.com/software/267.html|MFC六大核心机制]] ==
-*   
+*   MFC程序的初始化   
+*   运行时类型识别（RTTI）
+*   动态创建
+*   永久保存
+*   消息映射
+*   消息传递
+
+== [[http://www.jizhuomi.com/software/340.html|VC++文件操作之最全篇]] ==
+*   MFC中有一个专门用来进行文件查找的类CFileFind，使用它可以方便快捷地进行文件的查找
+*   MFC的类CFileDialog用于实现文件的打开/保存对话框
+*   CFile进行文件的读写
+*   GetTempFileName()获得临时文件
+*   MFC中没有提供直接进行文件的复制、删除等的功能，因而要使用SDK。SDK中的文件相关函数常用的有CopyFile()、CreateDirectory()、DeleteFile()、MoveFile()
+*   取得和设置文件的创建时间、最后访问时间、最后写时间: GetFileTime SetFileTime
+*   取得和设置文件的属性    GetFileAttributes  SetFileAttributes
+*   获取文件名,文件类型,文件长度,文件路径   virtual CString GetFileName( ) const, virtual CString GetFileTitle( ) const, virtual CString GetFilePath( ) const, virtual DWORD GetLength( ) const;throw( CFileException );

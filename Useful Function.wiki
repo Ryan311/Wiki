@@ -1,0 +1,76 @@
+%toc
+
+= [[http://www.cnblogs.com/linyilong3/p/3140694.html|Windwos 黑客基础]] =
+== 获取其他进程的HANDLE ==
+*   如果我们要操作其他的进程，首先需要的肯定是要能够在自己的程序中拿到其他进程的标识符，在windows下为我们提供了OpenProcess这个函数
+    {{{
+        HANDLE OpenProcess(DWORD dwDesiredAccess,BOOL bInheritHandle,DWORD dwProcessId)
+            dwDesireAccess是操作权限，在本章节中设置为PROCESS_ALL_ACCESS
+            bInheritHandle,表示所得到的进程句柄是否可以被继承
+            dwProcessID，这个是最重要的，就是进程的ID
+    }}}
+*   方法1：通过任务管理器查看进程的ID， 再调用上述函数得到进程的Handle
+*   方法2：WINDOWS提供了一个API来让我们找到一个进程的窗口句柄，即FindWindows，同时，我们可以通过GetWindowThreadProcessID，我们只要传入通过FindWindow找到的HWND，然后传给GetWindowThreadProcessID就可以找到该进程的ID
+    {{{
+        HANDLE OpenProcessByID(const DWORD id)
+        {
+            return OpenProcess(PROCESS_ALL_ACCESS,FALSE,id);
+        }
+        
+        HANDLE OpenProcessByWindowName(const char *name)
+        {
+            HWND hWnd = FindWindow(NULL,name);
+            if (hWnd != NULL)
+            {
+                DWORD ThreadID = -1;
+                DWORD ProcessID = -1;
+                ThreadID = GetWindowThreadProcessId(hWnd,&ProcessID);
+
+                return OpenProcessByID(ProcessID);
+            }
+            return INVALID_HANDLE_VALUE;
+        }
+    }}}
+*   方法3：在Windows下，我们可以通过枚举系统所有进程的名称，然后根据进程的名称一个个地去比较来找到对应的进程ID
+    *   CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS,0);
+
+*   GitHub  hacker-tutorial
+
+== 代码注入 ==
+*   CreateRemoteThread的功能就是在指定的进程创建一个线程，这个线程运行我们指定的函数
+    {{{
+        HANDLE WINAPI CreateRemoteThread(
+          _In_   HANDLE hProcess,
+          _In_   LPSECURITY_ATTRIBUTES lpThreadAttributes,
+          _In_   SIZE_T dwStackSize,
+          _In_   LPTHREAD_START_ROUTINE lpStartAddress,
+          _In_   LPVOID lpParameter,
+          _In_   DWORD dwCreationFlags,
+          _Out_  LPDWORD lpThreadId
+        );
+    }}}
+*   在指定进程中分配内存， 写内存
+    {{{
+        LPVOID WINAPI VirtualAllocEx(
+          _In_      HANDLE hProcess,
+          _In_opt_  LPVOID lpAddress,
+          _In_      SIZE_T dwSize,
+          _In_      DWORD flAllocationType,
+          _In_      DWORD flProtect
+        );
+
+        BOOL WINAPI WriteProcessMemory(
+          _In_   HANDLE hProcess,
+          _In_   LPVOID lpBaseAddress,
+          _In_   LPCVOID lpBuffer,
+          _In_   SIZE_T nSize,
+          _Out_  SIZE_T *lpNumberOfBytesWritten
+        );
+
+    }}}
+*   Sample Code  http://www.cnblogs.com/linyilong3/p/3140694.html
+
+== 查找进程运行的基址 ==
+*   通过GetModuleHandle，我们可以获取一个进程的基址，直接传入一个NULL就可以直接拿到该进程的基址，但是这种方法我们只能拿到自己进程的基址.
+*   查找其它进程的运行基址， CreateToolhelp32Snapshot(TH32CS_SNAPMODULE,ProcessID)，这样的话，第一个DLL将会是我们要查找的DLL
+*   psapi库里面也有提供一些进程状态的API，其中EnumProcessModules的库就可以枚举对应进程加载的所有模块，枚举的第一个就是我们要查看进程对应的地址

@@ -20,12 +20,14 @@
     }}}
 
 = topic =
+== [[Useful Function]] ==
 == [[http://blogs.msdn.com/b/iliast/archive/2007/10/06/driver-driver-and-driver-application-communication.aspx|Driver-Driver and Driver-Application Communication]] ==
 == [[Windows Driver]] ==
 == [[Windows API]] ==
 == [[Windows Service]] ==
 == [[Windows Hook]] ==
 == [[Tool help Library]] ==
+== [[Windows Shell]] ==
 == Samples ==
 *   监视进程的创建并获得其启动时的命令行参数， 共有三种方法：
     *   通过CreateRemoteThread得到cmd line  [[CommandLine.cpp]]

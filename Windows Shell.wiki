@@ -1,0 +1,30 @@
+%toc
+
+==  Reference  ==
+*   [[https://msdn.microsoft.com/en-us/library/bb773177%28v=vs.85%29.aspx|MSDN]]
+*   [[http://blog.csdn.net/chchzh/article/details/2211475#comments|Windows Shell 编程]]
+*   Windows+Shell扩展编程完全指南.chm
+*   Visual C++ Windows Shell Programming.pdf
+
+==  Creating Context Menu Handlers ==
+*   IShellExtInit
+    *   Exposes a method that initializes Shell extensions for property sheets, shortcut menus, and drag-and-drop handlers 
+    *   Implement IShellExtInit when you are writing a handler based on the IContextMenu or IShellPropSheetExt interface.
+    *   Note that Shell extensions based on other interfaces do not use this method of initialization.  只有在实现了上面两个接口时才需要该接口
+    *   Method: Initialize      --> second parameter,   A pointer to an IDataObject interface object that can be used to retrieve the objects being acted upon.
+*   IContextMenu
+    *   Exposes methods that either create or merge a shortcut menu associated with a Shell object.
+    *   Methods:
+        *   GetCommandString 	Gets information about a shortcut menu command, including the help string and the language-independent, or canonical, name for the command.
+        *   InvokeCommand 	    Carries out the command associated with a shortcut menu item.  
+        *   QueryContextMenu 	Adds commands to a shortcut menu.
+*   How to create context menu project
+    *   MSDN Sample: ATL Windows Shell context menu handler (ATLShellExtContextMenuHandler), follow the description.html
+
+==  [[https://msdn.microsoft.com/en-us/library/bb776886%28v=vs.85%29.aspx|Launching Applications]]  ==
+==  [[https://msdn.microsoft.com/en-us/library/cc144185%28v=vs.85%29.aspx|Implementing Control Panel Items]]  ==
+==  [[https://msdn.microsoft.com/en-us/library/ff521657%28v=vs.85%29.aspx|Implementing a Custom File Format]]  ==
+
+==  Shell functions ==
+*   DragQueryFile   https://msdn.microsoft.com/en-us/library/windows/desktop/bb776408%28v=vs.85%29.aspx
+    *   Retrieves the names of dropped files that result from a successful drag-and-drop operation.     鼠标选中文件
