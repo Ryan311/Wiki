@@ -18,7 +18,7 @@
     *   [[Algorithms]]
     *   [[Scratch]]
     *   [[C_C++]] [[Object-C]] [[C#]]
-    *   [[QT]] [[MFC]] [[WPF]] [[WinForm]] [[cocoa]]
+    *   [[QT]] [[MFC]] [[WPF]] [[WinRT]] [[WinForm]] [[cocoa]]
     *   [[Python]] [[Python3]] [[PyQt]] [[Cython]] [[IPython]] [[Canopy]] [[Anaconda]] [[Sage]]
     *   [[Erlang]] 
     *   [[HTML]] [[JavaScript]] [[CSS]] [[LAMP]]

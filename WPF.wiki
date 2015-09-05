@@ -1,5 +1,7 @@
 %toc
 
+[[http://www.cnblogs.com/powertoolsteam/p/WPF_1.html|WPF老矣，尚能饭否”—且说说WPF今生未来]]
+
 *WPF编程宝典：使用C# 2012和.Net 4.5 第5版*
 {{{
     WPF，微软在Win Form的思路上走到死胡同后，终于痛下决心用正确的方法开发UI库了。21世纪的UI一定是定义出来的，绝对不能是代码写出来的，所以有了XAML这个强大的定义工具，
@@ -77,3 +79,39 @@ http://www.cnblogs.com/windstore/archive/2011/08/28/2156185.html
     *   命令绑定
     *   命令源
     *   命令目标
+
+== WPF Resource ==
+From MSDN：
+*   Getting started with WPF     https://msdn.microsoft.com/en-us/library/mt149845.aspx
+*   Client App in .Net        https://msdn.microsoft.com/en-us/library/54xbah2z%28v=vs.110%29.aspx
+*   MVVM    https://msdn.microsoft.com/en-us/magazine/dd419663.aspx
+
+From Code Project：
+*   WPF Tutorial:   http://www.codeproject.com/Articles/140611/WPF-Tutorial-Beginning                         
+    *       WPF Tutorial : Beginning [^]
+    *       WPF Tutorial : Layout-Panels-Containers & Layout Transformation [^]
+    *       WPF Tutorial : Fun with Border & Brush [^]
+    *       WPF Tutorial - TypeConverter & Markup Extension [^]
+    *       WPF Tutorial - Dependency Property [^]
+    *       WPF Tutorial - Concept Binding [^]
+    *       WPF Tutorial - Styles, Triggers & Animation [^] 
+*   animation tutorial on WPF    http://www.codeproject.com/Articles/23257/Beginner-s-WPF-Animation-Tutorial
+*   WPF progress bar        http://www.codeproject.com/Articles/38555/WPF-ProgressBar
+*   WPF SplitButton        http://www.codeproject.com/Articles/20612/A-WPF-SplitButton
+*   Woodstock                http://www.codeproject.com/Articles/21279/Woodstock-for-WPF
+*   OpenWeather         http://www.codeproject.com/Articles/630248/WPF-OpenWeather
+*   Bindable WPF WYSIWYG Text Editor    http://www.codeproject.com/Articles/37169/WPF-RichText-Editor
+*   MVVM in WPF        http://www.codeproject.com/Articles/165368/WPF-MVVM-Quick-Start-Tutorial
+*   Basic TreeView        http://www.codeproject.com/Articles/30721/WPF-TreeListView-Control
+*   Rubik's Cube            http://www.codeproject.com/Articles/322872/WPF-Rubiks-Cube
+*   3D Primer    http://www.codeproject.com/Articles/23332/WPF-D-Primer
+*   Bindable WPF RichTextBox    http://www.codeproject.com/Articles/66054/A-Bindable-WPF-RichTextBox
+*   WPF Diagram Designer    http://www.codeproject.com/Articles/22952/WPF-Diagram-Designer-Part
+*   WPF DataGrid  Using MVVM    http://www.codeproject.com/Articles/42548/MVVM-and-the-WPF-DataGrid
+*   Model-View-ViewModel pattern    http://www.codeproject.com/Articles/22357/Model-View-ViewModel-in-WPF
+*   classic Snakes WPF'ed    http://www.codeproject.com/Articles/20901/WPF-The-Classic-Snakes-WPF-ed
+*   NotifyIcon (system tray icon)      http://www.codeproject.com/Articles/36468/WPF-NotifyIcon
+*   TimeLineControl       http://www.codeproject.com/Articles/72670/WPF-A-TimeLineControl
+
+年度巨献-WPF项目开发过程中WPF小知识点汇总（原创+摘抄）
+*   http://blog.csdn.net/rocketzhm/article/details/45272703

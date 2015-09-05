@@ -4,6 +4,10 @@
 *   http://csharp.net-tutorials.com
 *   https://msdn.microsoft.com/en-us/library/aa287558%28v=vs.71%29.aspx
 
+== Problems ==
+*   Compile fail with new project from code.project
+    *   System.Windows.Controls.DataVisualization.Toolkit is not found
+    *   install it for certain solution: Tools->NuGet Package Manager->Package Manager console ==> Install-Package System.Windows.Controls.DataVisualization.Toolkit 
 
 == Features ==
 The following reasons make C# a widely used professional language:
@@ -16,7 +20,7 @@ The following reasons make C# a widely used professional language:
 #   It can be compiled on a variety of computer platforms.
 #   Part of .Net Framework.
 
-=== Features ===
+=== Details ===
 *   Nullables
     *   <data_type> ? <variable_name> = null;
     {{{
