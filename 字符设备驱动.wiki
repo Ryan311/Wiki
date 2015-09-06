@@ -1,0 +1,46 @@
+%toc
+
+= 主设备号和次设备号 =
+*   由ls -l显示出的位于/dev目录下的特殊文件(或称为设备文件)
+    *   第一列为'c',  字符设备驱动
+    *   第一列为'b',  块设备驱动 
+*   主设备号标识设备对应的驱动程序， 如/dev/null和/dev/zero由设备驱动程序1管理
+*   次设备号由内核使用， 用于正确确定设备文件所指的设备。 可以通过次设备号获得一个指向内核设备的直接指针
+*   内核中, dev_t类型(<linux/types.h>)用来保存设备编号----包括主设备号和次设备号
+*   动态分配主设备号的情况下， 无法预先创建设备节点， 可以用脚本安装， 先加载设备， 再从/proc/devices中读模块的主设备号， 再创建相应的设备节点
+
+= 重要数据结构 =
+*   <linux/fs.h>    struct file_operations， fops(指向该结构的指针)
+    *   该结构包含一组函数指针， 每个打开的文件和一组函数关联,  这些操作用来实现系统调用
+    *   这个结构的每一个字段都必须指向驱动程序中实现特定操作的函数， 对于不支持的操作， 对应字段可设为NULL
+    *   该结构的第一个字段并不是一个操作， 而是指向“拥有”该结构的模块的指针
+    {{{
+        struct file_operations scull_fops = {
+            .owner = THIS_MODULE,
+            .llseek = scull_llseek,
+            .read = scull_read,
+            .write = scull_write,
+            .ioctl = scull_ioctl,
+            .open = scull_open,
+            .release = scull_release,
+        }
+    }}}
+    
+*   <linux/fs.h>    struct file     filp(指向该结构的指针)
+    *   与用户空间程序的FILE没有任何关联， 是一个内核结构， 不会出现在用户空间
+    *   该结构代表一个打开的文件， 由内核在open时创建， 并传递给在该文件上进行操作的所有函数， 直到最后的close函数
+    *   重要成员:   mode_t f_mode; struct file_operations *f_op;(与文件相关操作, 可重载)
+    
+*   <linux/fs.h>    struct inode
+    *   内核用inode结构在内部表示文件， 与file不同。 它们的关系类似进程和程序的关系。
+    *   该结构中包含大量与文件相关的信息
+        *   dev_t i_rdev        表示设备文件的inode结构
+        *   struct cdev *i_cdev     表示字符设备的内核的内部结构， 当inode指向一个字符设备文件时， 该字段包含了指向struct cdev结构的指针
+
+*   <linux/cdev.h>  struct cdev
+    *   内核内部使用该结构表示字符设备
+    *   相关操作函数
+        *   cdev_alloc()        分配该结构
+        *   cdev_init()         初始化已分配的结构
+        *   cdev_add()          告诉内核该结构的信息
+        *   cdev_del()          从系统中移除一个字符设备
