@@ -1,0 +1,28 @@
+%toc
+
+MSDN:
+https://msdn.microsoft.com/en-us/library/windows/desktop/ms646979%28v=vs.85%29.aspx
+
+= Comparison with C Run-time String =
+String Function Comparison
+| CRT String Function     | strcat            | strcpy             | strlen             |
+|                         |                   |                    |                    |
+| Windows String Function | lstrcat           | lstrcpy            | lstrlen            |
+|                         |                   |                    |                    |
+| StrSafe Function        | StringCchCat      | StringCchCopy      | StringCchLength    |
+| <Strsafe.h>             | StringCchCatEx    | StringCchCopyEx    |                    |
+|                         | StringCbCat       | StringCbCopy       | StringCchLength    |
+|                         | StringCbCatEx     | StringCbCopyEx     |                    |
+|                         |                   |                    |                    |
+| StrSafe in Kernel       | RtlStringCchCat   | RtlStringCchCopy   | RtlStringCchLength |
+| <ntstrsafe.h>           | RtlStringCchCatEx | RtlStringCchCopyEx |                    |
+| #define NTSTRSAFE_LIB   | RtlStringCbCat    | RtlStringCbCopy    | RtlStringCchLength |
+|                         | RtlStringCbCatEx  | RtlStringCbCopyEx  |                    |
+
+Features about safe string
+    *   每个函数以目标缓冲区所占的字节大小作为其一个输入参数，因此可以保证在写入时不会超出缓冲区末端。
+    *   每个函数的输出字符串均以NULL结尾（null-terminate），即使该函数可能会对正确的结果进行截断。
+    *   所有函数均有返回值，类型为NTSTATUS，只有返回STATUS_SUCCESS时，操作结果才正确。
+    *   每个函数均有两种类型的版本，__按字节或者按字符数__。例如，StringCbCatW和StringCchCatW。
+    *   每个函数均有支持双字节的unicode字符（以W作为后缀）和单字节的ANSI字符（以A作为后缀）的版本。例如：StringCbCatW和StringCbCatA。
+    *   大部分函数有提供扩展版本的函数（以Ex作为后缀），例如，StringCbCatW和StringCbCatExW。

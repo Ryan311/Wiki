@@ -1,0 +1,243 @@
+%toc
+
+msdn:   https://msdn.microsoft.com/en-us/library/windows/hardware/ff550855%28v=vs.85%29.aspx
+
+Device Information Sets
+https://msdn.microsoft.com/en-us/library/windows/hardware/ff541247%28v=vs.85%29.aspx
+
+==  通过Device Interface class查看设备并打开 ==
+*   SetupDiGetClassDevs
+    *   Each device is associated with an SP_DEVINFO_DATA structure. 
+    *   You can retrieve a handle (HDEVINFO) to a device information set that contains all installed devices in a particular class. 
+    {{{
+        The following are some examples of how to use the SetupDiGetClassDevs function.
+        Example 1: Build a list of all devices in the system, including devices that are not currently present.
+            Handle = SetupDiGetClassDevs(NULL, NULL, NULL, DIGCF_ALLCLASSES);
+
+        Example 2: Build a list of all devices that are present in the system.
+            Handle = SetupDiGetClassDevs(NULL, NULL, NULL, DIGCF_ALLCLASSES | DIGCF_PRESENT);
+
+        Example 3: Build a list of all devices that are present in the system that are from the network adapter device setup class.
+            Handle = SetupDiGetClassDevs(&GUID_DEVCLASS_NET, NULL, NULL, DIGCF_PRESENT);
+
+        Example 4: Build a list of all devices that are present in the system that have enabled an interface from the storage volume device interface class.
+            Handle = SetupDiGetClassDevs(&GUID_DEVINTERFACE_VOLUME, NULL, NULL, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
+    }}}
+*   SetupDiDestroyDeviceInfoList
+    *    free all SP_DEVINFO_DATA structures in a device information set
+*   Example
+    *   Open device using device interface which is found by GUID  
+    {{{
+        //
+        // guid是Device Interface Class， 每个LE设备配对后， LEEnum枚举一个PDO， 加载PDO后会为该设备提供一下Device Interface
+        // Device Interface Name为   BTHLEDevice#{GUID}_BDADDR_#****** 
+        //
+        HANDLE OpenLeInterface(ULONGLONG ullBtAddr, GUID guid)
+        {
+            HANDLE hOut = INVALID_HANDLE_VALUE;
+            HRESULT hr = E_FAIL;
+            
+            //
+            // Create a device information set composed of all present devices associated with device interface GUID 
+            //
+            HDEVINFO hDevInfo = SetupDiGetClassDevs(&guid, NULL, NULL, DIGCF_PRESENT|DIGCF_INTERFACEDEVICE);
+            ULONG iDevIndex = 0;
+            while(1){
+                SP_DEVICE_INTERFACE_DATA deviceInfoData;
+                deviceInfoData.cbSize = sizeof (SP_DEVICE_INTERFACE_DATA);
+                //  enumerate the device interfaces in a device information set
+                if(SetupDiEnumDeviceInterfaces(hDevInfo, 0, &guid, iDevIndex, &deviceInfoData))
+                {
+                    DWORD cbRequired = 0;
+                    //
+                    // get required buffer size
+                    //
+                    SetupDiGetDeviceInterfaceDetail(hDevInfo,
+                        &deviceInfoData,
+                        0,
+                        0,
+                        &cbRequired,
+                        0);
+                    if (ERROR_INSUFFICIENT_BUFFER == GetLastError())
+                    {
+                        PSP_DEVICE_INTERFACE_DETAIL_DATA pdidd = (PSP_DEVICE_INTERFACE_DETAIL_DATA)LocalAlloc(LPTR, cbRequired);
+
+                        if (pdidd)
+                        {
+                            pdidd->cbSize = sizeof(*pdidd);
+                            //
+                            // get the interface name
+                            //
+                            if (SetupDiGetDeviceInterfaceDetail(hDevInfo,
+                                &deviceInfoData,
+                                pdidd,
+                                cbRequired,
+                                &cbRequired,
+                                0))
+                            {
+                                //CString csDev(_T("668E28F99733"));
+                                //csDev.Format(_T("%I64x"), ullBtAddr);
+                                CString csDevicePath = pdidd->DevicePath;
+                                //csDev.MakeLower();
+                                //csDevicePath.MakeLower();
+                                //if (csDevicePath.Find(csDev) != -1)
+                                {
+                                    hOut= 
+                                        CreateFile(pdidd->DevicePath,   //A NULL-terminated string that contains the device interface path
+                                        GENERIC_READ | GENERIC_WRITE,
+                                        FILE_SHARE_READ | FILE_SHARE_WRITE,
+                                        NULL,
+                                        OPEN_EXISTING,
+                                        FILE_ATTRIBUTE_NORMAL,
+                                        NULL);
+                                    LocalFree(pdidd);
+                                    break;
+                                }
+                                
+                            }
+                            LocalFree(pdidd);
+                        }
+                    }	 
+                }
+                else if(GetLastError() == ERROR_NO_MORE_ITEMS) //No more items
+                {
+                    break;
+                }
+                iDevIndex++;
+            }
+            SetupDiDestroyDeviceInfoList(hDevInfo);
+            return hOut; 
+        }
+    }}}
+    *   Finds the Device instance of the DevNode with the matching DriverName.
+    {{{
+        /*****************************************************************************
+
+          DriverNameToDeviceInst()
+
+          Finds the Device instance of the DevNode with the matching DriverName.
+          Returns FALSE if the matching DevNode is not found and TRUE if found
+
+        *****************************************************************************/
+        BOOL 
+        DriverNameToDeviceInst(
+            _In_reads_bytes_(cbDriverName) PCHAR DriverName,
+            _In_ size_t cbDriverName,
+            _Out_ HDEVINFO *pDevInfo,
+            _Out_writes_bytes_(sizeof(SP_DEVINFO_DATA)) PSP_DEVINFO_DATA pDevInfoData
+            )
+        {
+            HDEVINFO         deviceInfo = INVALID_HANDLE_VALUE;
+            BOOL             status = TRUE;
+            ULONG            deviceIndex;
+            SP_DEVINFO_DATA  deviceInfoData;
+            BOOL             bResult = FALSE;
+            PCHAR            pDriverName = NULL;
+            PSTR             buf = NULL;
+            BOOL             done = FALSE;
+
+            if (pDevInfo == NULL)
+            {
+                return FALSE;
+            }
+
+            if (pDevInfoData == NULL)
+            {
+                return FALSE;
+            }
+
+            memset(pDevInfoData, 0, sizeof(SP_DEVINFO_DATA));
+
+            *pDevInfo = INVALID_HANDLE_VALUE;
+
+            // Use local string to guarantee zero termination
+            pDriverName = (PCHAR) ALLOC((DWORD) cbDriverName + 1);
+            if (NULL == pDriverName)
+            {
+                status = FALSE;
+                goto Done;
+            }
+            StringCbCopyN(pDriverName, cbDriverName + 1, DriverName, cbDriverName);
+
+            //
+            // We cannot walk the device tree with CM_Get_Sibling etc. unless we assume
+            // the device tree will stabilize. Any devnode removal (even outside of USB)
+            // would force us to retry. Instead we use Setup API to snapshot all
+            // devices.
+            //
+
+            // Examine all present devices to see if any match the given DriverName
+            //
+            deviceInfo = SetupDiGetClassDevs(NULL,
+                    NULL,
+                    NULL,
+                    DIGCF_ALLCLASSES | DIGCF_PRESENT);
+
+            if (deviceInfo == INVALID_HANDLE_VALUE)
+            {
+                status = FALSE;
+                goto Done;
+            }
+
+            deviceIndex = 0;
+            deviceInfoData.cbSize = sizeof(deviceInfoData);
+
+            while (done == FALSE)
+            {
+                //
+                // Get devinst of the next device
+                //
+                status = SetupDiEnumDeviceInfo(deviceInfo,
+                                               deviceIndex,
+                                               &deviceInfoData);
+                deviceIndex++;
+                if (!status)
+                {
+                    //
+                    // This could be an error, or indication that all devices have been
+                    // processed. Either way the desired device was not found.
+                    //
+                    done = TRUE;
+                    break;
+                }
+
+                //
+                // Get the DriverName value
+                //
+                bResult = GetDeviceProperty(deviceInfo,
+                                            &deviceInfoData,
+                                            SPDRP_DRIVER,
+                                            &buf);
+                
+                // If the DriverName value matches, return the DeviceInstance
+                //
+                if (bResult == TRUE && buf != NULL && _stricmp(pDriverName, buf) == 0)
+                {
+                    done = TRUE;
+                    *pDevInfo = deviceInfo;
+                    CopyMemory(pDevInfoData, &deviceInfoData, sizeof(deviceInfoData));
+                    FREE(buf);
+                    break;
+                }
+                if(buf != NULL)
+                {
+                    FREE(buf);
+                    buf = NULL;
+                }
+            }
+
+        Done:
+            if (bResult == FALSE)
+            {
+                if (deviceInfo != INVALID_HANDLE_VALUE)
+                {
+                    SetupDiDestroyDeviceInfoList(deviceInfo);
+                }
+            }
+            if (pDriverName != NULL)
+            {
+                FREE(pDriverName);
+            }
+            return status;
+        }
+    }}}

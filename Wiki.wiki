@@ -56,6 +56,11 @@ http://www.gracecode.com/vimwiki-usage-notes.html
         # 有序列表 条目二
 
         * 和 - 是等价的，后面必须跟一个空格
+        
+        Table:
+        | l11 | l12 | l13 |
+        | l21 | l22 | l23 |
+        | l31 | l32 | l33 |
     }}}
 *   特殊占位符   在wiki条目中使用以下占位符，能对生成的HTML文件做一些特殊的处理。
     *   %toc 自动生成的目录

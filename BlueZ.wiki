@@ -1,5 +1,8 @@
 %toc
 
+== BlueZ ==
+*   KernelMode part：   被编译为.ko模块
+*   UserMode part：     各Profile， 通过IO与Kernel Mode通信
 == Build ==
 *   下载Source Code并解压
 *   在解压目录下运行如下, 如果出现错误可在config.log里面找原因， 一般是依赖的包没有安装， 用apt-get安装即可

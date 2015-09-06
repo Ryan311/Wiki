@@ -28,6 +28,8 @@
 == [[Windows Hook]] ==
 == [[Tool help Library]] ==
 == [[Windows Shell]] ==
+== [[Windows SetupAPI]] ==
+== [[Windows Strings]]
 == Samples ==
 *   监视进程的创建并获得其启动时的命令行参数， 共有三种方法：
     *   通过CreateRemoteThread得到cmd line  [[CommandLine.cpp]]
@@ -56,5 +58,4 @@
             *   %S, %ws 	NULL终止的宽字符串 	    wchar_t*
             *   %Z 	        ANSI_STRING字符串 	    ANSI_STRING
             *   %wZ 	    UNICODE_STRING字符串 	UNICODE_STRING
-    
-    *   
+*   检查已存在的进程， 用[[Tool help Library]]

@@ -33,7 +33,7 @@
     *   [[Mono]]
 *   Tech
     *   [[DataBase]]
-    *   [[wireless]] [[Bluetooth]] [[BLE]] [[USB]] [[ANT]] [[Zigbee]]
+    *   [[wireless]] [[Bluetooth]] [[BLE]] [[USB]] [[GPS]] [[ANT]] [[Zigbee]]
     *   [[http://www.ruanyifeng.com/blog/2011/12/ssh_remote_login.html|SSH]]
     *   [[OpenGL]] [[WebGL]] 
     *   [[CUDA]] [[OpenCL]]
