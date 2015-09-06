@@ -1,6 +1,124 @@
 %toc
 
+== MFC ==
+MFC是微软基础类库的简称，是微软公司实现的一个c++类库，主要封装了大部分的windows API函数，消息系统对于一个win32程序来说十分重要， 它是
+一个程序运行的动力源泉。一个消息，是系统定义的一个32位的值，他唯一的定义了一个事 件，向Windows发出一个通知，告诉应用程序某个事情发生了。
+众所周知，windows是基于消息驱动的，作好消息处理是WINDOWS编程的关键任务之一，用VC制作WINDOWS程式同样离不开消息的处理。
+
 == 事件处理模型 ==
+*   消息映射
+{{{
+    http://bbs.51cto.com/thread-487061-1-1.html
+    http://blog.csdn.net/ocean2006/article/details/5498265
+    http://developer.51cto.com/art/201107/275773.htm
+    http://blog.csdn.net/yaoxinchao/article/details/8248617
+    http://blog.csdn.net/ocean2006/article/details/5500357
+    在MFC中消息是通过一种所谓的消息映射机制来处理的。其实质是一张消息及其处理函数的一一对应表以及分析处理这张表的应用框架内部的一些程序代码.
+    这样的好处是可以避免像早期的SDK编程一样需要罗列一大堆的CASE语句来处理各种消息.
+
+    1、每个MFC应用程序中都存在一个消息响应链表，这个表由DECLARE_MESSAGE_MAP定义 
+    2、MFC中用BEGIN_MESSAGE_MAP和END_MESSAGE_MAP宏实现消息映射, 填充消息响应链表的内容
+    3、取得消息后，MFC会查询这个表，对于感兴趣的消息会调用其响应函数，对于没有处理的消息，会继续查询其父类的映射表。
+    
+
+    windows消息组成结构
+    windows消息由消息号和参数组成：
+    　　消息号：windows操作系统通过32整数标识一条windows消息，称为消息号。windows消息号具有三个特点：
+        (1)唯一性：唯一性指对于windows操作系统中的每一条消息都有一个且只有一个消息号与它相对应。由于windows操作系统通过消息激活相应的过程，因此消息的标识必须是唯一的。
+        (2)直观性：消息号在形式上表现为消息名，消息名往住直观地说明了消息的产生方式和类型，例如消息名WM_LBUTTONDOWN直观地表示了单击产生的消息。
+    　　(3)可自定义性：windows系统定义了一些消息号和消息名，程序员可以运用这些消息，也可以使用自已定义的窗口的消息。形式如下：　#define 消息名 消息号
+        　　注意，为了不与现有的windows系统消息相冲突，在消息号的定义中通常采用如下：
+        　　WM_USER+n   WM_USER是windows操作系统定义的用户消息起始值，程序员必须从该起始值后选取消息号，例如自定义消息名为“MESSAGE_1”和 “MESSAGE_2”，可采用如下形式：
+        　　#define MESSAGE_1 WM_USER+1
+        　　#DEFINE MESSAGE_2 WM_USER+2
+
+    消息的种类
+        消息主要有三种类型，即windows消息，命令消息和控件通知。
+        
+        按消息的产生可以分为四类：
+        　　*(1)外界输入事件产生的消息；　*(2)windows系统向应用程序发出的消息
+            *(3)应用程序之间发送的消息；　*(4)其他
+
+        根据产生消息的对象，可以进一步将消息分为以下几类：
+        　　*(1)窗口管理消息　　包括激活基本窗口操作的消息，如关闭、最大化等。
+        　　*(2)初始化消息　　应用程序、窗口、控件等对象初始化的消息。
+        　　*(3)输入消息　　包括键盘、鼠标、绘图仪等处部输入工具的输入消息。
+        　　*(4)系统消息　　windows系统内部消息。
+        　　*(5)剪贴板消息　　操作剪贴板时产生的消息。
+        　　*(6)系统信息消息　　用于系统信息发送和处理的消息。
+        　　*(7)控件处理消息　　操作控件时产生的消息。
+        　　*(8)控件通知消息　　系统采用空件通知消息向控件发送消息。
+        　　*(9)滚动条消息　　操作滚动条时产生的消息
+        　　*(10)非用户区消息　　非用户区产生的消息
+        　　*(11)MDI消息　　用于多文档操作的消息
+        　　*(12)DDE消息　　用于动态数据交换的消息。
+        　　*(13)应用程序自定义的消息等等。
+
+
+    需要说明的是消息处理函数的原型一定要以afx_msg打头.比如:
+        1.	afx_msg OnFileOpen();// 函数原型 
+            作为约定.消息处理函数一般以On打头
+
+    发送Windows消息实例 
+        1、利用API函数SendMessage能以同步的方式向目标窗体发送一条消息，然后等待目标窗体处理过程处理此消息。
+        2、利用API函数PostMessage能以异步方式向目标窗体投递一条消息，消息投递出去后，函数立即返回。
+        3、PostMessage和SendMessage返回值是BOOL类型，代表消息是否发送成功。
+    
+}}}
+*   MFC消息反射机制
+{{{
+    在Windows里面，子控件经常向父控件发送消息，例如很多子控件要绘制自己的背景，就可能向父窗口发送消息WM_CTLCOLOR。
+    对于从子控件发来的消息，父控件有可能在处理之前，把消息返还给子控件处理，这样消息看起来就想是从父窗口反射回来一样，
+    故此得名：消息反射。
+    需要注意：消息反射是MFC实现的，不是windows实现的；要让你的消息反射机制工作，你得类必须从CWnd类派生。
+    
+    消息反射的由来
+        在windows和MFC4.0版本一下，父窗口（通常是一个对话框）会对这些消息进行处理，换句话说，自控件的这些消息处理必须在父窗口类体内，
+        每当我们添加子控件的时候，就要在父窗口类中复制这些代码，我们可以想象这是多么的复杂，代码是多么的臃肿！
+        我们可以想象，如果这些消息都让父窗口类去做，父窗口就成了一个万能的神，一个臃肿不堪的代码机，无论如何消息的处理都集中在父窗口类中，
+        会使父窗口繁重无比，但是子控件却无事可做，并且代码也无法重用，这对于一个程序员来讲是多么痛苦的一件事？！
+        在老版本的MFC中，设计者也意识到了这个问题，他们对一些消息采用了虚拟机制，例如：WM_DRAWITEM，这样子控件就有机会控制自己的动作，
+        代码的可重用性有了一定的提高，但是这还没有达到大部分人的要求，所以在高版本的MFC中，提出了一种更方便的机制：消息反射。
+     
+    Message-Map中的处理
+        如果想要处理消息反射，必须了解相应的Message-Map宏和函数原型。一般来讲，Message-Map是有一定的规律的，通常她在消息的前面加上一个ON_ ，
+        然后再消息的最后加上 _REFLECT。例如前面提到的WM_CTLCOLOR 经过处理后变成ON_WM_CTLCOLOR_REFLECT；WM_MEASUREITEM则变成ON_WM_MEASUREITEM_REFLECT。
+        凡事总会有例外，这里也是这样，这里面有3个例外：
+        (1) WM_COMMAND 转换成 ON_CONTROL_REFLECT；
+        (2) WM_NOTIFY  转换成 ON_NOTIFY_REFLECT；
+        (3) ON_Update_COMMAND_UI 转换成 ON_Update_COMMAND_UI_REFLECT；
+        对于函数原型，也必须是以afx_msg 开头。
+
+    利用ClassWizard添加消息反射
+        (1)在ClassWizard中，打开选择项Message Maps；
+        (2)在下拉列表Class name中选择你要控制的类；
+        (3)在Object IDs中，选中相应的类名；
+        (4)在Messages一栏中找到前面带有=标记的消息，那就是反射消息；
+        (5)双击鼠标或者单击添加按钮，然后OK!
+    
+    消息处理的过程
+    　　(1) 子窗口向父窗口发送通知消息，激发父窗口去调用它的虚函数CWnd::OnNotify。大致的结构如下 
+            BOOL CWnd::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
+            {
+                 if(ReflectLastMsg(hWndCtrl, pResult))     // hWndCtrl,为发送窗口
+                     return TRUE;                         // 如果子窗口已处理了此消息，返回
+                 AFX_NOTIFY notify;
+                 notify.pResult = pResult;
+                 notify.pNMHDR = pNMHDR;
+                 return OnCmdMsg(nID, MAKELONG(nCode, WM_NOTIFY)? notify:NULL);
+            }
+        (2) ReflectLastMsg声明如下：static BOOL PASCAL ReflectLastMsg(HWND hWndChild, LRESULT* pResult = NULL);
+    　　    它的主要任务就是调用发送窗口的SendChildNotifyLastMsg。 
+        (3) SendChildNotifyLastMsg声明如下：BOOL SendChildNotifyLastMsg(LRESULT* pResult = NULL);
+        　　调用发送窗口的虚函数OnChildNotify函数，进行处理。 如果发送窗口没有进行重载处理，则调用
+            ReflectChildNotify(...)函数进行标准的反射消息的消息映射处理。
+}}}
+*   MFC消息循环和消息泵
+{{{
+    应该清楚MFC的消息循环(::GetMessage,::PeekMessage)、消息泵(CWinThread::PumpMessage)和MFC的消息在窗口之间的路由是两件不同的事情。
+    在MFC的应用程式中(应用程式类基于CWinThread继承)，必须要有一个消息循环，它的作用是从应用程式的消息队列中读取消息， 并把他派送出去
+    (::DispatchMessage)。 而消息路由是指消息派送出去之后，系统(USER32.DLL)把消息投递到哪个窗口，连同以后消息在窗口之间的传递是怎样的。
+}}}
 *   消息映射是功能简陋，而且容易出错的方式，
 *   唯一优点是性能好
 
@@ -21,3 +139,399 @@
 *   取得和设置文件的创建时间、最后访问时间、最后写时间: GetFileTime SetFileTime
 *   取得和设置文件的属性    GetFileAttributes  SetFileAttributes
 *   获取文件名,文件类型,文件长度,文件路径   virtual CString GetFileName( ) const, virtual CString GetFileTitle( ) const, virtual CString GetFilePath( ) const, virtual DWORD GetLength( ) const;throw( CFileException );
+
+== Experience with MFC ==
+study note when write MAP sample UI
+*   MessageBox
+{{{
+    http://blog.sina.com.cn/s/blog_6217219f0100remq.html
+    http://www.cnblogs.com/shanwenbin/archive/2012/10/26/2740592.html
+
+    函数原型：
+    int MessageBox( HWND hWnd, LPCTSTR lpText, LPCSTR lpCaption,UINT uStyle );
+    注：应先将项目属性中的字符集属性改为多字符集（Unicode）。
+    消息框函数有4 个参数:
+    1.	hwnd:      父窗口的句柄,为NULL,说明消息框没有父窗口，大多数情况下可以省略不写
+    2.	lpText:     指向要显示字符串的指针,对话框上显示的信息
+    3.	lpCaption: 消息框的标题,即提示框上部分显示的内容
+    4.	uStyle:     消息框的内容和形为(即该消息框有几个按钮、文本对齐等状态，可以在20多个属性值中进行组合)
+    uStyle可以是在WINUSER.H中定义的一组前缀以MB_开始的常数组合
+    可以使用"或"(|)运算符将下面显示的三组中各选一个常数组合起来指定消息框的内容和形为: 
+    // 显示哪些按钮:
+    #define MB_OK              0X00000000L 
+    #define MB_OKCANCEL        0X00000001L 
+    #define MB_ABORTRERYGNORE  0X00000002L 
+    #define MB_YESNOCANCEL     0X00000003L 
+    #define MB_YESNO           0X00000004L 
+    #define RERYCANCEL         0X00000005L 
+
+    // 焦点在哪个按钮上:
+    #define MB_DEFBUTTON1      0X00000000L 
+    #define MB_DEFBUTTON2      0X00000100L 
+    #define MB_DEFBUTTON3      0X00000200L 
+    #define MB_DEFBUTTON4      0X00000300L
+
+    // 图示的外观：
+    #define MB_ICONHAND        0x00000010L
+    #define MB_ICONQUESTION    0x00000020L
+    #define MB_ICONEXCLAMATION 0x00000030L
+    #define MB_ICONASTERISK    0x00000040L
+
+    //图示的某些有替代名称：
+    #define MB_ICONWARNING     MB_ICONEXCLAMATION
+    #define MB_ICONERROR       MB_ICONHAND
+    #define MB_ICONINFORMATION MB_ICONASTERISK
+    #define MB_ICONSTOP        MB_ICONHAND
+
+    示例:
+    1.	MessageBox(_T("这是一个最简单的消息框！"));
+    2.	MessageBox(_T("这是一个有标题的消息框！"),_T("标题"));
+    3.	MessageBox(_T("这是一个有标题的消息框！"),_T("标题"), MB_OKCANCEL );
+    4.	MessageBox(_T("这是一个有标题的消息框！"),_T("标题"), MB_ICONEXCLAMATION );
+    5.	MessageBox(_T("这是一个有标题的消息框！"),_T("标题"), MB_ICONEXCLAMATION|MB_OKCANCEL );
+    6.	if(MessageBox("一种常用的应用",_T("标题"),MB_ICONEXCLAMATION|MB_OKCANCEL)==IDCANCEL)return;
+    7.  CString str;
+    　　int number=15;
+    　　str.Format(_T("%d"),number);
+
+    以上消息框的用法是在CWnd的子类中的应用，如果不是，则要
+    MessageBox(NULL,"ddd","ddd",MB_OK); 
+    或	MessageBox(hWnd,"ddd","ddd",MB_OK); 
+    hWnd为某窗口的句柄，或者直接用AfxMessageBox。 如下：
+    MessageBox(NULL, _T("Hello, Windows!"),_T("hello"), MB_OK );
+    MessageBox(NULL, _T("Hello, Windows!"),_T("HelloMsg"), MB_YESNO|MB_ICONEXCLAMATION) ;
+    MessageBox(NULL, _T("Hello, Windows!"),_T("HelloMsg"), MB_YESNO|MB_DEFBUTTON1) ;//表示窗口出来后焦点focus落在Yes(第一个)按钮上返回值：
+    IDOK     -- 1
+    IDCANCEL -- 2
+    IDABORT  -- 3
+    IDRETRY  -- 4
+    IDIGNORE -- 5
+    IDYES    -- 6
+    IDNO     -- 7
+    
+}}}
+
+*   WCHAR,  CString
+    *   WCHAR Copy:	   wcsncpy, wcsncpy_s
+    {{{
+        WCHAR:  C Strings library Null-terminated wide strings
+                http://en.cppreference.com/w/c/string/wide/wcsncpy
+         
+        Copy Func Defined in header <wchar.h>: 		
+        wchar_t* wcsncpy( wchar_t* dest, const wchar_t* src, size_t count );
+                                                                    (since C95) 
+                                                                    (until C99) 
+        wchar_t *wcsncpy(wchar_t *restrict dest, const wchar_t *restrict src, size_t n);
+                                                                    (since C99) 
+        errno_t wcsncpy_s( wchar_t *restrict dest, rsize_t destsz, const wchar_t *restrict src, rsize_t n);	
+                                                                    (since C11)
+        Parameters：
+        dest 	- 	pointer to the wide character array to copy to 
+        src 	- 	pointer to the wide string to copy from 
+        count 	- 	maximum number of wide characters to copy 
+        destsz 	- 	the size of the destination buffer 
+                
+
+        void timeFormat(WCHAR *rawTime, CString &timeShow)
+        {
+            timeShow.Empty();
+            WCHAR temp[32] = { '0' };
+            //WCHAR* temp = new WCHAR[32];
+            int rawLen = lstrlenW(rawTime);
+            WCHAR *p = temp;
+            WCHAR *q = temp;
+
+            //Date
+            wcsncpy_s(temp, 32, rawTime, 4);
+            temp[4] = '/';
+            p = temp + 5;
+            q = rawTime + 4;
+            wcsncpy_s(temp + 5, 27, rawTime + 4, 2);
+            temp[7] = '/';
+            wcsncpy_s(temp + 8, 24, rawTime + 6, 2);
+            temp[10] = ' ';
+
+            //Time
+            wcsncpy_s(temp + 11, 21, rawTime + 9, 2);
+            temp[13] = ':';
+            wcsncpy_s(temp + 14, 18, rawTime + 11, 2);
+            temp[16] = ':';
+            wcsncpy_s(temp + 17, 15, rawTime + 13, 2);
+
+            timeShow.Format(_T("%s"), temp);
+
+            //delete temp;
+            return;
+        }
+
+
+        注意： wcsncpy_s的第二个参数必须是该数组剩余的长度， 否则Copy失败!!!
+        即wcsncpy_s表示数组的实际大小， 而第四个参数不能比它大， 否则越界!!!
+            
+    }}}
+    *   WCHAR to CString
+    {{{
+        1. 	CString handleStr((*pList)[i].handle);
+        2.	CString timeShow;
+            timeShow.Format(_T("%s"), temp);
+    }}}
+    *   [[UTF-8 和 CString 互相转换]] 
+    {{{
+        UTF-8格式的显示问题    
+        CString不支持UTF-8格式字符串的显示， 如果直接将UTF-8格式的字符串转换成CString， 显示时会出现乱码!!!
+        要用MultiByteToWideChar先将UTF-8转成UNICODE， 再交给CString显示!!!
+    }}}
+    *   CString截取
+    {{{
+        1. CString::Find	查找单个字符或子串， 返回匹配位置的第一个字符位置
+        2. CString::FindOneOf	查找字符集合， 返回第一个匹配位置
+        3. CString::ReservedFind		返向查找字符
+        4. CString::Mid(start, n)		截取子串， 参数为开始位置、子串长度
+        5. CString::Right(n)			截取右端n个字符长度的子串
+    }}}
+*   ListCtrl
+{{{
+    http://blog.chinaunix.net/uid-20676637-id-86116.html
+
+    1.  Message header
+        HDN：	Header Notify
+        LVN：	ListView control Notify 
+        NM：	Notify Message
+        TVN：	TreeView control Notify
+        
+    2.  http://www.cnblogs.com/wind-net/archive/2012/10/30/2745817.html
+        双击某一行的回调函数是NM_DCLICK  !!!
+
+    3.  在第一行前插入一行
+        InsertItem
+        该函数的第一个参数表示插入的位置！！！
+
+
+    4.  插入Icon，  在Init中加入：
+        m_Imagelist.Create(22, 22, ILC_COLOR32, 2, 1);  //创建ImageList
+        HICON   hIcon = AfxGetApp()->LoadIcon(IDI_ICON3);   // 从Resouce中加载一个图
+        m_Imagelist.Add(hIcon); //将该图加入到ImageList中， 编号为0
+        hIcon = AfxGetApp()->LoadIcon(IDI_ICON4);   // 从Resouce中加载一个图
+        m_Imagelist.Add(hIcon); // 将该图加入到ImageList中， 编号为1
+        m_List2.SendMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0, LVS_EX_FULLROWSELECT | LVS_EX_FLATSB);
+        m_List2.SetImageList(&m_Imagelist, LVSIL_SMALL)
+        m_List2.InsertColumn(COL_STATE, strState, LVCFMT_IMAGE|LVCFMT_LEFT, 50);
+        
+
+        // Insert Item Line     只能在Insert Item时插入图片， 不能像改变Text一样动态修改
+        if (readStr.Find(_T("yes")) != -1)
+        {// read
+            m_smsList.InsertItem(InsertLocation, _T(""), READ_STATUS_YES);	//插入一行
+        }
+        else
+        {// unread		
+            m_smsList.InsertItem(InsertLocation, _T(""), READ_STATUS_NO);	//插入一行
+            m_unReadMsg += 1;
+        }
+        
+        // change the image, 需要先删除原Item再添加Item
+        // Delete the message and insert new
+        CString str1 = m_smsList.GetItemText(nItem, COL_FROM);	// from
+        CString str2 = m_smsList.GetItemText(nItem, COL_RECEIVED);	// received
+        CString str4 = m_smsList.GetItemText(nItem, COL_HANDLE); // handle
+        CString str5(_T("yes"));
+        m_smsList.DeleteItem(nItem);
+        m_smsList.InsertItem(nItem, _T(""), READ_STATUS_YES);	// insert read status line
+        m_smsList.SetItemText(nItem, COL_FROM, str1);//设置数据
+        ....
+}}}
+*   Tab Control
+{{{
+    http://blog.csdn.net/l_andy/article/details/9197137
+    http://blog.163.com/gz_ricky/blog/static/1820491182011061180897/
+    
+    用于分页显示多个Dialog窗口， 首先要建立一个包含Tab的Dialog控件， 然后建立多个Dialog窗口， 
+    它们的属性值： Border->None, Style->Child。然后就可以将Dialog作为子控件插入到Tab的页中。
+    页的切换要用到TabCtrl的TCN_SELCHANGE事件响应函数OnSelchangeTabtest
+}}}
+*   MFC Edit
+{{{
+    详细使用
+    http://blog.sina.com.cn/s/blog_af68a2c201019v53.html
+
+    MFC EditCtrl关联整型变量
+    http://www.tuicool.com/articles/yYnQjm
+}}}
+*   MFC中控件的TAB顺序
+{{{
+    关于改变Tab顺序的方法有以下几种：
+    方法一：		简单有效
+        在编辑界面按下ctrl+D键，就会出现所有控件的Tab键顺序，按照自己想要的顺序依次点击控件的数字标识，就可以重新安排控件的TAB键顺序。
+
+    方法二：
+        在动态创建控件的时候STYLE设置成为WS_CHILD|WS_VISIBLE|WS_TABSTOP，其中WS_TABSTOP是影响TAB顺序的。
+        先创建的控件TAB顺序在前。如果要颠倒TAB顺序的话，就把在创建控件时把WS_TABSTOP去掉，并增加对“TAB键被按下”事件的捕捉，人工使用SETFOCUS来
+        控制TAB顺序。
+     
+    方法三：
+        在VC中，首先控件没有TABINDEX属性，有 TABSTOP 属性；
+        其次，如果你发现这可能是由resource.h中控件的ID值引起的。那么你就错了：因为无论你如何调整resource.h中控件的ID值，都对TAB键的切换顺序不能发生任何影响；
+        那么，VC中的控件顺序是由什么决定的呢？该如何来修改呢？
+        在你的工程文件和工作区文件所在目录下有一同名的资源文件(*.rc),其中包含了本工程所有使用到的资源。在VC集成开发环境中，该资源是以树状和可视的状态出现的。
+        现在用任意文本编辑器(最好就是记事本notepad.exe)将该资源文件打开;
+        找到DIALOG字段，在BEGIN...END语句之中就是对话框中所有的控件定义与属性描述；
+        假定你将其中先后出现的控件顺序改变一下；然后保存该文件；然后用VC打开，重新生成执行文件执行一下：----怎么样?!!控件间的切换顺序已经改变了!!!
+        原来，VC中控件的TAB切换顺序即是资源文件中上述BEGIN...END间先后出现的顺序----改变其中的控件出现顺序(在文本编辑器中)便可改变控件间的TAB切换顺序。
+}}}
+*   MFC控件数据交换
+{{{
+    http://blog.csdn.net/eldn__/article/details/38357643 
+    MFC中操纵控件的两种方式：
+    1） 方式1 通过调用CWnd::GetDlgItem()函数，根据控件ID获取控件对象指针，操作控件即可。 对话框的初始化函数：OnInitDialog()
+       
+    2） 方式2 对话框的数据交换技术(DDX) 
+       将控件和一个成员变量绑定，可以通过操作成员变量达到操作控件的目的。
+       1 定义与控件绑定的成员变量
+       2 在对话框中添加DoDataExchange()函数,在函数中完成控件
+         与变量的绑定。
+         DDX_Control()	//控件类型的绑定
+         DDX_Text()		//值类型的绑定
+       3 通过成员变量完成对控件的操作 
+       4 值类型的绑定，还需要调用UpdateData(BOOL)函数
+         UpdateData(TRUE)- 控件中的值传赋值变量(接收)
+         UpdateData(FALSE)-将变量的值显示到控件上
+         
+    可与控件绑定两种变量， 控件变量和值变量， 控件变量就是将控件ID与成员变量关联起来， 操作变量就相当于操作该控件。 值变量是将控件的内容与变量关联起来， 比如Edit中的文本内容与一个CString变量关联， 当内容变化时， CString变量值也会变化。
+    通过Add Varialble...对话框加入的变量， 实际在Code中加入了如下代码：
+    void MSGCreateDlg::DoDataExchange(CDataExchange* pDX)
+    {
+        CDialogEx::DoDataExchange(pDX);
+        DDX_Control(pDX, IDC_EDIT1, m_Receiver);
+        DDX_Control(pDX, IDOK, m_SendBtn);
+        DDX_Control(pDX, IDC_CLEAR, m_ClearBtn);
+        DDX_Control(pDX, IDCANCEL, m_CancelBtn);
+        DDX_Control(pDX, IDC_EDIT2, m_MsgEdit);
+        DDX_Text(pDX, IDC_EDIT1, m_ReceiverNum);
+        DDX_Text(pDX, IDC_EDIT2, m_MsgStr);
+    }
+
+    DDX_Control		关联控件变量
+    DDX_Text		关联值变量
+    MSDN是这样描述的：Called by the framework to exchange and validate dialog data.大意是框架调用此函数来改写与确认对话框数据。
+    DoDataExchange会被框架调用，用来改变和验证对话框的数据。在这个函数中一般是将控件和某些变量关联，当在其它地方改变量的值，通过UpdateData 进行双向交换。
+    DoDataExchange函数是被框架与控件用来交流数据的。而里面的DDX函数才是动态绑定技术。
+    MSDN后面附加了一句 
+        Never call this function directly. It is called by the UpdateData member function. 
+        Call UpdateData to initialize a dialog box’s controls or retrieve data from a dialog box.
+    就是说此函数永远不被直接调用，它只是呼叫UpdateData函数时才会被调用。
+}}}
+*   MFC UpdateData(FALSE)和UpdateData(TRUE)的作用
+{{{
+    当使用ClassWizard建立了控件和变量之间的联系后：
+        当修改了变量的值，而希望对话框控件更新显示，就应该在修改变量后调用UpdateData(FALSE)；
+        如果希望知道用户在对话框中到底输入了什么，就应该在访问变量前调用UpdateData(TRUE)。 
+    
+    此外：使用UpdateData()函数时，当前界面上所有绑定了的变量(即通过MFC ClassWizard给控件添加了对应的变量)都会被UpdateData(TRUE)更新成对应控件中的内容；
+        同样所有绑定了变量的控件中的内容也会 UpdateData(FALSE)更新成对应变量中的内容。
+    
+    注意理解：
+        GetWindowText()是获取控件当前内容值，是对单个控件而言；而UpdateData()是作用于整个CWnd的DDX数据交换机制之中的，是控件和数据的双向通道。
+        数据量不多的话，最好用SetDlgItemText()和GetDlgItemText()
+
+    UpdateData(TRUE) 即：控件的值—>变量。
+        ——刷新控件的值到对应的变量。(外部输入值交给内部变量)
+        -----------------------------------默认的缺省参数为TRUE，
+    UpdateData(FALSE)即：变量值—>控件显示。
+        —— 拷贝变量值到控件显示。(变量的最终运算结果值交给外部输出显示)
+        void CMyDlg::OnOK()
+        {
+            // TODO: Add extra validation here， numX为Value关联变量
+                UpdateData(true); 
+                num3=num1+num2;
+                UpdateData(false);   
+        }
+}}}
+*   MFC中CFileDialog(文件对话框)
+{{{
+    文件选择对话框的使用：首先构造一个对象并提供相应的参数，构造函数原型如下： 
+    CFileDialog::CFileDialog( BOOL bOpenFileDialog, LPCTSTR lpszDefExt = NULL, LPCTSTR lpszFileName = NULL, 
+                                DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, LPCTSTR lpszFilter = NULL, CWnd* pParentWnd = NULL );
+    参数意义如下：
+        bOpenFileDialog 	为TRUE则显示打开对话框，为FALSE则显示保存对话文件对话框。 
+        lpszDefExt 		指定默认的文件扩展名。 
+        lpszFileName 		指定默认的文件名。 
+        dwFlags 			指明一些特定风格。 
+        lpszFilter 是最重要的一个参数，它指明可供选择的文件类型和相应的扩展名。参数格式如： 
+            "Chart Files (*.xlc)|*.xlc|Worksheet Files (*.xls)|*.xls|Data Files (*.xlc;*.xls)|*.xlc; *.xls|All Files (*.*)|*.*||";
+            文件类型说明和扩展名间用 | 分隔，同种类型文件的扩展名间可以用 ; 分割，每种文件类型间用 | 分隔，末尾用 || 指明。 
+        pParentWnd 为父窗口指针。 
+
+    创建文件对话框可以使用DoModal()，在返回后可以利用下面的函数得到用户选择： 
+    CString CFileDialog::GetPathName( )     得到完整的文件名，包括目录名和扩展名如：c: est est1.txt 
+    CString CFileDialog::GetFileName( )     得到完整的文件名，包括扩展名如：test1.txt 
+    CString CFileDialog::GetExtName( )      得到完整的文件扩展名，如：txt 
+    CString CFileDialog::GetFileTitle ( )   得到完整的文件名，不包括目录名和扩展名如：test1 
+    POSITION CFileDialog::GetStartPosition( )   对于选择了多个文件的情况得到第一个文件位置。 
+    CString CFileDialog::GetNextPathName( POSITION& pos ) 对于选择了多个文件的情况得到下一个文件位置，并同时返回当前文件名。
+                                                          但必须已经调用过POSITION CFileDialog::GetStartPosition( )来得到最初的POSITION变量。
+
+    void SaveFile()
+    {
+        // TODO: Add your control notification handler code here
+        TCHAR fileBuffer[256] = { 0 };
+        CFile out;
+        BOOL isOpen = FALSE;        //是否打开(否则为保存)  
+        CString defaultDir = _T("E:\\FileTest");   //默认打开的文件路径  
+        CString fileName = _T("bMessage.txt");         //默认打开的文件名  
+        CString filter = _T("文本文档 (*.txt)|*.xxx|所有文件 (*.*)|*.*||");   //文件过虑的类型  
+        CFileDialog outDlg(isOpen, defaultDir, fileName, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, filter, this);
+        //设定保存对话框标题
+        outDlg.m_ofn.lpstrTitle = _T("保存bMessage格式数据到文件");
+        outDlg.m_ofn.lpstrDefExt = _T("txt");
+        if (outDlg.DoModal() == IDOK)
+        {	
+            if (out.Open(outDlg.GetPathName(), CFile::modeWrite | CFile::modeCreate))
+            {
+                int wBSize = sizeof(bMsgSampleBuf);
+                out.Write(bMsgSampleBuf, wBSize);
+                out.Close();
+                MessageBox(_T("保存文件成功"), _T("搞定了"), MB_ICONEXCLAMATION | MB_OK);
+            }
+            else
+                MessageBox(_T("保存文件失败"), _T("失败了"), MB_ICONSTOP | MB_OK);
+        }
+    }
+    
+}}}
+*   MFC Process控件
+{{{
+    该控件可显示某个操作执行的进度
+    设置控件使能和可见
+    m_process.EnableWindow(TRUE)
+    m_process.ShowWindow(TRUE)
+}}}
+*   MFC删除指定文件或文件夹内容
+{{{
+    1.删除指定文件
+        第一种方法：定义一个文件类对象来操作
+         CFile    TempFile;   
+         TempFile.Remove(指定文件名);
+
+        第二种方法：
+        DeleteFile("c:\\abc\\test.exe ");	//MFC框架中可直接调用此函数
+    2.删除目录
+        _rmdir()
+        DeleteDirectory(sTempDir)
+        RemoveDirectory(sTempDir) 
+}}}
+*   MFC修改程序窗口图标和EXE图标的方法
+{{{
+    一、修改程序运行时窗口图标的方法： 
+        在OnInitDialog函数中添加：
+        //加载图标
+        HICON hIcon = AfxGetApp()->LoadIcon(IDI_HK);
+        //设置图标
+        SetIcon(hIcon, FALSE);
+
+    二、修改程序EXE图标的方法：
+        打开resource.h文件，MFC自动生成IDR_MAINFRAME的ID是128，自己添加的ICON文件都大于这个值，而VC默认以最小值做为EXE图标，
+        所以我们只需要将自己的资源ID改低于128就可以了。
+
+    三，一步到位：
+        将自己的资源图标直接替换主程序图标即可， 用*.icon格式的图标
+}}}

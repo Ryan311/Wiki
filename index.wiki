@@ -6,12 +6,12 @@
     I fear not the man who has practiced 10,000 kicks once, but I fear the man who had practiced one kick 10,000 times
     <br>                                                                                                    _Bruce Lee_
 
-=== WHO AM I ===
+== WHO AM I ==
 
-    My name is Rick, I am a programmer. I like opensource very much. 
-    <br>This is my personal wiki web site. Write my diary and study note here
+    My name is Rick, I am a programmer. I like new tech very much. 
+    <br>This is my personal wiki web site. Write my diary and study note here...
 
-=== Learning road ===
+== Learning road ==
 *   [[Windows]] [[WindowsEmbeded]] [[WindowsProgram]] 
 *   [[Linux]] [[Ubuntu]]
 *   [[Programming]] 
@@ -42,23 +42,14 @@
     *   [[TCP_IP]]
     *   [[BlueZ]] [[DBUS]] 
     *   [[Charset]]
-    *   XML JSON
+    *   [[REST]] [[http://tidesdk.multipart.net/docs/user-dev/generated/€ý,€ý,|TideSDK]] XML JSON 
 
+== [[Reading Notes]] ==
 
-=== As a programmer ===
+== As a programmer ==
 *   [[http://www.linuxeden.com/html/news/20130819/142662.html|³ÌÐòÔ±µÄÀ§¾³]]
-*   [[https://github.com/trending?l=python|Project Trending]]
-*   [[REST]]
-*   Interesting WebSet
-    *   [[http://www.pythonchallenge.com/|Learn Python]]
+*   program training
+    *   [[http://www.pythonchallenge.com/|python challenge]]
     *   [[http://projecteuler.net/|Solve Problem in least code]]
     *   [[http://www.topcoder.com/]]
 
-=== New Tech ===
-*   [[http://www.tidesdk.org/|TideSDK]]   
-    *   Create multi-platform desktop apps with HTML5, CSS3 and JavaScript
-
-=== [[Reading Notes]] ===
-
-=== Useful Links ===
-*   [[http://wiki.osdev.org/Main_Page|OSDEV]] build os

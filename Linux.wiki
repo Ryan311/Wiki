@@ -1,6 +1,9 @@
 %toc
 ---------------------------------------------------------------------------
-=== Linux Command ===
+== Build OS ==
+*   [[http://wiki.osdev.org/Main_Page|OSDEV]]
+ 
+== Linux Command ==
 *   [[https://wiki.gnome.org/action/show/Apps/Nautilus?action=show&redirect=Nautilus|Nautilus]]: the file manager for GNOME desktop
     *   F9  打开/隐藏侧边栏
     *   Ctrl+L  在文件浏览器中呼出地址栏
@@ -118,7 +121,7 @@
     *   Alt+H 打开 “帮助” 菜单（help） 
 
 ---------------------------------------------------------------------------
-=== Linux Should known ===
+== Linux Should known ==
 http://coolshell.cn/articles/8883.html
 
 *   Bash
