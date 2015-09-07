@@ -6,7 +6,31 @@
 *   [[Visual C++中C_C++格式化输出]]
 *   [[const]]
 *   类的访问权限
+*   #define
+{{{
+    #define A(x) T_##x      连接
+    #define B（x) #@x       转换
+    #define C（x) #x        转换
+    
+    我们假设：x=1，则有：
+    A(1)------〉T_1
+    B(1)------〉'1'
+    C(1)------〉"1"
+}}}
 
+==  GNU C  ==
+*   Extensions to the C Language Family   http://gcc.gnu.org/onlinedocs/gcc/C-Extensions.html
+*   GNU C provides several language features not found in ISO standard C 
+*   Linux内核使用的GNU C扩展:
+    *   语句表达式 
+    *   typeof
+    *   零长度数组
+    *   可变参数宏
+    *   标号元素
+    *   Case 范围
+    *   声明的特殊属性
+    *   当前函数名
+    *   内建函数
 
 ==  Bugs ==
 *   单目运算符的优先级很高， 且结合方向是自右向左， 

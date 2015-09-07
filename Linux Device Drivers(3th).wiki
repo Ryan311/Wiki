@@ -4,3 +4,18 @@
 
 = [[字符设备驱动]] =
 
+
+= 重要头文件 =
+| #include <linux/init.h>        | 包含模块初始化及清除函数的宏          | module_init(init_function), module_exit(cleanup_function)                   |
+| #include <linux/sched.h>       | 包含驱动程序使用的大部分内核API的定义 | Sleep()及各种变量声明                                                       |
+| #include <linux/module.h>      | 必需的头文件，必须包含在模块源代码中  |                                                                             |
+| #include <linux/version.h>     | 包含所构造内核版本信息的头文件        | LINUX_VERSION_CODE                                                          |
+| #include <linux/moduleparam.h> | 用来创建模块参数的宏所需头文件        | module_param(variable, type, perm);                                         |
+| #include <linux/kernel.h>      | 包含打印函数的头文件                  | printk(), container_of宏                                                    |
+| #include <linux/types.h>       | 包含一些变量声明                      | dev_t 设备号类型                                                            |
+| #include <linux/kdev_t.h>      | 设备号相关宏操作                      | MAJOR(dev_t dev), MINOR(dev_t dev), MKDEV(int major, int minor)             |
+| #include <linux/fs.h>          | 文件系统相关操作                      | register_chrdev_region(), alloc_chrdev_region(), unregister_chrdev_region() |
+| #include <linux/slab.h>        | 内存管理相关操作                      | kmalloc, kfree                                                              |
+| #include <linux/cdev.h>        | 字符设备结构定义及函数操作            | struct cdev, cdev_init, cdev_add, cdev_alloc, cdev_del                      |
+| #include <asm/uaccess.h>       | 声明在kernel和user mode移动数据函数   | copy_from_user, copy_to_user                                                |
+|                                |                                       |                                                                             |
