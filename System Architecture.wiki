@@ -1,0 +1,11 @@
+%toc
+
+Windows内核模式组件
+| Ntoskrnl.exe                | 执行体和内核                                                              |
+| Ntkrnlpa.exe(仅用于32位系统 | 执行体和内核， 支持物理地址扩展(PAE)， 使用32位系统可寻址多达64GB物理内存 |
+| Hal.dll                     | 硬件抽象层                                                                |
+| Win32k.sys                  | Windwos子系统的内核模式部分                                               |
+| Ntdll.dll                   | 内部支持函数， 以及执行体函数的系统服务分发存根                           |
+| Kernel32.dll, Advapi32.dll  | Windwos的核心子系统                                                       |
+| User32.dll, Gdi32.dll       |                                                                           |
+
