@@ -24,6 +24,7 @@
     *   如果你比较关注渲染性能，当然可以选择C++和DirectX进行开发。
 
 *   WinRT API Reference
+    *   https://msdn.microsoft.com/en-us/library/windows/desktop/hh920511(v=vs.85).aspx#windows_runtime_classes
     *   https://msdn.microsoft.com/en-us/library/windows/apps/br211369.aspx
     *   http://www.codeproject.com/Articles/262151/Visual-Cplusplus-and-WinRT-Metro-Some-fundamentals
     *   http://www.codeproject.com/Articles/328551/Part-Introduction-to-WinRT-the-new-Windows-Runti

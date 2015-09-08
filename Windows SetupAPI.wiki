@@ -5,7 +5,7 @@ msdn:   https://msdn.microsoft.com/en-us/library/windows/hardware/ff550855%28v=v
 Device Information Sets
 https://msdn.microsoft.com/en-us/library/windows/hardware/ff541247%28v=vs.85%29.aspx
 
-==  通过Device Interface class查看设备并打开 ==
+==  查找指定设备并打开 ==
 *   SetupDiGetClassDevs
     *   Each device is associated with an SP_DEVINFO_DATA structure. 
     *   You can retrieve a handle (HDEVINFO) to a device information set that contains all installed devices in a particular class. 
@@ -27,6 +27,7 @@ https://msdn.microsoft.com/en-us/library/windows/hardware/ff541247%28v=vs.85%29.
     *    free all SP_DEVINFO_DATA structures in a device information set
 *   Example
     *   Open device using device interface which is found by GUID  
+    *   Sample from MSDN:   Usbsamp Sample
     {{{
         //
         // guid是Device Interface Class， 每个LE设备配对后， LEEnum枚举一个PDO， 加载PDO后会为该设备提供一下Device Interface

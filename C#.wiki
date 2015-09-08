@@ -20,7 +20,34 @@ The following reasons make C# a widely used professional language:
 #   It can be compiled on a variety of computer platforms.
 #   Part of .Net Framework.
 
-=== Details ===
+== DllImport 用法和路径问题 ==
+*   C#只提供托管的API，如果想要操作硬件， 有以下两种方法
+    *   调用Win32的非托管的API
+    *   使用WinRT C# API，但它本身也是非托管的
+*   DllImport是System.Runtime.InteropServices命名空间下的一个属性类，其功能是提供从非托管DLL导出的函数的必要调用信息。
+*   非托管及托管数据类型对应关系：
+| LPCTSTR    | String        |
+| LPTSTR     | StringBuilder |
+| DWORD      | int           |
+| HDEVNOTIFY | IntPtr        |
+
+*   DllImport的导入规则：
+    *   方法名与Win API完全一样。如果在C#中调用时显示完全不同的方法名称，则需要引入EntryPoint属性，使用别名显示。
+    *   函数除需要DllImport类修饰符外，还需要声明public static extern类型。
+    *   函数返回值和参数必须和调用的API的完全一样。
+    *   必须引入System.Runtime.InteropServices命名空间 
+
+*   DllImport会按照顺序自动去寻找的地方：
+    *   exe所在目录
+    *   System32目录
+    *   环境变量目录
+
+*   C#操作硬件：    Win32 API --> C#  http://blog.csdn.net/cocosoft/article/details/2086710
+*   Sample：    DeviceManager  http://download.csdn.net/detail/cocosoft/352079
+    *   Need to copy to GitHub
+
+
+== Details ==
 *   Nullables
     *   <data_type> ? <variable_name> = null;
     {{{
