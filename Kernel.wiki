@@ -1,0 +1,4 @@
+%toc
+
+== [[Linux Log]] ==
+== [[Linux IPC]] ==

@@ -22,6 +22,17 @@
     >   sudo apt-get install nautilus-actions nautilus-actions-extra 
     }}}
     *   [[http://www.ibm.com/developerworks/cn/linux/l-script-linux-desktop-2/index.html?ca=drs/|扩展Nautilus]]
+*   Linux查找所有正在运行的守护进程（daemon）
+    *   守护进程（daemon）和后台进程（background process）有区别。守护进程是一种后台进程，但是，同时，它必须具备以下特性：
+        #   没有控制它的tty
+        #   必须是一个session leader
+        #   必须是一个进程组的leader
+        #   执行后台任务
+        #   root目录即为工作目录
+        #   umask设置为0
+        #   文件描述符（file descriptor）都必须先关闭，然后再关联相应文件（或者设备），如果有需要的话。
+    *   只用前两条做为判断条件即可
+    *   > ps -eo ppid,pid,sid,stat,tty,comm  | awk '{ if ($2 == $3 && $5 == "?") {print $0}; }'
 *   Ctrl+Alt+T  打开终端
 *   ps -aux     list all user and system process(包括守护进程)
 *   pstree      查看进程与线程的树形结构

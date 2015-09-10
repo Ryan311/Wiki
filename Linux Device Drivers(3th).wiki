@@ -18,4 +18,10 @@
 | #include <linux/slab.h>        | 内存管理相关操作                      | kmalloc, kfree                                                              |
 | #include <linux/cdev.h>        | 字符设备结构定义及函数操作            | struct cdev, cdev_init, cdev_add, cdev_alloc, cdev_del                      |
 | #include <asm/uaccess.h>       | 声明在kernel和user mode移动数据函数   | copy_from_user, copy_to_user                                                |
-|                                |                                       |                                                                             |
+| #include <linux/proc_fs.h>     | 所有使用/proc的模块必须包含           | 其中的函数用于创建只读的/proc文件等                                         |
+
+
+= 重要函数及宏 =
+| container_of            | <linux/kernel.h> | 宏， 由结构中成员的指针获得结构的指针 |
+| mutex_lock_interuptible |                  |                                       |
+| mutex_unlock            |                  |                                       |

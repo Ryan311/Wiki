@@ -1,0 +1,47 @@
+%toc
+
+= Links =
+*   Knowledge from   http://blog.csdn.net/henni386/article/details/7439142
+*   rsyslogd    http://www.rsyslog.com/
+
+= Arch =
+{{images/linux_log.jpg}}
+
+= Details =
+从上面的图片中可以看出，linux系统的的log主要分成下面几个部分：
+*   syslogd
+*   klogd
+*   /etc/syslog.conf
+*   用户空间log写log接口，logger/syslog()
+*   内核空间log接口，printk/Log_buf
+*   用户空间对内核空间log的访问接口klogctl()/do_syslog()
+
+== 内核日志存储 ==
+*   内核的日志存在log_buf(循环缓冲区, 大小为__LOG_BUF_LEN在配置内核时指定为4KB~1MB之间值)指向的内存缓冲区中。 大小在新的内核是可配置的，CONFIG_LOG_BUF_SHIFT=xx
+*   格式 <level>xxxxxx
+*   内核log_buf的大小受限，而内核随着时间的运行，其日志信息会越来越多，当过多时，log_buf中的日志信息就会被循环覆盖。
+
+== log API ==
+*   printk：内核代码中常见的日志输出方式, 附加不同的日志级别(log level)
+*   do_syslog/syslog: 内核提供的系统调用，用来操作log_buf 
+*   klogctl()：C库中提供的函数，用来使用上面的系统调用。  klogd使用
+
+== Tools ==
+*   以下两个命令直接操作内核log日志
+    *   dmesg：用来查看log_buf中的数据
+    *   cat /proc/kmsg ：   读取log_buf中的数据
+*   syslogd和klod   用户空间守护进程
+    *   为了解决内核log_buf大小受限， 长时间运行较早的log会被覆盖(也就是使用的循环缓冲区)
+    *   klogd通过klogctl()将log_buf中的日志信息读取出来，然后发给syslogd。
+    *   syslogd负责接收系统中的每个进程发送过来的日志消息，然后根据消息的Priority和/ect/syslogd.conf的配置,进行分类存储或者转发。
+*   rsyslogd in Ubuntu
+    *   Ubuntu uses rsyslogd which does not not need the klogd server at all. 
+    *   In fact, rsyslogd reads the /proc/kmsg file itself. So everything works as is with the default configuration from Ubuntu.
+
+= 使用/proc文件系统 =
+*   /proc是一种特殊的， 由软件创建的文件系统，内核使用它向外界导出信息
+*   /proc下面的每个文件都绑定一个内核函数， 用户读取其中的文件时， 该函数动态地生成文件的"内容"
+*   linux下的很多工具都是从/proc中获取信息， 如ps， top和uptime
+*   驱动程序也可以在任何时候添加或删除/proc中的入口项， 用以导出信息
+*   所有使用/proc的模块必须包含<linux/proc_fs.h>, 驱动程序可通过该头文件中定义的函数创建一个只读的/proc文件，再实现一个函数用于读取文件时生成数据
+*   在某个进程读取我们的/proc文件时， 内核会分配一个内在页， 驱动程序可以将数据通过这个内存页返回到用户空间
