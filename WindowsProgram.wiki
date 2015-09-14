@@ -31,3 +31,4 @@
 == [[Windows SetupAPI]] ==
 == [[Windows Strings]] ==
 == [[Windows Version]] ==
+== [[Bluetooth API]] ==

@@ -5,6 +5,258 @@ msdn:   https://msdn.microsoft.com/en-us/library/windows/hardware/ff550855%28v=v
 Device Information Sets
 https://msdn.microsoft.com/en-us/library/windows/hardware/ff541247%28v=vs.85%29.aspx
 
+== 查找系统中BLE设备 ==
+*   所有的LE设备在Properties里都有Friendly name属性， Hardware ID属性为BTHLE\DEV_{Address}
+*   将有Friendly Name属性的设备对应地址返回
+{{{
+    BOOL CGuardKeyInportDemoDlg::GetBtDeviceInfo(GUID guid, map<CString, CString> &deviceMap)
+    {
+        HDEVINFO         deviceInfo = INVALID_HANDLE_VALUE;
+        BOOL             status = TRUE;
+        ULONG            deviceIndex;
+        SP_DEVINFO_DATA  deviceInfoData;
+        BOOL             bResult = FALSE;
+        LPTSTR           buf = NULL;
+        BOOL             done = FALSE;
+
+        //
+        // Examine all present devices to see if any match the given DriverName
+        //
+        deviceInfo = SetupDiGetClassDevs(&BT_CLASS,
+            NULL,
+            NULL,
+            DIGCF_PRESENT);
+
+        if (deviceInfo == INVALID_HANDLE_VALUE)
+        {
+            status = FALSE;
+            goto Done;
+        }
+
+        deviceIndex = 0;
+        deviceInfoData.cbSize = sizeof(deviceInfoData);
+
+        while (done == FALSE)
+        {
+            //
+            // Get devinst of the next device
+            //
+
+            status = SetupDiEnumDeviceInfo(deviceInfo,
+                    deviceIndex,
+                    &deviceInfoData);
+
+            deviceIndex++;
+
+            if (!status)
+            {
+                //
+                // This could be an error, or indication that all devices have been
+                // processed. Either way the desired device was not found.
+                //
+                done = TRUE;
+                break;
+            }
+
+            //
+            // Get the Hardware ID
+            //
+            bResult = GetDeviceProperty(deviceInfo,
+                &deviceInfoData,
+                SPDRP_HARDWAREID,
+                &buf);
+
+            if (bResult == TRUE && buf != NULL)
+            {
+                CString HardwareID = buf;
+                //MessageBox(HardwareID);
+                int pos = HardwareID.Find(L"BTHLE\\Dev");
+                if (pos != -1)
+                {
+                    CString Adress = HardwareID.Right(pos + 12);
+                    free(buf);
+                    buf = NULL;
+                    //
+                    // Get the friendly name
+                    //
+                    bResult = GetDeviceProperty(deviceInfo,
+                        &deviceInfoData,
+                        SPDRP_FRIENDLYNAME,
+                        &buf);
+
+                    // If the DriverName value matches, return the DeviceInstance
+                    //
+                    if (bResult == TRUE && buf != NULL)
+                    {
+                        CString fname = buf;
+                        //MessageBox(fname);
+                        //break;
+                        deviceMap[Adress] = fname;
+                    }
+                }
+                //MessageBox(friendName);
+            }
+
+            if (buf != NULL)
+            {
+                free(buf);
+                buf = NULL;
+            }
+        }
+    Done:
+        if (deviceInfo != INVALID_HANDLE_VALUE)
+        {
+            SetupDiDestroyDeviceInfoList(deviceInfo);
+        }
+        return status;
+    }
+}}}
+获得设备的属性函数,  所有属性见： https://msdn.microsoft.com/en-us/library/ff551967%28v=vs.85%29.aspx
+{{{
+    BOOL CGuardKeyInportDemoDlg::GetDeviceProperty(
+        _In_    HDEVINFO         DeviceInfoSet,
+        _In_    PSP_DEVINFO_DATA DeviceInfoData,
+        _In_    DWORD            Property,
+        _Outptr_  LPTSTR        *ppBuffer
+        )
+    {
+        BOOL bResult;
+        DWORD requiredLength = 0;
+        DWORD lastError;
+
+        if (ppBuffer == NULL)
+        {
+            return FALSE;
+        }
+
+        *ppBuffer = NULL;
+
+        bResult = SetupDiGetDeviceRegistryProperty(DeviceInfoSet,
+            DeviceInfoData,
+            Property,
+            NULL,
+            NULL,
+            0,
+            &requiredLength);
+        lastError = GetLastError();
+
+        if ((requiredLength == 0) || (bResult != FALSE && lastError != ERROR_INSUFFICIENT_BUFFER))
+        {
+            return FALSE;
+        }
+
+        *ppBuffer = (LPTSTR)malloc(requiredLength);
+
+        if (*ppBuffer == NULL)
+        {
+            return FALSE;
+        }
+
+        bResult = SetupDiGetDeviceRegistryProperty(DeviceInfoSet,
+            DeviceInfoData,
+            Property,
+            NULL,
+            (PBYTE)*ppBuffer,
+            requiredLength,
+            &requiredLength);
+        if (bResult == FALSE)
+        {
+            free(*ppBuffer);
+            *ppBuffer = NULL;
+            return FALSE;
+        }
+
+        return TRUE;
+    }
+}}}
+
+*   根据Service UUID找出所有的Device Interface 
+{{{ 
+    int CGuardKeyInportDemoDlg::GetPairedDevList(GUID guid, set<CString> &devPath)
+    {
+        HRESULT hr = E_FAIL;
+        HDEVINFO hDevInfo = SetupDiGetClassDevs(&guid, NULL, NULL, DIGCF_PRESENT | DIGCF_INTERFACEDEVICE);
+        ULONG iDevIndex = 0;
+        while (1) {
+            SP_DEVICE_INTERFACE_DATA deviceInfoData;
+            deviceInfoData.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
+            if (SetupDiEnumDeviceInterfaces(hDevInfo, 0, &guid, iDevIndex, &deviceInfoData))
+            {
+                DWORD cbRequired = 0;
+                SetupDiGetDeviceInterfaceDetail(hDevInfo,
+                    &deviceInfoData,
+                    0,
+                    0,
+                    &cbRequired,
+                    0);
+                if (ERROR_INSUFFICIENT_BUFFER == GetLastError())
+                {
+                    PSP_DEVICE_INTERFACE_DETAIL_DATA pdidd = (PSP_DEVICE_INTERFACE_DETAIL_DATA)LocalAlloc(LPTR, cbRequired);
+
+                    if (pdidd)
+                    {
+                        pdidd->cbSize = sizeof(*pdidd);
+                        if (SetupDiGetDeviceInterfaceDetail(hDevInfo,
+                            &deviceInfoData,
+                            pdidd,
+                            cbRequired,
+                            &cbRequired,
+                            0))
+                        {
+                            CString csDevicePath = pdidd->DevicePath;
+                            devPath.insert(csDevicePath);
+                        }
+                        LocalFree(pdidd);
+                    }
+                }
+            }
+            else if (GetLastError() == ERROR_NO_MORE_ITEMS) //No more items
+            {
+                break;
+            }
+            iDevIndex++;
+        }
+        SetupDiDestroyDeviceInfoList(hDevInfo);
+        return iDevIndex;
+    }
+}}}
+*   根据以上两个集合， 找出Address::Name::DevicePath对应关系
+{{{
+    set<CString> pList;	// map< address, friendly name >
+	map<CString, CString> maList;	// map< address, friendly name >
+	map<CString, CString>::iterator mitr;
+	set<CString>::iterator sitr;
+	GetBtDeviceInfo(BT_CLASS, maList);
+	GetPairedDevList(COM_SERVICE, pList);
+	
+	m_DevList.DeleteAllItems();
+	for (sitr = pList.begin(); sitr != pList.end(); ++sitr)
+	{
+		CString Name;
+		CString Address;
+		CString Path;
+		Path = *sitr;
+		//MessageBox(Path);
+		for (mitr = maList.begin(); mitr != maList.end(); ++mitr)
+		{
+			Address = mitr->first;
+			Name = mitr->second;
+			Address.MakeLower();
+			Path.MakeLower();
+			//MessageBox(Name);
+			//MessageBox(Address);
+			int pos = Path.Find(Address);
+			if (pos != -1)
+			{
+				m_DevList.InsertItem(0, _T(""), 0);
+				m_DevList.SetItemText(0, COL_NAME, mitr->second);
+				m_DevList.SetItemText(0, COL_ADRESS, mitr->first);
+				m_DevList.SetItemText(0, COL_PATH, *sitr);
+			}
+		}
+	}
+}}}
+
 ==  查找指定设备并打开 ==
 *   SetupDiGetClassDevs
     *   Each device is associated with an SP_DEVINFO_DATA structure. 
