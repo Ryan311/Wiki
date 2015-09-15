@@ -276,10 +276,26 @@ https://msdn.microsoft.com/en-us/library/windows/hardware/ff541247%28v=vs.85%29.
             Handle = SetupDiGetClassDevs(&GUID_DEVINTERFACE_VOLUME, NULL, NULL, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
     }}}
 *   SetupDiDestroyDeviceInfoList
-    *    free all SP_DEVINFO_DATA structures in a device information set
-*   Example
-    *   Open device using device interface which is found by GUID  
-    *   Sample from MSDN:   Usbsamp Sample
+    *   free all SP_DEVINFO_DATA structures in a device information set
+*   SetupDiGetDeviceRegistryProperty
+    *   查找设备属性值:   在Device Properties -> Details -> (Property, Value)
+    *   见例子2
+    {{{
+        BOOL SetupDiGetDeviceRegistryProperty(
+          _In_      HDEVINFO         DeviceInfoSet,
+          _In_      PSP_DEVINFO_DATA DeviceInfoData,
+          _In_      DWORD            Property,
+          _Out_opt_ PDWORD           PropertyRegDataType,
+          _Out_opt_ PBYTE            PropertyBuffer,
+          _In_      DWORD            PropertyBufferSize,
+          _Out_opt_ PDWORD           RequiredSize
+        );
+    }}}
+
+
+== Example ==
+=== Open device using device interface which is found by GUID ===  
+*   Sample from MSDN:   Usbsamp Sample
     {{{
         //
         // guid是Device Interface Class， 每个LE设备配对后， LEEnum枚举一个PDO， 加载PDO后会为该设备提供一下Device Interface
@@ -362,7 +378,8 @@ https://msdn.microsoft.com/en-us/library/windows/hardware/ff541247%28v=vs.85%29.
             return hOut; 
         }
     }}}
-    *   Finds the Device instance of the DevNode with the matching DriverName.
+=== Finds the Device instance of the DevNode with the matching DriverName. ===
+*   Sample from MSDN:   USBView sample application
     {{{
         /*****************************************************************************
 
@@ -493,4 +510,64 @@ https://msdn.microsoft.com/en-us/library/windows/hardware/ff541247%28v=vs.85%29.
             }
             return status;
         }
+        
+
+
+    _Success_(return == TRUE)
+    BOOL
+    GetDeviceProperty(
+        _In_    HDEVINFO         DeviceInfoSet,
+        _In_    PSP_DEVINFO_DATA DeviceInfoData,
+        _In_    DWORD            Property,
+        _Outptr_  LPTSTR        *ppBuffer
+        )
+    {
+        BOOL bResult;
+        DWORD requiredLength = 0;
+        DWORD lastError;
+
+        if (ppBuffer == NULL)
+        {
+            return FALSE;
+        }
+
+        *ppBuffer = NULL;
+
+        bResult = SetupDiGetDeviceRegistryProperty(DeviceInfoSet,
+                                                   DeviceInfoData,
+                                                   Property ,
+                                                   NULL,
+                                                   NULL,
+                                                   0,
+                                                   &requiredLength);
+        lastError = GetLastError();
+
+        if ((requiredLength == 0) || (bResult != FALSE && lastError != ERROR_INSUFFICIENT_BUFFER))
+        {
+            return FALSE;
+        }
+
+        *ppBuffer = ALLOC(requiredLength);
+
+        if (*ppBuffer == NULL)
+        {
+            return FALSE;
+        }
+
+        bResult = SetupDiGetDeviceRegistryProperty(DeviceInfoSet,
+                                                    DeviceInfoData,
+                                                    Property ,
+                                                    NULL,
+                                                    (PBYTE) *ppBuffer,
+                                                    requiredLength,
+                                                    &requiredLength);
+        if(bResult == FALSE)
+        {
+            FREE(*ppBuffer);
+            *ppBuffer = NULL;
+            return FALSE;
+        }
+
+        return TRUE;
+    }
     }}}

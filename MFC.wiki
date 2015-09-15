@@ -535,3 +535,52 @@ study note when write MAP sample UI
     三，一步到位：
         将自己的资源图标直接替换主程序图标即可， 用*.icon格式的图标
 }}}
+*   MFC中一个CString 型的十六进制数转为int型, sscanf_s和swscanf_s
+    {{{
+        #include<stdio.h>
+
+        CString offsetStr;
+        CString valueStr;
+        valueStr = tmp.Right(tmp.GetLength() - pos);
+        offsetStr = tmp.Left(pos);
+        valueStr.Trim();
+        offsetStr.Trim();
+        swscanf_s(offsetStr.GetBuffer(0), L"%x", &offset);
+        swscanf_s(valueStr.GetBuffer(0), L"%x", &value);
+    }}}
+*   MFC 按行读取文件中的内容
+    {{{
+        #include <fstream>
+        
+        ifstream inLine;
+        inLine.open(filePath, ios::in);
+        if (!inLine)
+        {
+            return false;
+        }
+
+        CString csLog;
+        CString csTime;
+        SYSTEMTIME st;
+        char nextline[256];
+        while (inLine.getline(nextline, sizeof(nextline)))
+        {
+            csLog = nextline;
+            csLog.Trim();
+            if (csLog.IsEmpty() || (nextline[0] == '/' && nextline[1] == '/'))
+                continue; 
+            GetLocalTime(&st);
+            csTime.Format(_T("%02d:%02d:%02d.%03d"), st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+            m_logList.InsertItem(0, csTime);
+            m_logList.SetItemText(0, 1, csLog);            
+        }
+        inLine.close();
+        inLine.clear();
+    }}}
+*   MFC中得到系统时间并格式化
+    {{{
+        SYSTEMTIME st;
+        CString csTime;
+        GetLocalTime(&st);
+        csTime.Format(_T("%02d:%02d:%02d.%03d"), st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+    }}}

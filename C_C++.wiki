@@ -3,8 +3,10 @@
 ==  Summary ==
 *   [[字符_字符串]]
 *   [[c运行库_C标准库_windowsAPI]]
+*   [[C++ STL]]
 *   [[Visual C++中C_C++格式化输出]]
 *   [[const]]
+*   [[sscanf函数和正则表达式]]
 *   类的访问权限
 *   #define
 {{{
