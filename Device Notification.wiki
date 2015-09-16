@@ -1,2 +1,5 @@
 %toc
 
+https://msdn.microsoft.com/en-us/library/windows/desktop/aa363431%28v=vs.85%29.aspx
+https://msdn.microsoft.com/en-us/library/windows/desktop/aa363432%28v=vs.85%29.aspx
+

@@ -1,0 +1,18 @@
+%toc
+
+= Links =
+*   http://blog.csdn.net/henni386/article/details/7455573
+
+= Linux中的执行体 =
+== Kernel mode ==
+=== kthread ===
+=== work queue ===
+=== soft irq ===
+=== tasklet ===
+=== IRQ ===
+=== Timer ===
+
+== User Mode ==
+=== process ===
+=== thread ===
+
