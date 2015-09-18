@@ -1,0 +1,3 @@
+%toc
+
+MSDN:   https://msdn.microsoft.com/en-us/library/windows/hardware/ff554112%28v=vs.85%29.aspx

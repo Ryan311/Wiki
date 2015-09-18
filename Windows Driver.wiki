@@ -46,6 +46,8 @@
         [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\CrashControl]
         "AlwaysKeepMemoryDump"=dword:00000001
     }}}
+*   Driver中设置动态断点， 当程序跑到该处时去连接调试器
+    *   DbgBreakPoint()
 
 == Unicode String in Driver ==
 *   structure

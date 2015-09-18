@@ -1,9 +1,65 @@
 %toc
 
-MSDN:
-https://msdn.microsoft.com/en-us/library/windows/desktop/ms646979%28v=vs.85%29.aspx
+MSDN:       https://msdn.microsoft.com/en-us/library/windows/desktop/ms646979%28v=vs.85%29.aspx
+C++ Ref:    http://www.cplusplus.com/reference/
 
-= Comparison with C Run-time String =
+= CString与string、char*的区别和转换 =
+*   From    http://blog.csdn.net/luoweifu/article/details/20232379
+*   char*       char*是一个指向字符的指针，是一个内置类型。可以指向一个字符，也可以表示字符数组的首地址（首字符的地址）。
+*   string      string是C++标准库(STL)中的类型，它是定义的一个类，定义在<string>头文件中。里面包含了对字符串的各种常用操作，它较char*的优势是内容可以动态拓展，以及对字符串操作的方便快捷
+*   CString     主要应用在MFC和ATL编程中，所以使用CString时要包含afx.h文件#include <afx.h>
+*   相互的转换
+{{{
+    1.  char*与string的转换
+        char* --> string    
+            char* ch = "hello world";  
+            string s1 = ch; 
+            string s2(ch), s3;  
+            s3 = string(ch);  
+        string --> char*
+            /************************************************************************* 
+            其实没有很大的必要将string转换成char*,因为string可以直接当成字符数组来使用， 
+            即通过下标来访问字符元素，如str[1]表示第1个字符't' 
+            **************************************************************************/  
+            const char *ch1 = str.c_str();    
+
+    2.  char*与CString
+        char* --> CString
+            char *ch = "char pointer.";  
+            CString cStr1 = ch;  
+            CString cStr2 = CString(ch);  
+        CString --> char*
+            char* chs=cstr.getbuffer(0)
+    
+    3.  CString与string
+        CString --> string
+            CString cstr4 = "CString to string4";  
+            CString cstr5 = "CString to string5";  
+            string str;  
+            str=cstr4.GetBuffer(0);  
+            str = LPCSTR(cstr5);   
+        string --> CString
+            string s1 = "string1 to CString";  
+            string s2 = "string2 to CString";  
+            string s3 = "string3 to CString";  
+            CString cstr(s1.c_str());  
+            CString cstr2;  
+            cstr2.Format("%s", s2.c_str()); // string to CString  
+            CString cstr3;  
+            cstr3.Format("%s", s3.data());  // string to CString  
+}}}
+*   string中的c_str()和data()区别是：前者返回带'/0'的字符串，后者则返回不带'/0'的字符串.
+
+= TCHAR,WCHAR,LPSTR,LPWSTR和LPCTSTR =
+*   From http://wuyuans.com/2012/09/tcharwcharlpstrlpwstr-and-lpctstr/
+*   From http://qiusuoge.com/8290.html
+
+= String Header =
+| <string.h> | C的头文件，包含比如strcpy、strcat之类的字符串处理函数                                                                                |
+| <cstring>  | 在C++标准化(1998年)过程中，为了兼容C，标准化组织将所有C头文件都进行了新的定义，加入到标准库，文件名新增一个"c"前缀并且去掉.h的后缀名 |
+| <string>   | C++标准定义的头文件，它定义了一个string的字符串类，里面包含了string类的各种操作                                                      |
+
+= Windwos Safe String Comparison with C Run-time String =
 String Function Comparison
 | CRT String Function     | strcat            | strcpy             | strlen             |
 |                         |                   |                    |                    |
