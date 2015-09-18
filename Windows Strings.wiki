@@ -3,6 +3,80 @@
 MSDN:       https://msdn.microsoft.com/en-us/library/windows/desktop/ms646979%28v=vs.85%29.aspx
 C++ Ref:    http://www.cplusplus.com/reference/
 
+= Basic =
+*   Windows中，每个Unicode字符都使用UTF-16编码。
+*   Microsoft的C/C++编译器定义了一个内建的数据类型wchar_t, 它表示一个16位的Unicode(UTF-16)字符
+*   WinNT.h中定义了Windows中使用的数据类型：
+{{{
+    typedef char CHAR;      // 8-bit character
+    typedef wchar_t WCHAR;  // 16-bit character
+    
+    // Pointer to 8-bit character(s)
+    typedef CHAR *PCHAR;
+    typedef CHAR *PSTR;
+    typedef CONST CHAR *PCSTR;
+
+    // Pointer to 16-bit character(s)
+    typedef WCHAR *PWCHAR;
+    typedef WCHAR *PWSTR;
+    typedef CONST WCHAR *PCWSTR;
+    
+    在编译时， 为了使ANSI或UNICODE都能编译通过， 定义如下宏：
+    #ifdef UNICODE
+    
+        typedef WCHAR TCHAR, *PTCHAR, PTSTR;
+        typedef CONST WCHAR *PCTSTR;
+
+        #define __TEXT(quote) L##quote
+
+    #else
+        
+        typedef CHAR TCHAR, *PTCHAR, PTSTR;
+        typedef CONST CHAR *PCTSTR;
+
+        #define __TEXT(quote) quote
+
+    #endif
+    
+    #define TEXT(quote) __TEXT(quote)
+    #define _T(quote)   __TEXT(quote)
+}}} 
+*   Windows函数通常都会提供两个版本， ANSI和UNICODE， 用宏来统一使用方式。 ANSI版本中， 只分配内存， 执行必要的字符串转换， 然后调用该函数的UNICODE版本。所以为使用程序执行更高效， 一开始就应该使用Unicode来开发程序。
+*   LPTCHAR, LPTSTR, LPCTCHAR, LPCTSTR: L表示long指针， 为了兼容16位系统， 没有实际意义， LP理解为P即可
+
+= Microsoft C运行库中的字符和字符串 =
+*   分别提供两组函数来支持ANSI和Unicode的字符和字符串， 不像Windows函数那样存在调用关系
+{{{
+    在String.h中定义的strlen, wcslen， 分别获取ANSI和UNICODE的字符串长度， 在TChar.h中定义如下宏， 方便同时编译ANSI和Unicode版本。
+    #ifdef _UNICODE
+        #define _tcslen     wcslen  //Unicode
+    #else
+        #define _tcslen     strlen  //ANSI
+    #endif
+}}}
+*   新的安全字符串函数 
+    *   需要包含StrSafe.h文件
+    *   对应于C中的每个字符串函数， 都有一个新版本函数， 添加一个_s后缀
+    *   新版本的函数中增加了对传入参数的判断， 可检查缓冲区有效性等， 当缓冲区出现错误时， 返回Error
+    | C的字符串函数 | 新的安全字符串函数 |
+    | _tcscpy       | _tcscpy_s          |
+    | _tcscat       | _tcscat_s          |
+*   为了获得更多控制， 可使用StringC*函数
+    *   同样需要包含StrSafe.h文件
+    *   Cch： Count of Characters， 由_countof宏来获得字符数
+    *   Cb：  Count of Bytes, 由sizeof操作符获得字节数
+    *   该系列函数返回HRESULT
+    *   不同于安全(后缀为_s)的函数， 当缓冲区太小时， 这些函数会执行截断
+
+= Windwos字符串函数 =
+*   StrFormatKbSize
+*   StrFormatByteSize
+*   ComparString(Ex)
+*   CompareStringOrdinal    
+*   MultiByteToWideChar
+*   WideCharToMultiByte
+
+
 = CString与string、char*的区别和转换 =
 *   From    http://blog.csdn.net/luoweifu/article/details/20232379
 *   char*       char*是一个指向字符的指针，是一个内置类型。可以指向一个字符，也可以表示字符数组的首地址（首字符的地址）。
@@ -50,9 +124,6 @@ C++ Ref:    http://www.cplusplus.com/reference/
 }}}
 *   string中的c_str()和data()区别是：前者返回带'/0'的字符串，后者则返回不带'/0'的字符串.
 
-= TCHAR,WCHAR,LPSTR,LPWSTR和LPCTSTR =
-*   From http://wuyuans.com/2012/09/tcharwcharlpstrlpwstr-and-lpctstr/
-*   From http://qiusuoge.com/8290.html
 
 = String Header =
 | <string.h> | C的头文件，包含比如strcpy、strcat之类的字符串处理函数                                                                                |

@@ -1,5 +1,6 @@
 %toc
 
+
 = Device and Driver Installation =
 *   Document:
     *   [[http://blogs.msdn.com/b/iliast/archive/2008/03/10/why-do-we-need-wdf-coinstallers.aspx|Why Do We Need WDF Coinstallers?]]
@@ -14,6 +15,8 @@
     *   Perform additional device installation tasks that the INF file cannot handle. For example, a co-installer could write additional device-specific information to the registry.
     *   Provide *finish-install Wizard pages* to display additional wizard pages to the user after your device is installed.
     *   Provide *finish-install action* to start an installation program that can only run in an interactive user context.
+
+== [[http://blogs.msdn.com/b/iliast/archive/2007/10/06/driver-driver-and-driver-application-communication.aspx|Driver-Driver and Driver-Application Communication]] ==
 
 = [[http://msdn.microsoft.com/en-us/library/windows/hardware/ff544200%28v=vs.85%29.aspx|Driver Support Routines]] =
 *   INF:    Device Information File     https://msdn.microsoft.com/en-us/library/windows/hardware/ff547402%28v=vs.85%29.aspx

@@ -5,26 +5,45 @@
 == [[Linux IPC]] ==
 
 
+= Tools =
+| strace    | 功能强大， 显示由用户空间程序所发出的所有系统调用， 不仅可以显示调用， 还能显示调用参数及用符号形式表示的返回值 |
+|           | > strace ls /dev > /dev/scull0                                                                                  |
+| lockmeter | 查看内核花费在锁上的时间， 确定锁竞争是否存在                                                                   |
+|           |                                                                                                                 |
+
+
 = 重要头文件 =
-| #include <linux/init.h>        | 包含模块初始化及清除函数的宏          | module_init(init_function), module_exit(cleanup_function)                   |
-| #include <linux/sched.h>       | 包含驱动程序使用的大部分内核API的定义 | Sleep()及各种变量声明                                                       |
-| #include <linux/module.h>      | 必需的头文件，必须包含在模块源代码中  |                                                                             |
-| #include <linux/version.h>     | 包含所构造内核版本信息的头文件        | LINUX_VERSION_CODE                                                          |
-| #include <linux/moduleparam.h> | 用来创建模块参数的宏所需头文件        | module_param(variable, type, perm);                                         |
-| #include <linux/kernel.h>      | 包含打印函数的头文件                  | printk(), container_of宏                                                    |
-| #include <linux/types.h>       | 包含一些变量声明                      | dev_t 设备号类型                                                            |
-| #include <linux/kdev_t.h>      | 设备号相关宏操作                      | MAJOR(dev_t dev), MINOR(dev_t dev), MKDEV(int major, int minor)             |
-| #include <linux/fs.h>          | 文件系统相关操作                      | register_chrdev_region(), alloc_chrdev_region(), unregister_chrdev_region() |
-| #include <linux/slab.h>        | 内存管理相关操作                      | kmalloc, kfree                                                              |
-| #include <linux/cdev.h>        | 字符设备结构定义及函数操作            | struct cdev, cdev_init, cdev_add, cdev_alloc, cdev_del                      |
-| #include <asm/uaccess.h>       | 声明在kernel和user mode移动数据函数   | copy_from_user, copy_to_user                                                |
-| #include <linux/proc_fs.h>     | 所有使用/proc的模块必须包含           | 其中的函数用于创建只读的/proc文件等                                         |
-| #include <asm/semaphore.h>     | Linux信号量                           | struct semaphore;  sema_init();  DECLARE_MUTEX(name); down*(); up();        |
-| #include <linux/rwsem.h>       | 读入者/写入者信号量, rwsem            | struct rw_semaphore;  init_rwsem; down*; up*; downgrade_write();            |
-| #include <linux/completion.h>  | 完成接口, completion                  | 一种轻量级的机制， 允许一个线程告诉另一个线程某个工作已经完成               |
-| #include <linux/spinlock.h>    | 自旋锁， spinlock                     | spinlock_t; spin_lock_init(); spin_lock*(); spin_unlock*();                 |
-| #include <linux/spinlock.h>    | 读入者/写入者自旋锁                   | rwlock_t; rwlock_init(); read_lock*(); read_unlock*(); write_lock*()        |
-|                                |                                       |                                                                             |
+| #include <linux/init.h>        | 包含模块初始化及清除函数的宏               | module_init(init_function), module_exit(cleanup_function)                   |
+| #include <linux/sched.h>       | 包含驱动程序使用的大部分内核API的定义      | Sleep()及各种变量声明                                                       |
+| #include <linux/module.h>      | 必需的头文件，必须包含在模块源代码中       |                                                                             |
+| #include <linux/version.h>     | 包含所构造内核版本信息的头文件             | LINUX_VERSION_CODE                                                          |
+| #include <linux/moduleparam.h> | 用来创建模块参数的宏所需头文件             | module_param(variable, type, perm);                                         |
+| #include <linux/kernel.h>      | 包含打印函数的头文件                       | printk(), container_of宏                                                    |
+| #include <linux/types.h>       | 包含一些变量声明                           | dev_t 设备号类型                                                            |
+| #include <linux/kdev_t.h>      | 设备号相关宏操作                           | MAJOR(dev_t dev), MINOR(dev_t dev), MKDEV(int major, int minor)             |
+| #include <linux/fs.h>          | 文件系统相关操作                           | register_chrdev_region(), alloc_chrdev_region(), unregister_chrdev_region() |
+| #include <linux/slab.h>        | 内存管理相关操作                           | kmalloc, kfree                                                              |
+| #include <linux/cdev.h>        | 字符设备结构定义及函数操作                 | struct cdev, cdev_init, cdev_add, cdev_alloc, cdev_del                      |
+| #include <asm/uaccess.h>       | 声明在kernel和user mode移动数据函数        | copy_from_user, copy_to_user                                                |
+| #include <linux/proc_fs.h>     | 所有使用/proc的模块必须包含                | 其中的函数用于创建只读的/proc文件等                                         |
+| #include <asm/semaphore.h>     | Linux信号量                                | struct semaphore;  sema_init();  DECLARE_MUTEX(name); down*(); up();        |
+| #include <linux/rwsem.h>       | 读入者/写入者信号量, rwsem                 | struct rw_semaphore;  init_rwsem; down*; up*; downgrade_write();            |
+| #include <linux/completion.h>  | 完成接口(completion), 同Windows中的Event   | 一种轻量级的机制， 允许一个线程告诉另一个线程某个工作已经完成               |
+| #include <linux/spinlock.h>    | 自旋锁， spinlock                          | spinlock_t; spin_lock_init(); spin_lock*(); spin_unlock*();                 |
+| #include <linux/spinlock.h>    | 读入者/写入者自旋锁                        | rwlock_t; rwlock_init(); read_lock*(); read_unlock*(); write_lock*()        |
+| #include <linux/kfifo.h>       | 内核中实现的通用的循环缓冲区               | 用于免锁的生产者/消费者任务的数据结构之一是循环缓冲区                       |
+| #include <asm/atomic>          | 原子的整数类型， atomic_t                  | 一个atomic_t变量在所有内核支持的架构上保存一个int值, 对该值的操作都是原子的 |
+| #include <asm/bitops.h>        | 内核提供的一组可原子修改和测试单个位的函数 | set_bit; clear_bit; test_bit                                                |
+| #include <linux/seqlock.h>     | 提供对共享资源的快速、免锁访问, seqlock_t  | 当要保护的资源很小、很简单、会频繁读而且写入很少且快速时， 使用seqlock      |
+| #include <linux/rcupdate.h>    | 读取-复制-更新（read-copy-update）         | 针对经常发生读取而很少写入的情形做了优化                                    |
+| #include <linux/jiffies.h>     | 内核计数器及读取计数器工具                 | jiffies（直接访问)， jiffies_64( get_jiffies_64()), 只读变量;               |
+| #include <linux/time.h>        | 时间操作函数                               | timespec_to_jiffies;jiffies_to_timespec;time_to_jiffies;jiffies_to_timeval  |
+| #include <linux/wait.h>        | 长延时操作， 超时                          | wait_event_timeout, wait_event_interruptble_timeout,                        |
+| #include <linux/delay.h        | 短延时, 平台相关，实际包含在<asm.delay.h>  | ndelay(纳秒); udelay(微秒); mdelay(毫秒)                                    |
+| #include <linux/timer.h        | 内核提供的声明、注册和删除内核定时器的函数 | struct timer_list; init_timer; add_timer; del_timer                         |
+| #include <linux/interrupt.h>   | tasklet, 内核设施， 类似内核定时器         | struct tasklit_struct; tasklet_init;                                        |
+| #include <linux/workqueue.h>   | 工作队列， 类似于tasklet                   | struct workqueue_struct; create_workqueue; create_siglethread_workqueue     |
+
 
 
 = 重要函数及宏 =

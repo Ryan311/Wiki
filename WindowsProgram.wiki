@@ -21,7 +21,6 @@
 
 = topic =
 == [[Useful Function]] ==
-== [[http://blogs.msdn.com/b/iliast/archive/2007/10/06/driver-driver-and-driver-application-communication.aspx|Driver-Driver and Driver-Application Communication]] ==
 == [[Windows Driver]] ==
 == [[Driver Debug]] ==
 == [[Windows API]] ==
