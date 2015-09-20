@@ -1,9 +1,142 @@
 %toc
 
-= kobject =
+= kobject， kset， 子系统 =
+== kobject ==
 *   kobject是组成设备模型的基本结构， 它所支持的代码包括
     *   对象的引用计数
     *   sysfs表述， sysfs中显示的每一个对象， 都对应一个kobject
     *   数据结构关联
     *   热插拔事件处理， 在kobject子系统控制下， 将产生事件以通知用户空间
-*   
+*   内核用kobject结构将各个对象连接起来组成一个分层的结构体系， 从而与模型化的子系统相匹配   
+*   kobject中的parent成员， 它保存了另一个kobject结构指针， 该结构表示分层结构中上一层的节点
+*   Functions：
+    *   kobject_init
+    *   kobject_set_name
+    *   kobject_get
+    *   kobject_put
+    *   struct kobj_type中包含Release函数
+
+== kset ==
+*   kset： 一个kset是嵌入相同类型结构的kobject集合， 可看作是顶层容器类
+*   kset总是在sysfs中出现， 一旦设置了kset并把它添加到系统中， 将在sysfs中创建一个目录。
+*   kset在一个标准的内核链表中保存了它的子节点
+*   Functions：
+    *   kset_init
+    *   kset_add
+    *   kset_register
+    *   kset_unregister
+    *   kset_get
+    *   kset_put
+*   kset也有一个指针指向kobj_type结构， 用来描述它所包含的kobject
+*   kset包含了一个子系统指针(subsys)
+*   每一个kset都必须以属于一个子系统
+
+== 子系统 ==
+*   子系统是对整个内核中一些高级部分的表示， 通常显示在sysfs分层结构中的顶层。
+*   内核中的子系统包括
+    *   block_subsys    对块设备来说是/sys/block
+    *   devices_subsys  设备分层结构的核心， /sys/devices
+    *   内核所知晓的用于各种总线的特定子系统
+*   子系统结构定义:     其实是对kset和一个信号量的封装
+    {{{
+        struct subsystem
+        {
+            struct kset kset;
+            struct rw_semaphore rwsem;
+        }
+    }}}
+*   Functions：
+    *   subsystem_init
+    *   subsystem_register
+    *   subsystem_unregister
+    *   subsystem_get
+    *   subsystem_put
+
+= 热插拔事件 =
+*   一个热插拔事件是从内核空间发送到用户空间的通知， 它表明系统配置出现变化。
+*   无论是kobject被创建还是被删除， 都会产生这种事情。
+*   热插拔事件会导致对/sbin/hotpulg程序的调用， 该程序通过加载驱动程序， 创建设备节点， 挂载分区，或者其它正确的动作来响应该事件 
+*   当把kobject传递给kobject_add或者kobject_del时， 才会真正产生这些事件
+*   对热插拔事件的控制函数：    在kset结构中的hotplug_ops成员中有指向该结构的指针
+    {{{
+        struct kset_hotplug_ops
+        {
+            int (*filter)(struct kset *kset, struct kobject *kobj);
+            char *(*name)(struct kset *kset, struct kobject *kobj);
+            int (*hotplug)(struct kset *kset, struct kobject *kobj, char **envp, int num_envp, char *buffer, int buffer_size);
+        }
+    }}}
+
+= 总线 =
+*   总线是处理器与一个或多个设备之间的通道， 在设备模型中， 所有设备都是通过总线相连， 甚至包括“虚拟”平台总线
+*   总线结构
+    {{{
+        struct bus_type
+        {
+            char *name;             //总线名字， 如PCI， USB
+            struct subsystem subsys;    //每个总线都有自己的子系统  
+            struct kset drivers;        //总线的驱动程序
+            struct kset devices;        //插入总线的所有设备
+            int (*match)(struct device *dev, struct device_driver *drv);    //对于真实硬件， 该函数会对设备硬件ID与驱动所支持ID做比较
+            struct device *(*add)(struct device *parent, char *bus_id);
+            int (*hotplug) (struct device *dev, char **envp, int num_envp, char *buffer, int buffer_size);
+            ......
+        }
+    }}}
+*   每个总线都会在sysfs的/sys/bus目录下看到
+*   ldd中包含lddbus的虚拟总线
+*   内核函数提供对设备和驱动程序的迭代
+    *   bus_for_each_dev
+    *   bus_for_each_drv
+*   总线属性， bus_attribute
+    *   BUS_ATTR(name, mode, show, store)        //该宏声明一个结构， 它将bus_attr_作为约定name的前缀来创建总线的真正名称
+    *   bus_remove_file         //创建属性， 在/sys/bus/ldd/目录下创建一个属性文件
+    *   bus_delete_file         //删除属性， 删除属性文件
+
+= 设备 =
+{{{
+    struct device
+    {
+        struct device *parent;      //总线或宿主控制器
+        struct kobject kobj;        //表示该设备并把它连接到结构体系中的kobject
+        char bus_id[BUS_ID_SIZE];   //在总线上唯一标识该设备的字符串， 包括：域编号、总线编号、设备编号和功能编号
+        struct bus_type *bus;       //标识该设备连接在何种类型的总线上
+        struct device_driver *driver;   //管理该设备的驱动程序
+        void *driver_data;              //由设备驱动程序使用的私有数据结构， 类似Windows Driver中的context
+        void (*release)(struct device *dev);    //当指向设备的最后一个引用被删除时， 内核调用该方法， 它将从内嵌的kobject的release方法中调用
+        ......
+    }
+}}}
+*   在注册设备结构前， 至少要设置parent、bus_id、bus和release成员
+*   设备注册
+    *   device_register
+    *   device_unregister
+*   设备属性
+    *   struct device_attribute
+    *   DEVICE_ATTR
+    *   device_create_file
+    *   device_remove_file
+*   device结构中包含设备模型核心用来模拟系统的信息， 通常嵌入到设备高层表示之中
+
+= 设备驱动程序 =
+{{{
+    struct device_driver
+    {
+        char *name;     // 驱动程序的名字， 在sysfs中显示
+        struct bus_type *bus;   //驱动程序所操作的总线类型
+        struct kobject kobj;    //
+        struct list_head devices;   //当前驱动程序能操作的设备链表
+        int (*probe)(struct device *dev);   //用来查询特定设备是否存在
+        int (*remove)(struct device *dev);  //当设备从系统中删除时调用
+        void (*shutdown)(struct device *dev);   //关机时调用该函数关闭设备
+    }
+}}}
+*   Driver注册
+    *   driver_register
+    *   driver_unregister
+*   Driver属性
+    *   struct attribute
+    *   DRIVER_ATTR
+    *   driver_create_file
+    *   driver_remove_file
+*   driver结构通常被包含在高层和总线相关的结构中

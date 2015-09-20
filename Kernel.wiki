@@ -56,7 +56,7 @@
 | #include <linux/byteorder>     | byteorder下文件：big_endian.h, little_endian.h  | 宏定义：可在处理器字节序与特殊字节序转换                                    |
 | #include <linux/list.h>        | 内核中的链表机制                                | list_head; INIT_LIST_HEAD(); list_for_each(); list_for_each_safe()          |
 | #include <linux/kobject.h>     | kobject， 设备模型的基本结构, 可嵌入(同list)    | kobject_init(); kobject_get(); kobject_put()                                |
-|                                |                                                 |                                                                             |
+| #include <linux/device.h>      | linux设备模型相关类型及函数定义                 | bus_type结构表示总线
 
 = 重要函数及宏 =
 | container_of            | <linux/kernel.h> | 宏， 由结构中成员的指针获得结构的指针 |
