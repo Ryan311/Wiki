@@ -233,4 +233,7 @@
     *   安装compiz特效插件： sudo apt-get install compiz-plugins-extra
 *   中文输入法 fcitx
     *   https://fcitx-im.org/wiki/Install_%28Ubuntu%29
+*   打字训练
+    *   sudo apt-get install typespeed
+    *   sudo apt-get install kTouch
 ---------------------------------------------------------------------------
