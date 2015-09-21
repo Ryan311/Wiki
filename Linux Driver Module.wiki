@@ -1,7 +1,29 @@
 %toc
 
-= kobject， kset， 子系统 =
+Linux设备模型：
+建立模型的意义在于文件管理设备。 Linux设备模型包含如下功能：
+#   电源管理与系统关机
+#   与用户空间通信， 通过sysfs文件系统来完成
+#   支持热插拔设备
+#   设备分类， /sys/class
+#   对象生命周期, kobject是设备模式中最底层的数据结构
+
+= kobject， kset， subsystem =
 == kobject ==
+{{{
+    struct kobject 
+    {
+        char * k_name;  //指向设备名称的指针
+        char name[KOBJ_NAME_LEN];   //设备名称
+        struct kref kref;   //对象引用计数
+        struct list_head entry; //链接所有kset中的单元
+        struct kobject *parent; //指向父对象的指针， kset.kobj
+        struct kset *kset;      //所属kset的指针
+        struct kobj_type *ktype;    //指向其对象类型描述符的指针
+        struct dentry *dentry;      //sysfs文件系统中与该对象对应的文件节点路径指针
+        wait_queue_head_t poll;   
+    }
+}}}
 *   kobject是组成设备模型的基本结构， 它所支持的代码包括
     *   对象的引用计数
     *   sysfs表述， sysfs中显示的每一个对象， 都对应一个kobject
@@ -15,8 +37,38 @@
     *   kobject_get
     *   kobject_put
     *   struct kobj_type中包含Release函数
+*   kobj_type
+    *   它用于说明kobject结构的类型
+    {{{
+    struct kobj_type
+    {
+        void (*release)(struct kobject*);   //注销函数指针
+        struct sysfs_ops *sysfs_ops;        //指向如何读写的函数指针
+        struct attribute **defalut_attrs;   //属性列表
+    }
+    }}}
+*   Attribute
+    *   在sysfs中， kobject对应目录， 属性对应文件
+    {{{
+    struct attribute
+    {
+        const char *name;       //attribute以文件形式输出到sysfs的目录中对应的文件名
+        struct module *owner;   
+        mode_t mode;
+    }
+    }}}
 
 == kset ==
+{{{
+    struct kset
+    {
+        struct kobj_type *ktype;    //指向该kset对象类型的描述符的指针
+        struct list_head list;      //用于连接该set中所有kobject的链表头
+        spinlock_t list_lock;       //互斥访问 
+        struct kobject kobj;        //嵌入的kobject， 所有属于该kset的kobject对象的parent域均指向这个内嵌对象
+        struct kset_uevent_ops *uevent_ops;
+    }
+}}}
 *   kset： 一个kset是嵌入相同类型结构的kobject集合， 可看作是顶层容器类
 *   kset总是在sysfs中出现， 一旦设置了kset并把它添加到系统中， 将在sysfs中创建一个目录。
 *   kset在一个标准的内核链表中保存了它的子节点
@@ -30,6 +82,7 @@
 *   kset也有一个指针指向kobj_type结构， 用来描述它所包含的kobject
 *   kset包含了一个子系统指针(subsys)
 *   每一个kset都必须以属于一个子系统
+*   相同类型(kobj_type)的kobject集合在一起组成kset, 许多kset(可以是不同类型)集合在一起组成了子系统
 
 == 子系统 ==
 *   子系统是对整个内核中一些高级部分的表示， 通常显示在sysfs分层结构中的顶层。
@@ -67,7 +120,7 @@
         }
     }}}
 
-= 总线 =
+= Bus =
 *   总线是处理器与一个或多个设备之间的通道， 在设备模型中， 所有设备都是通过总线相连， 甚至包括“虚拟”平台总线
 *   总线结构
     {{{
@@ -93,7 +146,7 @@
     *   bus_remove_file         //创建属性， 在/sys/bus/ldd/目录下创建一个属性文件
     *   bus_delete_file         //删除属性， 删除属性文件
 
-= 设备 =
+= Device =
 {{{
     struct device
     {
@@ -118,7 +171,7 @@
     *   device_remove_file
 *   device结构中包含设备模型核心用来模拟系统的信息， 通常嵌入到设备高层表示之中
 
-= 设备驱动程序 =
+= Device Driver =
 {{{
     struct device_driver
     {
@@ -140,3 +193,38 @@
     *   driver_create_file
     *   driver_remove_file
 *   driver结构通常被包含在高层和总线相关的结构中
+
+= Class =
+*   类是一个设备的高层视图， 它抽象出了低层的实现细节
+*   驱动程序核心导出了两个不同的接口来管理类
+    *   class_simple例程
+        *   class_simple_create
+        *   class_simple_destroy
+        *   class_simple_device_add
+        *   class_simple_set_hotplug
+        *   class_simple_device_remove
+    *   正规类接口
+        *   管理类
+            *   struct class
+            *   class_register
+            *   class_unregister
+            *   struct_attribute
+            *   CLASS_ATTR(name, mode, show, store)
+            *   class_create_file
+            *   class_remove_file
+        *   类设备
+            *   类存在的真正目的， 是给作为类成员的各个设备提供一个窗口
+            *   struct class_device表示类的成员， 也就是类设备
+            *   class_device_register
+            *   class_device_unregister
+            *   struct class_device_attribute
+            *   CLASS_DEVICE_ATTR(name, mode, show, store)
+            *   class_device_create_file
+            *   class_device_remove_file
+*   类接口  <-->  类似于Windows Driver中的class interface概念？？？
+    *   设备模型其它部分没有的附加概念
+    *   一种设备加入或者离开类时获得信息的触发机制
+    *   struct class_interface
+    *   class_interface_register
+    *   class_interface_unregister
+    *   可为单个类注册多个接口

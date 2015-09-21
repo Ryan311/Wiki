@@ -7,13 +7,14 @@
 == [[Linux IPC]] ==
 == [[Linux memory]] ==
 == [[Linux Driver Module]] ==
+== [[Sysfs]] ==
 
 
 = Tools =
 | strace    | 功能强大， 显示由用户空间程序所发出的所有系统调用， 不仅可以显示调用， 还能显示调用参数及用符号形式表示的返回值 |
 |           | > strace ls /dev > /dev/scull0                                                                                  |
 | lockmeter | 查看内核花费在锁上的时间， 确定锁竞争是否存在                                                                   |
-|           |                                                                                                                 |
+| tree      | 显示目录树结构                                                                                                  |
 
 
 = 重要头文件 =
