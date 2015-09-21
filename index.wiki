@@ -26,7 +26,7 @@
     *   [[Vim]] [[Eclipse]] [[Vimer]] [[Sumblime]] [[QtCreator]] [[MonoDevelop]]
     *   [[Visual Studio]] [[Windbg]] [[Visual Code Studio]]
     *   [[Wiki]] [[Jekyll]] [[BootStrap]] [[DISQUS]]
-    *   GCC MSVC [[Clang]]
+    *   [[MsBuild]] GCC [[Clang]]
     *   [[git_github]] [[bitbucket]] [[google code]]
     *   [[VirsualBox]]
     *   [[Blender]] [[GIMP]]

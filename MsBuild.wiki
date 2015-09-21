@@ -1,0 +1,8 @@
+%toc
+
+MSDN:   https://msdn.microsoft.com/zh-cn/library/ee662426%28v=vs.120%29.aspx
+
+
+
+MSBuild 是 Visual C++ 项目的标准生成系统。 在 Visual Studio 集成开发环境 (IDE) 中生成项目时，项目使用 msbuild.exe 工具、基于 XML 的项目文件以及可选设置文件。 尽管您可以在命令行上使用 msbuild.exe 和项目文件，不过 IDE 还是提供了用户界面，以便您可以更轻松地配置设置以及生成项目。 本概述介绍 Visual C++ 如何使用 MSBuild 系统。
+

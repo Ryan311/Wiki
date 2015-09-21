@@ -2,22 +2,52 @@
 
 = Basic =
 *   CWnd与HWND的区别与转换
-    {{{
-        一、区别
-            HWND是句柄，CWnd是MFC窗体类,CWnd中包含HWND句柄成员对象是m_hWnd.
-            HWND是Windows系统中对所有窗口的一种标识，即窗口句柄。这是一个SDK概念。  
-            CWnd是MFC类库中所有窗口类的基类。微软在MFC中将所有窗口的通用操作都封装到了这个类中，如：ShowWindow等等，同时它也封装了窗口句柄即m_hWnd成员。
+{{{
+一、区别
+    HWND是句柄，CWnd是MFC窗体类,CWnd中包含HWND句柄成员对象是m_hWnd.
+    HWND是Windows系统中对所有窗口的一种标识，即窗口句柄。这是一个SDK概念。  
+    CWnd是MFC类库中所有窗口类的基类。微软在MFC中将所有窗口的通用操作都封装到了这个类中，
+    如：ShowWindow等等，同时它也封装了窗口句柄即m_hWnd成员。
 
-        二、如何得到窗口对象指针CWnd * pCWnd
-            1,在窗体里，直接用 this->，//this就是本窗体的窗口对象指针
-            2,主窗体的类对象指针：AfxGetApp()->m_pMainWnd->,  //AfxGetApp()->m_pMainWnd就是主窗体的窗口对象指针
-            3,pCWnd=GetDlgItem(ID_EDIT_NAME);//GetDlgItem 函数可以得到某个控件的窗口对象指针
-    }}}
+二、如何得到窗口对象指针CWnd * pCWnd
+    1,在窗体里，直接用 this->，//this就是本窗体的窗口对象指针
+    2,主窗体的类对象指针：AfxGetApp()->m_pMainWnd->,  //AfxGetApp()->m_pMainWnd就是主窗体的窗口对象指针
+    3,pCWnd=GetDlgItem(ID_EDIT_NAME);//GetDlgItem 函数可以得到某个控件的窗口对象指针
+}}}
 *   句柄和ID
-    {{{
-        句柄是窗口资源的标识，它标识资源在系统中所占用的内存块，应用程序通过窗口句柄对窗口进行操作。
-        窗口ID是窗口在应用程序中的唯一标识，通过窗口ID可以获取窗口句柄。
-    }}}
+{{{
+句柄是窗口资源的标识，它标识资源在系统中所占用的内存块，应用程序通过窗口句柄对窗口进行操作。
+窗口ID是窗口在应用程序中的唯一标识，通过窗口ID可以获取窗口句柄。
+}}}
+*   Public Symbols and Private Symbols   
+{{{
+Typically, symbol files can include any or all of the following symbols:
+*   The names and addresses of all functions
+*   All data type, structure, and class definitions
+*   The names, data types, and addresses of global variables
+*   The names, data types, addresses, and scopes of local variables
+*   The line numbers in the source code that correspond to each binary instruction
+
+Some program developers might feel uncomfortable sharing all this information with their customers. 
+BinPlace can be used to reduce the amount of symbols in a symbol file.
+
+Public Symbols:
+    Some basic symbols, such as function names and global variables, are needed for even the most rudimentary debugging. 
+    These are called public symbols. 
+
+Private Symbols:
+    Symbols such as data structure names, global variables visible in only one object file, local variables, 
+    and line number information are not always required for debugging, 
+    although they are useful for a more in-depth debugging session. These are called private symbols.
+
+A symbol file that contains both private and public symbols is called a full symbol file. 
+A symbol file that contains public symbols alone is called a stripped symbol file. 
+
+Current Symbol File System:
+    In the current system, there are always two files: the executable file and a .pdb file. 
+    The .pdb file contains all the symbols.
+    The executable file contains a pointer to the .pdb file.
+}}}
 
 = topic =
 == [[Useful Function]] ==

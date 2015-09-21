@@ -1,3 +1,101 @@
 %toc
 
 MSDN:   https://msdn.microsoft.com/en-us/library/windows/hardware/ff554112%28v=vs.85%29.aspx
+
+= Driver Development Tools =
+= Tools for INF Files =
+*   ChkINF
+*   Stampinf
+*   InfVerif
+
+= Tools for Changing Boot Optins for Driver Testing and Debugging =
+*   BCDEdit
+*   Using Boot Parameters
+
+= Tools for Building Drivers =
+The Windows Driver Kit (WDK) 8.1 and WDK 8 introduced a major change to the environment that you use to build a driver. The WDK no longer uses Build.exe. The WDK build environment for drivers uses MSBuild.exe and is fully integrated with the Visual Studio development environment. This means that source files, makefile.inc, makefile.new and other related build files present in the previous version of the WDK are no longer used. The WDK now enables you to create, edit, build, test, and deploy a driver through Visual Studio. 
+*   MSBuild
+*   Binplace
+    *   BinPlace is a tool for managing large code projects. 
+    *   BinPlace is useful for manipulating symbol files.
+*   Nmake2MsBuild
+    *   For most Windows 7 WDK projects that were built using Build.exe, you can use the Nmake2MsBuild utility, or the automatic conversion process within Visual Studio, to generate a project file (.VcxProj). 
+    *   Win7 WDK中Build工具是Build.exe，可使用该工具或用VS2012上的自动转换工具， 生成.VcxProj工程文件， 就可以在VS2012上Build Driver了
+    *   >nmake2msbuild.exe  .\myDriver\sources      ==>    sources是Win7上使用的， 很像Makefile， 但只包含编译文件及设置
+*   ProjectUpgradeTool      To upgrade a WDK 8 project or solution to WDK 8.1
+    *   Takes Microsoft Visual Studio 2012 project (*.vcxproj) and solution files (*.sln) that were created with the Windows Driver Kit (WDK) for Windows 8 and upgrades them to work with the WDK for Windows 8.1 and Microsoft Visual Studio 2013.
+    *   Important:  It does not change source files and only converts the project and solutions files. By default, the tool saves a backup copy of the original files.
+    *   > ProjectUpgradeTool.exe  G:\SVNWorkspace\trunk\HostSW\win7-inbox-driver\RtkFilter
+*   Devenv
+    *   vs2012 
+        *   打开VS2012 x86 Native Tools Command Prompt Cmd， 在该环境下调用devenv.exe来Build Driver
+    *   VS2013 & VS2015
+        *   VS2013没有 VS2013 x86 Native Tools Command Prompt Cmd， 但也保留了相同的环境配置C:\Program Files\Microsoft Visual Studio 12.0\Common7\Tools\VsDevCmd.bat
+        *   创建Cmd的快捷方式， 并将目标修改为 %comspec% /k ""C:\Program Files\Microsoft Visual Studio 12.0\Common7\Tools\VsDevCmd.bat"
+        *   双击， 并在此环境下运行Build脚本就可以了， 也是调用Devenv来Build Driver。
+= Tools for Signing Driver =
+*   Inf2Cat  生成目标平台上的cat档
+    *   Inf2Cat (Inf2Cat.exe) is a command-line tool that determines whether a driver package's INF file can be digitally-signed for a specified list of Windows versions. If so, Inf2Cat generates the unsigned catalog files that apply to the specified Windows versions. 
+    *   Inf2Cat.exe /driver:. /os:8_x86 ==> Windows 8 x86 Edition
+    *   Inf2Cat.ext /driver:. /os:6_3_X86 ==> Windows 8.1 x86 Edition
+
+= Tools for Testing Drivers =
+*   Devcon
+    *   enable, disable, install, configure, remove devices ; add and remove Driver Packages
+    *   Examples:  https://msdn.microsoft.com/en-us/library/windows/hardware/ff544746%28v=vs.85%29.aspx
+*   Device Fundamentals Tests       同HCK
+    *   CHOAS
+    *   Coverage
+    *   CPUStress
+    *   I/O
+    *   Reboot
+    *   Sleep
+    *   DriverInstall
+    *   Penetration
+    *   PnP
+*   PnPUtil     在C:\Windows\system32的工具
+    *   Adds a driver package to the driver store.
+    *   Deletes a driver package from the driver store.
+    *   pnputil -e  ->  Enumerates the driver packages(not include inbox) that are currently in the driver store. 
+*   PoolMon     Memory Pool Monitor, 用来检测Memory Leak
+    *   displays data that the operating system collects about memory allocations from the system paged and nonpaged kernel pools, 
+    *   The data is grouped by pool allocation tag.
+
+= Tools for Verifying Drivers =
+*   Static Driver Verifier
+*   Driver Verifier
+*   Wdf Verifier
+*   WdfTester
+    *   WdfFiTester tests the capability of the KMDF driver to handle these injected failures correctly. 
+    *   https://msdn.microsoft.com/en-us/library/windows/hardware/ff556118%28v=vs.85%29.aspx
+
+= Tools for Software Tracing =
+*   TraceView
+*   Tracelog
+*   Tracepdb
+*   Tracefmt
+*   WPP
+*   ETW
+
+= Tools for Debugging Drivers =
+*   Conditional Compilation and the Build Environment
+    *   DBG preprocessor constant: Debug config 1; Release Config 0
+    *   作用routines： ASSERT, ASSERTMSG, KdBreakPoint, KdBreakPointWithStatus, KdPrint, KdPrintEx
+    *   在代码中使用上面的函数或宏时， 只有在Debug Version中才有效， Release时没有作用
+*   Breaking Into the Debugger
+    *   User Mode Break Routines：  VOID DebugBreak(VOID);
+    *   Kernel Mode Break Routines： 
+        *   DbgBreakPoint, DbgBreakPointWithStatus  --> breaks into the debugger
+        *   KdBreakPoint, KdBreakPointWithStatus    --> only available in checked build environment
+        *   Conditional break macros:   ASSERT, ASSERTMSG   --> tests a logical expression, available in checked build environment 
+        *   Conditional break macros:   NT_ASSERT, NT_ASSERTMSG
+*   Sending Output to the Debugger
+    *   User Mode Output Routines:  VOID OutputDebugString(LPCTSTR lpOutputString);     //可将UserMode App的输出log显示在DebugView上
+    *   Kernel Mode Output Routines:
+        *   DbgPrint, DbgPrintEx
+        *   KdPrint, KdPrintEx  --> only available in checked build environment
+*   DbgPrint Buffer and the Debugger
+    *   When the DbgPrint, DbgPrintEx, vDbgPrintEx, vDbgPrintExWithPrefix, KdPrint, or KdPrintEx routine transmits a message to the debugger, the formatted string is sent to the DbgPrint buffer. 
+    *   Any single call to DbgPrint, DbgPrintEx, vDbgPrintEx, vDbgPrintExWithPrefix, KdPrint, or KdPrintEx transmits only 512 bytes of information. Any output longer than the 512 bytes is lost. 
+    *   The DbgPrint buffer itself can hold up to 4 KB of data on a free build of Windows, and up to 32 KB of data on a checked build of Windows
+    *   !dbgprint  --> view the contents of the DbgPrint buffer in Windbg
