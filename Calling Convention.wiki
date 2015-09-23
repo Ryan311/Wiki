@@ -1,0 +1,85 @@
+%toc
+
+= Calling Convention =
+Calling Convention是指程序在函数调用时传递参数和获取返回值所采用的方法：通过寄存器、或通过栈、或者是两者的混合。
+C 语言有 __cdecl、__stdcall、__fastcall、naked、__pascal。
+C++ 语言有 __cdecl、__stdcall、__fastcall、naked、__pascal、__thiscall，比 C 语言多出一种 __thiscall 调用方式
+VC中默认调用是 __cdecl 方式，Windows API 使用 __stdcall 调用方式，在DLL导出函数中，为了跟Windows API保持一致，建议使用 __stdcall 方式。
+
+*   __cdecl (C Default Calling Convention)：
+    <br>
+    1>  压栈顺序: 函参数按从右到左的顺序传递，放于栈中
+    <br>
+    2>  参数栈维护: 栈的清空由主调函数完成
+    <br>
+    3>  函数修饰名约定: 在生成的汇编代码中，函数名以下划线 _ 开头
+    <br>
+    4>  编译选项:/Gd    C的默认选项， 对于变参函数，如printf，只能用这种方式
+
+*   __stdcall(standard Calling Convertion): (Pascal方式清理C方式压栈，通常用于Win32 Api中) 
+    <br>
+    1)  压栈顺序: 函数参数从右到左的压栈顺序
+    <br>
+    2)  参数栈维护: 被调用函数把参数弹出栈(在退出时清空堆栈)
+    <br>
+    3)  函数修饰名约定: VC将函数编译后会在函数名前面加上下划线前缀，在函数名后加上"@"和参数的字节数
+    <br>
+    ex. VC: int f(void *p) (编译后)-> _f@4(在外部汇编语言里可以用这个名字引用这个函数) 
+    <br>
+    4>  编译选项:/Gz        Windows程序默认选项
+    5>  在Windows.h中定义的宏,  _CALLBACK_, _WINAPI_ 都是指的该选项
+
+*   __fastcall (fast Call Convertion, 快速调用约定,通过寄存器来传送参数)
+    <br>
+    1)  压栈顺序:用ECX和EDX传送前两个双字（DWORD）或更小的参数，剩下的参数仍旧自右向左压栈传送
+    <br>
+    2)  参数栈维护:被调用函数在返回前清理传送参数的内存栈
+    <br>
+    3)  函数修饰名约定:VC将函数编译后会在函数名前面加上"@"前缀，在函数名后加上"@"和参数的字节数 
+    <br>
+    4>  编译选项:/Gr        一般不用 
+
+*   __thiscall (本身调用,仅用于“C++”成员函数)
+    <br>
+    1)  压栈顺序: this指针存放于CX/ECX寄存器中，参数从右到左的压栈顺序
+    <br>
+    2)  *__thiscall不是关键词，因此不能被程序员指定*
+
+
+= Function Modifier =
+C和C++对应不同的调用约定，产生的修饰符也各不相同
+| Call Convention | Modifier:  C or extern "C" | C Example: void test(int n) | Modifier: .cpp, .cxx           | C++ Example: void test(int n) |
+| __cdecl         | _functionname              | _test                       | ?functionname@YA...@Z          | ?test@YAXH@Z                  |
+| __stdcall       | _functionname@number       | _test@1                     | ?functionname@YG...@Z          | ?test@YGXH@Z                  |
+| __fastcall      | @functionname@number       | @test@1                     | ?functionname@YI...@Z          | ?test@YIXH@Z                  |
+| __thiscall      |                            |                             | ?functionname@className@@...@Z |                               |
+
+1. 对于C++编译器， 普通非类成员函数修饰符的...表示参数表， 它的拼写有些复杂, 拼写代码如下：
+| X  | void                   |
+| D  | char                   |
+| E  | unsigned char          |
+| F  | short                  |
+| H  | int                    |
+| I  | unsigned int           |
+| J  | long                   |
+| K  | unsigned long（DWORD） |
+| M  | float                  |
+| N  | double                 |
+| _N | bool                   |
+| U  | struct                 |
+| PA | pointer                |
+| PB | const pointer          |
+如果相同类型的指针连续出现，以“0”代替，一个“0”代表一次重复
+<br> U表示结构类型，通常后跟结构体的类型名，用“@@”表示结构类型名的结束
+<br> 参数表后以“@Z”标识整个名字的结束，如果该函数无参数，则以“Z”标识结束
+
+<br>
+2. C++中类成员函数修饰符
+<br>函数名字和参数表之间插入以“@”字符引导的类名；
+<br>参数表的开始，公有(public)成员函数的标识是“@@QAE”, 保护(protected)成员函数的标识是“@@IAE”, 私有(private)成员函数的标识是“@@AAE”，
+<br>如果函数声明使用了const关键字，则相应的标识应分别为“@@QBE”，“@@IBE”和“@@ABE”。
+<br>如果参数类型是类实例的引用，则使用“AAV1”，对于const类型的引用，则使用“ABV1”。
+
+= 查看函数的名字修饰 =
+*   编译输出列表    ???
+*   dumpbin         ???

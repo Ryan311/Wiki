@@ -1,0 +1,112 @@
+%toc
+
+以下两个功能的实现见Project： GuardKeyExport
+= 在类中使用线程 =
+在类中安全的使用线程， 需要时创建线程， 并在正确的时候等待线程退出， 需要以下几个函数：
+*   start       创建两个Event， 分别用于等待线程初始化完成和线程退出， 创建线程并调用s_func
+*   stop        等待线程结束， 作必要的反初始化， 关闭Handles
+*   s_func      静态类成员函数， 线程执行函数的过渡函数
+*   func        线程执行的主体， 类成员函数， 一般会有一个有条件退出的无限循环体
+
+为什么要使用一个过度函数呢？
+这是为了让线程在执行时与给定的类对象绑定在一起， 因为CreateThread函数在创建线程时， 传递的参数不能是类的普通成员， 
+调用规则不同， 而只能是类成员。 类成员函数在执行针对类对象的操作时会很麻烦， 所以引入了一个过度函数， 使线程执行的
+是普通对象的函数， 可以方便的访问对象的各个成员。
+
+{{{
+HRESULT StartMessagePump(void);
+HRESULT StopMessagePump(void);
+static DWORD WINAPI s_MessagePumpThreadProc(LPVOID lpv);
+DWORD MessagePumpThreadProc(void);
+HRESULT                 m_hrMessagePumpStartStatus;
+HANDLE                  m_hMessagePumpInitialized;
+HANDLE                  m_hMessagePumpTerminate;
+HANDLE                  m_hMessagePumpThread;
+HWND                    m_hWnd;
+}}}
+
+
+= 蓝牙设备通知功能 =
+窗体是接收消息的主体， 如果在dll这种不需要窗口的应用中接收系统消息， 可以创建一个窗体但不显示出来， 只用它来接收消息。
+在创建窗体并设置Win_proc函数时， 同样用到了一个过渡函数
+{{{
+    m_hWnd = CreateWindow(GUARD_KEY_SERVICE_CLASSNAME,
+			NULL,
+			WS_OVERLAPPEDWINDOW,
+			0,
+			0,
+			0,
+			0,
+			HWND_MESSAGE, // Message only window, skips UI initialization
+			(HMENU)NULL,
+			g_hInstance,
+			(LPVOID)this);
+}}}
+对于BT设备来说， 连接或断开的消息是通过Bthport发出的， 所以注册时要使用它的Handle
+{{{
+    BOOL CGuardKeyExport::RegisterRemoteBtDviceNotify()
+{
+	BOOL bRet = FALSE;
+	HANDLE hBtDeviceHandle;
+	TCHAR  lpstrFilePath[MAX_PATH];
+	bRet = GetDevicePath((LPGUID)&GUID_BTHPORT_DEVICE_INTERFACE, lpstrFilePath);
+	if (TRUE == bRet)
+	{
+		hBtDeviceHandle = CreateFile(
+			lpstrFilePath,  // drive 
+			GENERIC_READ | GENERIC_WRITE,
+			FILE_SHARE_READ | FILE_SHARE_WRITE,
+			NULL,
+			OPEN_EXISTING,
+			FILE_FLAG_OVERLAPPED,
+			NULL);
+		if (INVALID_HANDLE_VALUE == hBtDeviceHandle)
+		{
+			//UI_TRACE(_T("Error:ErrorNo = %d, %s(%d)"), GetLastError(), __WFILE__, __LINE__);
+		}
+		else
+		{
+			DEV_BROADCAST_HANDLE dbhZ;
+			ZeroMemory(&dbhZ, sizeof(dbhZ));
+			dbhZ.dbch_size = sizeof dbhZ;
+			dbhZ.dbch_devicetype = DBT_DEVTYP_HANDLE;
+			dbhZ.dbch_reserved = 0;
+			dbhZ.dbch_handle = hBtDeviceHandle;
+			dbhZ.dbch_hdevnotify = NULL;
+			memcpy(&dbhZ.dbch_eventguid, &GUID_BLUETOOTH_RADIO_IN_RANGE, sizeof dbhZ.dbch_eventguid);
+			dbhZ.dbch_nameoffset = 0;
+			dbhZ.dbch_data[0] = 0;
+
+			m_hRemoteDeviceNotify = RegisterDeviceNotification(m_hWnd, &dbhZ, DEVICE_NOTIFY_WINDOW_HANDLE);
+			if (!m_hRemoteDeviceNotify)
+			{
+				//UI_TRACE(_T("Error:ErrorNo = %d, %s(%d)"), GetLastError(), __WFILE__, __LINE__);
+				return FALSE;
+			}
+			CloseHandle(hBtDeviceHandle);
+		}
+	}
+	return TRUE;
+}
+}}}
+在Win_proc
+{{{
+    case DBT_CUSTOMEVENT:
+    if (GUID_BLUETOOTH_HCI_EVENT == pHdrHandle->dbch_eventguid)
+    {
+        PBTH_HCI_EVENT_INFO pCxnEvent = (PBTH_HCI_EVENT_INFO)pHdrHandle->dbch_data;
+        if (HCI_CONNECTION_TYPE_LE == pCxnEvent->connectionType )//&& m_BthDeviceAddress == pCxnEvent->bthAddress)
+        {
+            if (pCxnEvent->connected)
+            {
+                m_pGDCallBack(GD_CONNECTED, (void*)&pCxnEvent->bthAddress, sizeof(m_BthDeviceAddress));
+                m_bDeviceConnected = TRUE;
+            }
+            else
+            {
+                m_pGDCallBack(GD_DISCONNECT, (void*)&pCxnEvent->bthAddress, sizeof(m_BthDeviceAddress));
+                m_bDeviceConnected = FALSE;
+            }
+        }
+    }
+}}}

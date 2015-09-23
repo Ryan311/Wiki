@@ -33,6 +33,7 @@
     *   Assist的Option中， C/C++ 选项 -> Customer -> other include -> 包含QT的Include， 然后重启即可
 
 == VC ==
+*   VC编译连接选项  http://www.cnblogs.com/skyofbitbit/p/3649819.html
 *   [[Query Register and Convert 64 int to String]]
 *   [[file operation in kernal mode]]
 *   [[http://msdn.microsoft.com/en-us/library/aa363765(v=vs.85).aspx|file operation in user mode]]

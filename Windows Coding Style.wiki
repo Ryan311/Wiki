@@ -1,0 +1,14 @@
+%toc
+
+Variable Name
+    Pointer:    *p, **pp
+    Variable:   前缀 i int, b bool, f float, 
+    global variable:    g_
+    static variable:    s_
+    
+Function Name
+    Name1Name2...
+
+Member in class
+    m_***
+    Static M_***

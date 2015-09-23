@@ -5,7 +5,24 @@ msdn:   https://msdn.microsoft.com/en-us/library/windows/hardware/ff550855%28v=v
 Device Information Sets
 https://msdn.microsoft.com/en-us/library/windows/hardware/ff541247%28v=vs.85%29.aspx
 
-== 查找系统中BLE设备 ==
+= Project:    BTDevManager =
+== 判断设备当前状态， Disabled、Enabled、YellowBang ==
+*   枚举Bluetooth类的所有设备， EnumDeviceAndGetDeviceState
+*   穷举每个设备（SetupDiEnumDeviceInfo）， 并获得每个设备的HardwareHID（GetDevMultiSz(hDevInfo, &DevInfoData, SPDRP_HARDWAREID)）， 并判断
+*   获得设备的Status， 并判断设备状态
+{{{
+	if(CM_Get_DevNode_Status(&dwDevStatus,&dwProblem,DevInfoData.DevInst,0)!=CR_SUCCESS)
+	{
+		return FALSE;
+	}
+	return ((dwDevStatus & DN_DISABLEABLE) && (dwProblem != CM_PROB_HARDWARE_DISABLED));    //Disabled
+	    or
+	return ((dwDevStatus & DN_HAS_PROBLEM) && (dwProblem == CM_PROB_FAILED_POST_START));    //YellowBang
+}}}
+== Enable、Disable设备 ==
+也可看devcon源代码
+
+= 查找系统中BLE设备 =
 *   所有的LE设备在Properties里都有Friendly name属性， Hardware ID属性为BTHLE\DEV_{Address}
 *   将有Friendly Name属性的设备对应地址返回
 {{{
