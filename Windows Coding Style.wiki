@@ -1,14 +1,20 @@
 %toc
 
+From Web:   http://blog.csdn.net/breaksoftware/article/details/37929885
+    
+1.  变量名：通常采用所谓的“匈牙利命名法”
 Variable Name
+    Meaningfull name:   bufSize, bufLen
     Pointer:    *p, **pp
-    Variable:   前缀 i int, b bool, f float, 
     global variable:    g_
     static variable:    s_
     
-Function Name
-    Name1Name2...
-
 Member in class
     m_***
     Static M_***
+    
+2.  函数名：各单词的首字母大写，如EnumerateFileInDrectory、ShowFileSize等。
+3.  常量：同类型名的命名方式。
+4.  宏：多与类型名命名方式相同，有的也与函数名命名方式相同。
+5.  大括号与代码段：一般大括号独立一行，大括号内的代码段缩进。如果代码段仅一行（如if-else后的语句），也建议使用大括号。
+    在调用或定义函数时，如果函数太长，可以分行写，将每个参数写一行。一般多于三个参数的函数需要分行写，以美观和方便阅读为原则

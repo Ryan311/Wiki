@@ -3,6 +3,7 @@
 msdn:   https://msdn.microsoft.com/en-us/library/windows/desktop/ms686837%28v=vs.85%29.aspx
 
 == Snapshots of the System ==
+*   Example:    BtDevManager --> list all the process
 *   Snapshots are at the core of the tool help functions. A snapshot is a read-only copy of the current state of one or more of 
 *   the following lists that reside in system memory: processes, threads, modules, and heaps.
 *   To take a snapshot of the system memory, use the CreateToolhelp32Snapshot function. 

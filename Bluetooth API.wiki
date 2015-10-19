@@ -1,3 +1,18 @@
 %toc
 
-https://msdn.microsoft.com/en-us/library/aa362927%28v=vs.85%29.aspx
+MSDN SDK:   https://msdn.microsoft.com/en-us/library/aa362761%28v=vs.85%29.aspx
+<br>MSDN Bluetooth Device:   https://msdn.microsoft.com/en-us/library/windows/hardware/ff536768%28v=vs.85%29.aspx
+
+Bluetooth API
+| Bthddi.h          | WDK, Driver           | L2cap Interface                                         |
+| BthSdpddi.h       | WDK, Driver           | SDP Interface                                           |
+| Bthioctl.h        | WDK, Driver or APP    | IOCTL_BTH_HCI_VENDOR_COMMAND, Send Verder Cmd to Radios |
+| Bluetoothapis.h   | UserMode Desktop APP  | Library: BthProps.lib                                   |
+| Bthsdpdef.h       | UserMode Desktop APP  | include by Bluetoothapis.h                              |
+| BluetoothLEApis.h | UserMode App and UMDF | LE GATT                                                 |
+
+= 从Bluetooth Enumerator手动枚举PDO =
+*   BluetoothSetLocalServiceInfo:    A user-mode API that is used only by profile driver developers to trigger the installation of a local service that is described by the service GUID in pClassGuid.
+*   WDK Sample -> Bluetooth Echo L2CAP Profile Driver -> bthsrvinst
+*   通过向Enumerator传递一个GUID， 枚举出一个PDO， 用于安装Bluetooth Profile Driver。 
+*   SDP也是这样工作， 做SDP搜索后， 知道远端支持哪些服务后， 会为每个服务枚举出一个PDO

@@ -289,6 +289,20 @@ study note when write MAP sample UI
         4. CString::Mid(start, n)		截取子串， 参数为开始位置、子串长度
         5. CString::Right(n)			截取右端n个字符长度的子串
     }}}
+    *   CString删除某个特定字符
+    {{{
+        CString str="leng!quan!!!!!";
+        str.Remove('!');
+
+
+        去掉CString左边的特定字符用TrimLeft
+        CString str="!!!!!lengquan!!quan!!";
+        str.TrimLeft('!');
+
+        去掉CString右边的特定字符用TrimRight
+        CString str="!!!!!lengquan!!quan!!";
+        str.TrimRight('!');
+    }}}
 *   ListCtrl
 {{{
     http://blog.chinaunix.net/uid-20676637-id-86116.html
@@ -583,4 +597,34 @@ study note when write MAP sample UI
         CString csTime;
         GetLocalTime(&st);
         csTime.Format(_T("%02d:%02d:%02d.%03d"), st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+    }}}
+*   Radio
+    *   分组， 同一组中的Radio互斥  http://blog.csdn.net/c_cyoxi/article/details/23868979
+        *   按CTRL+D，保证同一组内的radio的tab序号是连续的
+        *   关联int型变量m_groupValue，注意：只需将group属性为true的radio1关联
+        *   设置radio1的事件，并设置radio2和radio3的点击事件函数和radio1相同 
+        *   m_groupVlalue: 0 - Radio1,  1 - Radio2,  2 - Radio3
+    *   设置默认的Radio
+    {{{
+    方法一、
+    为Radio Group中的第一个Radio关联int型变量m_Radio；
+    在初始化RADIO时添加如下代码：
+    m_Radio=0； //设置第一个Radio为选中状态
+    UpdateData(FALSE)；
+    
+    方法二、
+    CButton* radio=(CButton*)GetDlgItem(IDC_RADIO_SINGLE);
+    radio->SetCheck(1);
+    }}}
+*   模态和非模态对框
+    *   模态对话框
+    {{{
+    CPBAPClientDlg PbapDlg;   //创建模态对话框 
+	PbapDlg.DoModal();
+    }}}
+    *   非模态对话框
+    {{{
+    CPBAPClientDlg *pPbapDlg = new CPBAPClientDlg();
+	pPbapDlg->Create(IDD_PBAPCLIENT_DIALOG); //创建一个非模态对话框  
+	pPbapDlg->ShowWindow(SW_SHOWNORMAL); //显示非模态对话框 
     }}}

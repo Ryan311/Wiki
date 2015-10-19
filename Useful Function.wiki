@@ -74,3 +74,191 @@
 *   通过GetModuleHandle，我们可以获取一个进程的基址，直接传入一个NULL就可以直接拿到该进程的基址，但是这种方法我们只能拿到自己进程的基址.
 *   查找其它进程的运行基址， CreateToolhelp32Snapshot(TH32CS_SNAPMODULE,ProcessID)，这样的话，第一个DLL将会是我们要查找的DLL
 *   psapi库里面也有提供一些进程状态的API，其中EnumProcessModules的库就可以枚举对应进程加载的所有模块，枚举的第一个就是我们要查看进程对应的地址
+
+== 三个给进程提权的方法(转) ==
+*   MSDN:   [[https://msdn.microsoft.com/en-us/library/aa446619.aspx|Enabling and Disabling Privileges in C++]]
+*   Example:    BtDevManager -->  通过PID打开进程并获得进程的信息(CmdLine buffer), 这个过程需要提升进程的权限
+{{{
+方法一：
+C/C++ code
+
+    bool EnableDebugPrivilege()   
+    {   
+        HANDLE hToken;   
+        LUID sedebugnameValue;   
+        TOKEN_PRIVILEGES tkp;   
+        if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)) //得到进程的令牌句柄
+        {   
+            return   FALSE;   
+        }   
+        if (!LookupPrivilegeValue(NULL, SE_DEBUG_NAME, &sedebugnameValue))  // 查询进程的权限 
+        {   
+            CloseHandle(hToken);   
+            return false;   
+        }   
+        tkp.PrivilegeCount = 1;   
+        tkp.Privileges[0].Luid = sedebugnameValue;   
+        tkp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;   
+        if (!AdjustTokenPrivileges(hToken, FALSE, &tkp, sizeof(tkp), NULL, NULL))   // 修改令牌权限
+        {   
+            CloseHandle(hToken);   
+            return false;   
+        }   
+        return true;   
+    }
+
+方法二：
+C/C++ code
+
+    bool UpPrivilege()   
+    {   
+        HANDLE hToken;                              //   handle   to   process   token   
+        TOKEN_PRIVILEGES tkp;                       //   pointer   to   token   structure   
+        bool result = OpenProcessToken(GetCurrentProcess(),   
+                                        TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY,     
+                                        &hToken);   
+        if(!result)         //打开进程错误   
+            return result;   
+        result   =   LookupPrivilegeValue(  NULL,     
+                                            SE_DEBUG_NAME,   
+                                            &tkp.Privileges[0].Luid);   
+        if(!result)         //查看进程权限错误   
+            return   result;   
+        tkp.PrivilegeCount   =   1;     //   one   privilege   to   set   
+        tkp.Privileges[0].Attributes   =   SE_PRIVILEGE_ENABLED;   
+        result   =   AdjustTokenPrivileges( hToken,     
+                                            FALSE,     
+                                            &tkp,     
+                                            sizeof(TOKEN_PRIVILEGES),   
+                                            (PTOKEN_PRIVILEGES) NULL,     
+                                            (PDWORD)NULL);   
+        return   result;   
+    }
+
+方法三：
+C/C++ code
+
+    #define SE_CREATE_TOKEN_NAME              TEXT("SeCreateTokenPrivilege")
+    #define SE_ASSIGNPRIMARYTOKEN_NAME        TEXT("SeAssignPrimaryTokenPrivilege")
+    #define SE_LOCK_MEMORY_NAME               TEXT("SeLockMemoryPrivilege")
+    #define SE_INCREASE_QUOTA_NAME            TEXT("SeIncreaseQuotaPrivilege")
+    #define SE_UNSOLICITED_INPUT_NAME         TEXT("SeUnsolicitedInputPrivilege")
+    #define SE_MACHINE_ACCOUNT_NAME           TEXT("SeMachineAccountPrivilege")
+    #define SE_TCB_NAME                       TEXT("SeTcbPrivilege")
+    #define SE_SECURITY_NAME                  TEXT("SeSecurityPrivilege")
+    #define SE_TAKE_OWNERSHIP_NAME            TEXT("SeTakeOwnershipPrivilege")
+    #define SE_LOAD_DRIVER_NAME               TEXT("SeLoadDriverPrivilege")
+    #define SE_SYSTEM_PROFILE_NAME            TEXT("SeSystemProfilePrivilege")
+    #define SE_SYSTEMTIME_NAME                TEXT("SeSystemtimePrivilege")
+    #define SE_PROF_SINGLE_PROCESS_NAME       TEXT("SeProfileSingleProcessPrivilege")
+    #define SE_INC_BASE_PRIORITY_NAME         TEXT("SeIncreaseBasePriorityPrivilege")
+    #define SE_CREATE_PAGEFILE_NAME           TEXT("SeCreatePagefilePrivilege")
+    #define SE_CREATE_PERMANENT_NAME          TEXT("SeCreatePermanentPrivilege")
+    #define SE_BACKUP_NAME                    TEXT("SeBackupPrivilege")
+    #define SE_RESTORE_NAME                   TEXT("SeRestorePrivilege")
+    #define SE_SHUTDOWN_NAME                  TEXT("SeShutdownPrivilege")
+    #define SE_DEBUG_NAME                     TEXT("SeDebugPrivilege")
+    #define SE_AUDIT_NAME                     TEXT("SeAuditPrivilege")
+    #define SE_SYSTEM_ENVIRONMENT_NAME        TEXT("SeSystemEnvironmentPrivilege")
+    #define SE_CHANGE_NOTIFY_NAME             TEXT("SeChangeNotifyPrivilege")
+    #define SE_REMOTE_SHUTDOWN_NAME           TEXT("SeRemoteShutdownPrivilege")
+    #define SE_UNDOCK_NAME                    TEXT("SeUndockPrivilege")
+    #define SE_SYNC_AGENT_NAME                TEXT("SeSyncAgentPrivilege")
+    #define SE_ENABLE_DELEGATION_NAME         TEXT("SeEnableDelegationPrivilege")
+    #define SE_MANAGE_VOLUME_NAME             TEXT("SeManageVolumePrivilege")
+
+    BOOL EnablePrivilege(LPCTSTR lpszPrivilegeName,BOOL bEnable)
+    {
+        HANDLE hToken;
+        TOKEN_PRIVILEGES tp;
+        LUID luid;
+        
+        if(!OpenProcessToken(GetCurrentProcess(),TOKEN_ADJUST_PRIVILEGES |
+            TOKEN_QUERY | TOKEN_READ,&hToken))
+            return FALSE;
+        if(!LookupPrivilegeValue(NULL, lpszPrivilegeName, &luid))
+            return TRUE;
+        
+        tp.PrivilegeCount = 1;
+        tp.Privileges[0].Luid = luid;
+        tp.Privileges[0].Attributes = (bEnable) ? SE_PRIVILEGE_ENABLED : 0;
+        
+        AdjustTokenPrivileges(hToken,FALSE,&tp,NULL,NULL,NULL);
+        CloseHandle(hToken);
+        return (GetLastError() == ERROR_SUCCESS);
+    }
+}}}
+
+== 以Admin权限运行一个App ==
+*   Example:    BTDevManager --> 在后台程式中运行regsvr32来注册Dll
+{{{
+void RunAppWithAdmin(TCHAR *csCmdLine)
+{
+	BTDEVMGR_DBG((_T("+++")));
+	HANDLE hToken = NULL;
+	HANDLE hTokenDup = NULL;
+	BOOL bSuccess = TRUE;
+	do 
+	{
+		if(OpenProcessToken(GetCurrentProcess(),TOKEN_ALL_ACCESS,&hToken))
+		{
+			if(DuplicateTokenEx(hToken, TOKEN_ALL_ACCESS,NULL, SecurityIdentification, TokenPrimary, &hTokenDup))
+			{
+				DWORD dwSessionId = WTSGetActiveConsoleSessionId();
+				if(!SetTokenInformation(hTokenDup,TokenSessionId,&dwSessionId,sizeof(DWORD)))
+				{
+					BTDEVMGR_DBG((TEXT("SetTokenInformation error ！error code：%d\n"),GetLastError()));
+					bSuccess = FALSE;
+					break;
+				}
+
+				STARTUPINFO si;
+				PROCESS_INFORMATION pi;
+				ZeroMemory(&si,sizeof(STARTUPINFO));
+				ZeroMemory(&pi,sizeof(PROCESS_INFORMATION));
+				si.cb = sizeof(STARTUPINFO);
+				si.lpDesktop = _T("WinSta0\\Default");
+				si.wShowWindow = SW_HIDE;
+				si.dwFlags  =   STARTF_USESHOWWINDOW /*|STARTF_USESTDHANDLES*/;
+
+				LPVOID pEnv = NULL;
+				DWORD dwCreationFlag = NORMAL_PRIORITY_CLASS | CREATE_NEW_CONSOLE | CREATE_UNICODE_ENVIRONMENT;
+				if(!CreateEnvironmentBlock(&pEnv,hTokenDup,FALSE))
+				{
+					BTDEVMGR_DBG((TEXT("CreateEnvironmentBlock error ！error code：%d\n"),GetLastError()));
+					bSuccess = FALSE;
+					break;
+				}
+
+				if(!CreateProcessAsUser(hTokenDup,_T("regsvr32.exe"),csCmdLine,NULL,NULL,FALSE,dwCreationFlag,pEnv,NULL,&si,&pi))
+				{
+					BTDEVMGR_DBG((TEXT("CreateProcessAsUser error ！error code：%d\n"),GetLastError()));
+					bSuccess = FALSE;
+					break;
+				}
+
+				if(pEnv)
+				{
+					DestroyEnvironmentBlock(pEnv);
+				}
+			}
+			else
+			{
+				BTDEVMGR_DBG((TEXT("DuplicateTokenEx error ！error code：%d\n"),GetLastError()));
+				bSuccess = FALSE;
+				break;
+			}
+		}
+		else
+		{
+			BTDEVMGR_DBG((TEXT("cannot get administror！error code：%d\n"),GetLastError()));
+			bSuccess = FALSE;
+			break;
+		}
+	}while(0);
+
+	if(hTokenDup != NULL && hTokenDup != INVALID_HANDLE_VALUE)
+		CloseHandle(hTokenDup);
+	if(hToken != NULL && hToken != INVALID_HANDLE_VALUE)
+		CloseHandle(hToken);
+}}}
