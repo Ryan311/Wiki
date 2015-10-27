@@ -28,6 +28,7 @@
 *   sys.getwindowsversion()     -> 获得当前Windows Version
 == sets ==
 == json ==
+*   
 == string ==
 === translate ===
 *   table = string.maketrans(from, to)

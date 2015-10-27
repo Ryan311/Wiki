@@ -1,6 +1,10 @@
 %toc    
-== GIMP ==
+== Install ==
 *   Install latest version
     *   sudo add-apt-repository ppa:otto-kesselgulasch/gimp
     *   sudo apt-get update
     *   sudo apt-get install gimp
+
+== Configuratin ==
+*   中英文切换  Edit->Preferences->Interface->Language
+*   单窗口多窗口界面切换    Windows->Single-Window Mode

@@ -2,6 +2,7 @@
 ---------------------------------------------------------------------------
 == Build OS ==
 *   [[http://wiki.osdev.org/Main_Page|OSDEV]]
+*   [[http://www.doudoulinux.org/web/english/index.html|DouDouLinux]]
  
 == Linux Command ==
 *   [[https://wiki.gnome.org/action/show/Apps/Nautilus?action=show&redirect=Nautilus|Nautilus]]: the file manager for GNOME desktop

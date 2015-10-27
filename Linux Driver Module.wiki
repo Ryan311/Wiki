@@ -9,6 +9,8 @@ Linux设备模型：
 #   对象生命周期, kobject是设备模式中最底层的数据结构
 
 = kobject， kset， subsystem =
+Linux设备模型的底层结构， 它们是组成设备模型的砖块!!!
+
 == kobject ==
 {{{
     struct kobject 
@@ -105,7 +107,7 @@ Linux设备模型：
     *   subsystem_get
     *   subsystem_put
 
-= 热插拔事件 =
+== 热插拔事件 ==
 *   一个热插拔事件是从内核空间发送到用户空间的通知， 它表明系统配置出现变化。
 *   无论是kobject被创建还是被删除， 都会产生这种事情。
 *   热插拔事件会导致对/sbin/hotpulg程序的调用， 该程序通过加载驱动程序， 创建设备节点， 挂载分区，或者其它正确的动作来响应该事件 
@@ -120,7 +122,9 @@ Linux设备模型：
         }
     }}}
 
-= Bus =
+= Linux设备模型的上层容器 =
+Linux设备模型通过Bus, Device, Device Driver这三个数据结构来描述的!!!
+== Bus ==
 *   总线是处理器与一个或多个设备之间的通道， 在设备模型中， 所有设备都是通过总线相连， 甚至包括“虚拟”平台总线
 *   总线结构
     {{{
@@ -146,7 +150,7 @@ Linux设备模型：
     *   bus_remove_file         //创建属性， 在/sys/bus/ldd/目录下创建一个属性文件
     *   bus_delete_file         //删除属性， 删除属性文件
 
-= Device =
+== Device ==
 {{{
     struct device
     {
@@ -171,7 +175,7 @@ Linux设备模型：
     *   device_remove_file
 *   device结构中包含设备模型核心用来模拟系统的信息， 通常嵌入到设备高层表示之中
 
-= Device Driver =
+== Device Driver ==
 {{{
     struct device_driver
     {
@@ -194,7 +198,7 @@ Linux设备模型：
     *   driver_remove_file
 *   driver结构通常被包含在高层和总线相关的结构中
 
-= Class =
+== Class ==
 *   类是一个设备的高层视图， 它抽象出了低层的实现细节
 *   驱动程序核心导出了两个不同的接口来管理类
     *   class_simple例程

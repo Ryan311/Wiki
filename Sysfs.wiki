@@ -2,4 +2,9 @@
 
 Sysfs是一个虚拟文件系统（类似proc文件系统）， 用于将系统中的设备组成层次结构， 并向用户模式程序提供详细的内核数据结构信息。 （同Windows Device Manager)
 Sysfs的信息来源是设备的层次结构， 读一个sysfs文件， 就是动态地从设备树寻找到相关节点， 提取信息， 返回给用户
+Sysfs是利用VFS的接口去读写kobject的层次结构， 建立起来的文件系统。
 
+实现一种文件系统就是要实现VFS定义的一系列接口
+*   file_operations     对每个具体文件的读写操作
+*   dentry_operations   对目录的操作， 属性、名字、建立或删除等操作
+*   inode_operations    对文件的操作， 属性、名字、建立或删除等操作

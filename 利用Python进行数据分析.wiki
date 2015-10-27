@@ -1,0 +1,16 @@
+%toc
+
+= Python Library =
+*   [[NumPy]](Numberical Python)    Python科学计算的基础包
+*   pandas(panel data)      提供快速便捷地处理结构化数据的大量数据结构和函数
+*   matplotlib      绘制数据图表的Python库
+*   IPython         增强的Python Shell， 目的是提高编写、测试、调试Python代码的速度， 主要用于交互式数据处理和利用matplotlib对数据进行可视化处理
+*   SciPy           一组专门解决科学计算中各种标准问题域的包的集合
+    *   scipy.integrate:    数值积分例程和微分议程求解器
+    *   scipy.linalg:    
+    *   scipy.optimize
+    *   scipy.signal
+    *   scipy.sparse
+    *   scipy.special
+    *   scipy.stats
+    *   scipy.weave

@@ -1,0 +1,71 @@
+%toc
+
+This module implements specialized container datatypes providing alternatives to Python’s general purpose built-in containers, dict, list, set, and tuple
+
+| namedtuple  | factory function for creating tuple subclasses with named fields     | New in version 2.6. |
+| deque       | list-like container with fast appends and pops on either end         | New in version 2.4. |
+| Counter     | dict subclass for counting hashable objects                          | New in version 2.7. |
+| OrderedDict | dict subclass that remembers the order entries were added            | New in version 2.7. |
+| defaultdict | dict subclass that calls a factory function to supply missing values | New in version 2.5. |
+
+== nametuple ==
+== deque ==
+== Counter ==
+A counter tool is provided to support convenient and rapid tallies
+{{{
+    >>> # Tally occurrences of words in a list
+    >>> cnt = Counter()
+    >>> for word in ['red', 'blue', 'red', 'green', 'blue', 'blue']:
+    ...     cnt[word] += 1
+    >>> cnt
+    Counter({'blue': 3, 'red': 2, 'green': 1})
+
+    >>> # Find the ten most common words in Hamlet
+    >>> import re
+    >>> words = re.findall(r'\w+', open('hamlet.txt').read().lower())
+    >>> Counter(words).most_common(10)
+    [('the', 1143), ('and', 966), ('to', 762), ('of', 669), ('i', 631),
+     ('you', 554),  ('a', 546), ('my', 514), ('hamlet', 471), ('in', 451)]
+}}}
+== OrderedDict ==
+== defaultdict ==
+Returns a new dictionary-like object. defaultdict is a subclass of the built-in dict class
+{{{//Using list as the default_factory
+    >>> s = [('yellow', 1), ('blue', 2), ('yellow', 3), ('blue', 4), ('red', 1)]
+    >>> d = defaultdict(list)
+    >>> for k, v in s:
+    ...     d[k].append(v)
+    ...
+    >>> d.items()
+    [('blue', [2, 4]), ('red', [1]), ('yellow', [1, 3])]
+
+    ///
+    >>> d = {}
+    >>> for k, v in s:
+    ...     d.setdefault(k, []).append(v)
+    ...
+    >>> d.items()
+    [('blue', [2, 4]), ('red', [1]), ('yellow', [1, 3])]
+}}}
+
+{{{//Setting the default_factory to int makes the defaultdict useful for counting
+    >>> s = 'mississippi'
+    >>> d = defaultdict(int)
+    >>> for k in s:
+    ...     d[k] += 1
+    ...
+    >>> d.items()
+    [('i', 4), ('p', 2), ('s', 4), ('m', 1)]
+}}}
+
+{{{// Setting the default_factory to set makes the defaultdict useful for building a dictionary of sets:
+    >>> s = [('red', 1), ('blue', 2), ('red', 3), ('blue', 4), ('red', 1), ('blue', 4)]
+    >>> d = defaultdict(set)
+    >>> for k, v in s:
+    ...     d[k].add(v)
+    ...
+    >>> d.items()
+    [('blue', set([2, 4])), ('red', set([1, 3]))]
+}}}
+
+

@@ -1,0 +1,22 @@
+%toc 
+
+http://scrapy.org/
+
+= Install =
+*   sudo pip install scrapy
+
+将网站将进爬虫：
+*   新建项目 (Project)：新建一个新的爬虫项目
+scrapy startproject tutorial  
+ 
+    在tutorial文件夹下的文件作用：
+    scrapy.cfg：项目的配置文件
+    tutorial/：项目的Python模块，将会从这里引用代码
+    tutorial/items.py：项目的items文件
+    tutorial/pipelines.py：项目的pipelines文件
+    tutorial/settings.py：项目的设置文件
+    tutorial/spiders/：存储爬虫的目录
+    
+*   明确目标（Items）：明确你想要抓取的目标
+*   制作爬虫（Spider）：制作爬虫开始爬取网页
+*   存储内容（Pipeline）：设计管道存储爬取内容

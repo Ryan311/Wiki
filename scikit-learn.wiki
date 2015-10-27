@@ -1,0 +1,9 @@
+%toc
+
+= Install =
+*   >sudo apt-get install build-essential python-dev python-setuptools python-numpy python-pandas python-scipy libatlas-dev libatlas3gf-base
+*   >sudo update-alternatives --set libblas.so.3 /usr/lib/atlas-base/atlas/libblas.so.3
+*   >sudo update-alternatives --set liblapack.so.3 /usr/lib/atlas-base/atlas/liblapack.so.3
+*   >sudo apt-get install python-matplotlib
+*   >python setup.py install scikit-learn
+*   or Download the source package from http://pypi.python.org/pypi/scikit-learn/, unpack the sources and cd into the source directory ==> python setup.py install

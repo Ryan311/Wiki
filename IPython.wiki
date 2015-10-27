@@ -6,22 +6,63 @@
 *   Using Python debugger
 *   Profiles
 *   QT-based
+*   pylab模式:  enable matplotlib integration, 可显示matplotlib的绘图
+    *   ipython --matplotlib   
+    *   ipython --pylab
+*   基于Qt的富GUI控制台
+    *   ipython qtconsole --pylab=inline
  
-==  Useful Command  ==
+== 快捷键 ==
+*   CTRL+P或向上箭头键
+*   CTRL+N或向下箭头键
+*   CTRL+C      中止当前正在执行的代码
+*   CTRL+A      将光标移动至行首
+*   CTRL+E      将光标移动至行尾
+*   CTRL+K      删除从光标开始至行尾的文本
+*   CTRL+U      清除当前所有文本
+*   CTRL+F      向前移动一个字符
+*   CTRL+b      向后移动一个字符
+*   CTRL+L      清屏
+
+==  Useful Magic Command  ==
+*   %quickref   Ipython快速参考
+*   %magic      显示所有魔术命令
+*   %paste      执行剪贴板中的命令
+*   %cpaste     打开一个特殊提示符以便手工粘贴待执行的Python代码
+*   %who, %who_ls, %whos    显示interactive命名空间中定义的变量， 信息级别/冗余度可变
+*   %xdel variable  删除variable
+*   %reset      删除interactive命名空间中的全部变量/名称
+*   %run        执行python脚本
+*   %prun       执行Python语句并计算每个函数的执行时间, cProfile
+*   %lprun      逐行分析函数性能, %lprun -f func1 -f func2 statement_to_profile
+*   %mprun      
+*   %pdb        启动调试器
 *   %edit
     *   ?%edit  查看使用方法
     *   %edit -p | _    打开上次编辑的临时文件
     *   %edit _Number   打开之前编辑过的文件
-*   %time       计算运行脚本所用的时间
+*   %time       计算运行脚本或语句所用的时间
 *   %timeit     运行多次， 计算平均运行时间 
     *   %timeit -n 100  []      指定运行次数
 *   %memit      运行多次， 计算平均占用的内存
     *   %memit -r 3 []      指定运行次数
 *   %prun       See how long it took each function in a script to run
+*   %bookmark   保存常用目录的别名以便实现快速跳转
+    *   %bookmark pdbook /home/persnail/WorkStation/Python2/pydata-book-master
+    *   %bookmark -l
+*   output = !cmd args  执行命令， 并将结果存放到变量output中
+*   %pwd    返回当前目录
+*   %pushd direction  将当前目录入栈
+*   %popd   弹出栈顶目录
+*   %dirs   返回一个含有当前目录栈的列表
+*   %env    以dict形式返回当前系统环境变量
+*   %dhist  返回目录访问历史
 
 == IPython shortcuts for line_profiler and memory_profiler ==
 *   http://www.huyng.com/posts/python-performance-analysis/
 *   http://itindex.net/detail/50507-python-%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90
+*   >sudo pip install line_profiler
+*   >sudo pip install memory_profiler
 *   %load_ext memory_profiler
 *   %load_ext line_profiler
 *   %mprun -f yourprogram func()
@@ -39,7 +80,7 @@ IPython Notebook 是一种新兴的交互式数据分析与记录工具，它定
 *   As ipython notebook kernel must run as root while chrome can't run as root
 *   modify /usr/bin/google-chrome, add *--user-data-dir* in the end of last line
 
-==  Windows Install line_profiler for ipython == 
+==  Install line_profiler for ipython == 
 *   pip install cython
 *   pip install line_profiler
 *   pip install memory_profiler
@@ -52,6 +93,3 @@ IPython Notebook 是一种新兴的交互式数据分析与记录工具，它定
                 [build]
                 compiler=mingw32
     }}}
-
-
-
