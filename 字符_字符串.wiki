@@ -94,6 +94,27 @@
     _TEXT(x)          x               L ## x
 }}}
 
+
+=== BSTR ===
+*   BSTR    "Basic String"的简称
+微软在 COM/OLE 中定义的标准字符串数据类型。对于 C++，Windows 头文件 wtypes.h中定义如下： 
+
+    typedef wchar_t WCHAR; 
+    typedef WCHAR OLECHAR; 
+    typedef OLECHAR __RPC_FAR *BSTR; 
+
+标准 BSTR 是一个有长度前缀和null结束符的OLECHAR 数组。
+BSTR 的前4字节是一个表示字符串长度的前缀。BSTR 长度域的值是字符串的字 节数，并且不包括0结束符。由于是Unicode串，所以字符数是字节数的一半。
+COM 提供了两个 BSTR 分配用的 API：SysAllocString / SysReallocString
+
+*   _bstr_t Class
+_bstr_t是微软C++ COM扩展的一部分。_bstr_t 封装了BSTR数据类型。
+_bstr_t 通过 SysAllocString and SysFreeString 等BSTR APIs管理资源的分配和释放。_bstr_t 提供了内部引用计数来减少额外负担。 
+
+
+百度文库：BSTR详解
+
+
 === 字符串处理函数总结 ===
 标准c中的strcpy,strchr,strcat等只能用于ANSI字符串，不能正确处理Unicode字符串，因此也提供了一组补充函数，功能等价，但用于Unicode码。
 我们来看看string.h字符串头文件中是怎样处理char*和wchar_t*两个字符串版本的：

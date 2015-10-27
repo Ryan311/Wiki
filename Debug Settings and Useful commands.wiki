@@ -1,5 +1,6 @@
 %toc
 == Windbg Command ==
+*   symcheck    下载指定模块的pdb,  symchk c:\windows\system32\crypt32.dll /s srv*c:\symbols*http://msdl.microsoft.com/download/symbols 
 *   !pnptriage   列出所有Pnp相关的信息
 *   !locks [-v]  列出所有的锁资源
 *   !poaction    列出执行中的电源IRP

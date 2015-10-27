@@ -310,7 +310,9 @@ an application calls a Win32 file I/O function(such as CreateFile, ReadFileEx, o
 *   echo
 *   [[wmic]]    windows下强大的wmic命令行工具
     *   wmic datafile where name="C:\\Windows\\System32\\Drivers\\RtkBtfilter.sys" get version | findstr [0-9].[0-9] 显示文件Version
-
+*   从MSFT服务器下载Public PDB
+    *   Symchk.exe <binary file> /s SRV*<local directory to download symbols to>*<symbol server>
+    *   Example:     symchk C:\windows\system32\drivers\hidclass.sys /s SRV*C:\Symbols*http://msdl.microsoft.com/downloads/symbols
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 == [[Work Debug]] ==

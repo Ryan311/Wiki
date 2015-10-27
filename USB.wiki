@@ -10,6 +10,7 @@
 === Doc ===
 *   [[http://blogs.msdn.com/b/usbcoreblog/archive/2011/05/11/demystifying-usb-selective-suspend.aspx|Demystifying USB Selective Suspend]]
 *   [[http://wiki.osdev.org/Universal_Serial_Bus|USB Tutorial]]
+*   [[http://blogs.msdn.com/b/usbcoreblog/|Microsoft Windows USB Core Team Blog]]  
  
 === USB Spec ===
 *   USB Speed       ==>   Hubs isolate high-speed signaling from full-/low-speed
