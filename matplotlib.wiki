@@ -1,0 +1,64 @@
+%toc
+
+Home:       http://matplotlib.org/index.html
+Examples:   http://matplotlib.org/examples/index.html
+Doc:        http://matplotlib.org/contents.html
+Install:    sudo pip install matplotlib
+
+ipython --pylab     IPython的pylab模式, 配置matplotlib GUI后端      
+
+matplotlib是一种比较低级的工具， 包含绘制图表的各种基础组件！！！
+
+matplotlib API函数都位于matplotlib.pyplot模块中， 引入约定：
+    import matplotlib.pyplot as plt
+
+matplotlib的图像都位于Figure对象中， 可以用plt.figure创建一个新的Figure
+fig = plt.figure()  创建一个新的Figure
+plt.gcf()   得到当前Figure引用
+
+不能通过空的Figure绘图， 必须用add_subplot创建一个或多个subplot才行
+    ax1 = fig.add_subplot(2,2,1)
+    ax2 = fig.add_subplot(2,2,2)
+    ax3 = fig.add_subplot(2,2,3)
+    ax4 = fig.add_subplot(2,2,4)
+
+
+在subplot上绘图：
+
+    plt.plot(randn(50).cumsum(), 'k--')     在最后一个subplot上进行绘制
+    _ = ax1.hist(randn(100), bins = 20, color = 'k', alpha = 0.3)
+    ax3.scatter(np.arange(30), np.arange(30) + 3*randn(30))
+
+创建Figure和Subplot更方便的方法：
+    fig, axes = plt.subplots(2,3)
+    
+plt.subplots_adjust     用于调整subplot周围的间距
+
+颜色、标记和线型
+ax.plot(x, y, 'g--')    ==      ax.plot(x, y, linetype='--', color='g')
+
+刻度、标签和图例
+ax.set_xticks()             设置刻度
+ax.set_xticklabels()        设置刻度标签
+ax.set_xlabel()             设置显示标题
+ax.plot(randn(1000).cumsum(), 'k--', label='three')     添加图例
+ax.set_xlim()               放大x轴
+ax.set_ylim()               放在y轴
+
+
+图表中添加图形
+rect = plt.Rectanggle()
+circ = plt.Circle()
+pgon = plt.Polygon()
+
+ax.add_patch(rect)
+ax.add_patch(circ)
+ax.add_patch(pgon)
+
+保存图表到文件
+plg.savefig('figpath.svg')
+from io import StringIO
+buffer = StringIO()
+plt.savefig(buffer)
+
+

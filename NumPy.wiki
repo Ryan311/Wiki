@@ -1,16 +1,131 @@
 %toc
 
+tutorial:   http://blog.csdn.net/lsjseu/article/details/20359201?utm_source=tuicool&utm_medium=referral
+
+Install:     sudo pip install numpy
+
 约定    import numpy as np
 
-面向数组的编程和思维方式
+面向数组的编程和思维方式:
+<br>NumPy的主要对象是同种元素的多维数组。这是一个所有的元素都是一种类型、通过一个正整数元组索引的元素表格(通常是元素是数字)。
+<br>在NumPy中维度(dimensions)叫做轴(axes)，轴的个数叫做秩(rank)。
 
-每个array都有一个shape（表示各维度大小的元组）和一个dtype（用于说明数组数据类型的对象）
+== ndarray对象属性有： ==
+| ndarray.ndim     | 数组轴的个数，在python的世界中，轴的个数被称作秩                                                             |
+| ndarray.shape    | 数组的维度。指示数组在每个维度上大小的整数元组。如一个n排m列的矩阵，它的shape属性将是(2,3)                   |
+| ndarray.size     | 数组元素的总个数，等于shape属性中元组元素的乘积。                                                            |
+| ndarray.dtype    | 一个用来描述数组中元素类型的对象，可以通过创造或指定dtype使用标准Python类型。另外NumPy提供它自己的数据类型。 |
+| ndarray.itemsize | 数组中每个元素的字节大小。如一个元素类型为float64的数组itemsiz属性值为8(=64/8)                               |
+| ndarray.data     | 包含实际数组元素的缓冲区，通常我们不需要使用这个属性，因为我们总是通过索引来使用数组中的元素。               |
 
-创建ndarray的函数
+== 创建ndarray的函数: ==
 | array             | 将输入数据(列表、元组、数组或其他序列类型)转换为ndarray |
-| asarry            |                                                         |
+| asarray           |                                                         |
 | arange            | 类似于内置的range， 但返回的是一个ndarray而不是列表     |
 | ones, ones_like   | 创建全1数组                                             |
 | zeros, zeros_like | 创建全0数组                                             |
 | empty, empty_like | 创建新数组， 只分配内存空间但不填充任何值               |
 | eye, identity     | 创建一个正方的N*N单位矩阵                               |
+
+== 通用函数(ufunc) ==
+在NumPy里这些函数作用按数组的元素运算，产生一个数组作为输出。
+    
+    sin,cos, exp, all, alltrue, any, apply along axis, argmax, argmin, argsort, average, bincount, ceil, clip, conj, conjugate, corrcoef, cov, cross, cumprod, cumsum, diff, dot, floor, inner, inv, lexsort, max, maximum, mean, median, min, minimum, nonzero, outer, prod, re, round, sometrue, sort, std, sum, trace, transpose, var, vdot, vectorize, where
+
+== 形状操作 ==
+*  更改数组的形状
+    *   ravel()展平的数组元素
+    *   reshape函数改变参数形状并返回它
+    *   resize函数改变数组自身。
+*  组合(stack)不同的数组
+    *   hstack , vstack, column_stack , row_stack , concatenate , c_ , r_ 
+*  分割数组(split)   
+    *   hsplit将数组沿着它的水平轴分割
+    *   vsplit沿着纵向的轴分割
+    *   array split允许指定沿哪个轴分割。   
+
+== 复制和视图 ==
+*   完全不拷贝
+ 
+    >>> a = arange(12)
+    >>> b = a            # no new object is created
+    >>> b is a           # a and b are two names for the same ndarray object
+    True
+    
+*   视图(view)和浅复制
+    *   不同的数组对象分享同一个数据。视图方法创造一个新的数组对象指向同一数据。
+    *   切片数组返回它的一个视图
+    
+    >>> c = a.view()
+    >>> c is a
+    False
+    >>> c.base is a                        # c is a view of the data owned by a
+    True
+    >>> c.flags.owndata
+    False
+    
+*   深复制
+    *   完全复制数组和它的数据
+    *   >>> d = a.copy()
+      
+== 函数和方法(method)总览 ==
+*   创建数组
+arange, array, copy, empty, empty_like, eye, fromfile, fromfunction, identity, linspace, logspace, mgrid, ogrid, ones, ones_like, r , zeros, zeros_like 
+
+*   转化
+astype, atleast 1d, atleast 2d, atleast 3d, mat 
+
+*   操作
+array split, column stack, concatenate, diagonal, dsplit, dstack, hsplit, hstack, item, newaxis, ravel, repeat, reshape, resize, squeeze, swapaxes, take, transpose, vsplit, vstack 
+
+*   询问
+all, any, nonzero, where 
+
+*   排序
+argmax, argmin, argsort, max, min, ptp, searchsorted, sort 
+
+*   运算
+choose, compress, cumprod, cumsum, inner, fill, imag, prod, put, putmask, real, sum 
+
+*   基本统计
+cov, mean, std, var 
+
+*   基本线性代数
+cross, dot, outer, svd, vdot
+
+== 广播法则(rule) ==
+*   广播法则能使通用函数有意义地处理不具有相同形状的输入。
+*   广播第一法则是，如果所有的输入数组维度不都相同，一个“1”将被重复地添加在维度较小的数组上直至所有的数组拥有一样的维度。
+*   广播第二法则确定长度为1的数组沿着特殊的方向表现地好像它有沿着那个方向最大形状的大小。对数组来说，沿着那个维度的数组元素的值理应相同。
+*   应用广播法则之后，所有数组的大小必须匹配。更多细节可以从这个文档找到。
+
+== 花哨的索引和索引技巧 ==
+NumPy比普通Python序列提供更多的索引功能。除了索引整数和切片，正如我们之前看到的，数组可以被整数数组和布尔数组索引。
+*   通过数组索引(也称花式索引 Fancy indexing)
+    *   np.ix_      将两个一维数组转换成一个用于选取矩形区域的索引器
+*   通过布尔数组索引
+
+== 矩阵类 ==
+*   NumPy提供了两个基本的对象：一个N维数组对象和一个通用函数对象。其它对象都是建构在它们之上的。
+*   特别的，矩阵是继承自NumPy数组对象的二维数组对象。
+ 
+    >>> A = arange(12)
+    >>> A
+    array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11])
+    >>> A.shape = (3,4)
+    >>> M = mat(A.copy())   
+
+== 随机数生成== 
+numpy.random模块对Python内置的random进行了补充， 增加了一些高效生成多种概率分布的样本值的函数。
+*   seed        确定随机数生成器的种子
+*   permutation 返回一个序列的随机排列或返回一个随机排列的范围
+*   shuffle     对一个序列就地随机排列
+*   rand        产生均匀分布的样本值
+*   randint     从给定的上下限范围内随机选取整数
+*   randn       产生正态分布的样本值(平均值为0， 标准差为1)
+*   normal      产生正态(高斯)分布的样本值
+*   binominal   产生二项分布的样本值
+*   beta        产生Beta分布的样本值
+*   chisquare   产生卡方分布的样本值
+*   gamma       产生Gamma分布的样本值
+*   uniform     产生在(0, 1)中均匀分布的样本值

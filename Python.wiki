@@ -6,10 +6,10 @@
 *   [[Basic]]
 *   [[Data Types]]
 *   [[Library]]
+*   [[Useful Library]]
 *   [[Distribute and Install package]]
 *   [[http://www.ibm.com/developerworks/cn/linux/l-cn-pythondebugger/|Debug]]
 *   [[PythonVirtualEnviroment]]
-*   [[Useful Library]]
 *   Books & Docs
     *   [[Python Cook Book]]
     *   [[http://www.tummy.com/presentations/vimpython-20070225/|python&vim]]

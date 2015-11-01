@@ -1,7 +1,21 @@
+%toc
+
 == IPython ==
 *   http://ipython.org/install.html
+*   [[NumPy]]
+*   [[pandas]]
+*   [[matplotlib]]
+*   [[SciPy]]
 
-=== [[http://www.pythonforbeginners.com/basics/ipython-a-short-introduction/|IPython]] ===
+=== Install ===
+*   sudo pip install ipython2
+*   sudo pip install ipython3
+*   sudo apt-get install python-ipython     // install old version
+*   出现"ImportError: No module named XXXX错误" 的错误时， 用sudo pip install XXXX来安装这个module就可以了
+*   sudo pip install qtconsole  ==> ipython qtconsole
+*   sudo pip install notebook   ==> ipython notebook
+
+=== [[http://www.pythonforbeginners.com/basics/ipython-a-short-introduction/|IPython short introduction]] ===
 *   Tab completion              " very useful
 *   Using Python debugger
 *   Profiles
@@ -11,6 +25,8 @@
     *   ipython --pylab
 *   基于Qt的富GUI控制台
     *   ipython qtconsole --pylab=inline
+*   ipython console
+*   ipython notebook
  
 == 快捷键 ==
 *   CTRL+P或向上箭头键
@@ -25,8 +41,13 @@
 *   CTRL+L      清屏
 
 ==  Useful Magic Command  ==
+在IPython中，指令分为两种，以%开头的叫做line magic，这种类型的指令只能作用与一行代码。
+<br>以%%开头的叫做cell magic，这种类型的指令可以作用于一个代码块, 如 %%time
+
 *   %quickref   Ipython快速参考
 *   %magic      显示所有魔术命令
+*   %lsmagic    列出所有的指令列表
+*   ?<name>     来查看具体某个指令的说明
 *   %paste      执行剪贴板中的命令
 *   %cpaste     打开一个特殊提示符以便手工粘贴待执行的Python代码
 *   %who, %who_ls, %whos    显示interactive命名空间中定义的变量， 信息级别/冗余度可变
@@ -57,6 +78,11 @@
 *   %dirs   返回一个含有当前目录栈的列表
 *   %env    以dict形式返回当前系统环境变量
 *   %dhist  返回目录访问历史
+*   %pdoc <obj name>        查看对象的pydoc
+*   %psource <obj name>     查看对象的源码，C扩展的话会有问题
+*   %pdef <function name>   查看函数的声明
+*   %pfile <obj name>       查看所在的源码文件
+*   %logstart、%logoff      使用Log来记录会话
 
 == IPython shortcuts for line_profiler and memory_profiler ==
 *   http://www.huyng.com/posts/python-performance-analysis/

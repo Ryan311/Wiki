@@ -1,7 +1,6 @@
+%toc
+
 == SQLite ==
-=== Install on Ubuntu ===
-    *>sudo apt-get install sqlite3*
-    
 *   CLP
 {{{
 $ sqlite3 

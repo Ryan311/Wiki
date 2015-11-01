@@ -7,9 +7,13 @@
 *   str() repr() `` eval()   
 *   isinstance()    -> isinstance(anobj, basestring) 
 *   range, xrange   -> range产生一个list， xrange产生一个xrange object， 功能相同，
-*                      但如果数据很大， xrange效率会更高， 因为他不会维护一个大的列表， 测试：
-*                      %timeit random.shuffle(range(10000), 10)
-*                      %timeit random.shuffle(xrange(1000), 10)
+    *   但如果数据很大， xrange效率会更高， 因为他不会维护一个大的列表， 测试：
+    *   %timeit random.shuffle(range(10000), 10)
+    *   %timeit random.shuffle(xrange(1000), 10)
+*   zip 返回一个元组的列表， 每个元组都是列表的第i个元素的， 元组个数为列表最小的那个参数
+    *   zip(*[]) == unzip   相当于将每个元素拆分， 然后再合并
+    *   x = [1,2,3]; b = [2,3,4]; zipped = zip(x, y) : [(1,2), (2,3), (3,4)]
+    *   lst = [[1,2,3], [2,3,4]]; zipped = zip(*lst) : [(1,2), (2,3), (3,4)]
 == os ==
 *   This module provides a portable way of using operating system dependent functionality.
 *   提供与系统相关的功能， 在各平台通用可移植的能力
@@ -26,9 +30,27 @@
 *   sys.argv    -> 表示一个列表， 包含命令行参数， argv[0]是脚本名称
 *   sys.exit    -> 退出Python
 *   sys.getwindowsversion()     -> 获得当前Windows Version
+== csv ==
+*   Commo Separated Values: The csv module implements classes to read and write tabular data in CSV format
+*   csv.reader  读入分隔符文件
+*   csv.writer  输出分隔符文件
 == sets ==
+== mashal ==
+== pickle,cpickle ==
 == json ==
-*   
+*   JavaScipt Object Notation   HTTP请求在Web浏览器和其他应用程序之间发送数据的标准格式之一
+*   json.loads  将JSON字符串转换成Python形式
+*   json.dumps  将Python对象转换成JSON格式
+== lxml ==
+*   用来读写HTML和XML格式数据的库
+*   lxml.html   处理HTML
+*   lxml.objectify  处理XML
+== urllib2 ==
+== requests ==
+== sqlite3 ==
+*   SQLite是一款嵌入式的数据库
+== pymongo ==
+*  NoSQL数据库 
 == string ==
 === translate ===
 *   table = string.maketrans(from, to)

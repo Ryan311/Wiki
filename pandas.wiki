@@ -1,0 +1,53 @@
+%toc
+
+= Install =
+sudo pip install pandas
+
+= 导入 =
+*   import pandas as pd
+*   from pandas import Series, DataFrame
+
+pandas中的两个主要数据结构：    Series和DataFrame
+
+Series: 由一组数据(各种Numpy数据类型)和一级与之相关的数据标签(索引)组成
+DataFrame： 表格型数据结构， 即有行索引又有列索引
+
+pandas中的绘图函数， 使用matplotlib中的组件组合成完整图表
+== 线型图 ==
+Series和DataFrame都有一个用于生成各类图表的plot方法, 默认是线型图
+
+    s = Series(np.random.randn(10).cumsum(), index=np.arange(0, 100, 10))
+    s.plot()
+    
+    df = DataFrame(np.random.randn(10, 4).cumsum(0), columns=['A', 'B', 'C', 'D'], index=np.arange(0,100,10))
+    df.plot()
+    
+plot()方法中包含各种参数！！！
+
+== 柱状图 ==
+plot的参数, kind='bar'(垂直柱状图)或kind='hbar'(水平柱状图)   
+
+    data.plot(kind='bar', ax=axes[0], color='k', alpha=0.7)
+    data.plot(kind='barh', ax=axes[1], color='k', alpha=0.7)
+
+== 直方图和密度图 ==
+kind = 'kde'
+
+== 散布图 ==
+plt.scatter
+
+== 读取文本格式数据 ==
+*   读入的数据表示为DataFrame
+    *   read_csv
+    *   read_table
+    *   read_fwf
+    *   read_clipboard
+*   Series.from_csv
+
+== 将数据写出文本格式 ==
+*   DataFrame.to_csv(path, sep)
+*   Series.to_csv()
+
+== 读取Microsoft Excel文件 ==
+*   pandas的ExcelFile类支持读取存储Excel 2003(或更高版本)中的表格型数据
+*   需要安装xlrd和openpyxl包
