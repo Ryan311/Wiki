@@ -30,9 +30,9 @@
     *   [[git_github]] [[bitbucket]] [[google code]]
     *   [[VirsualBox]]
     *   [[Blender]] [[GIMP]]
-    *   [[Mono]]
+    *   Matlab [[Scilab]] [[Octave]]
 *   Tech
-    *   [[scikit-learn]] 
+    *   [[Machine Learning]] [[scikit-learn]] [[Weka]]
     *   [[scrapy]]
     *   [[DataBase]]
     *   [[wireless]] [[Bluetooth]] [[BLE]] [[USB]] [[GPS]] [[ANT]] [[Zigbee]]

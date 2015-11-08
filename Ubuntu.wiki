@@ -1,6 +1,16 @@
 %toc
 
 == Ubuntu ==
+*   PPA:    https://launchpad.net/ubuntu/+ppas?
+直接在ubuntu源中下载到的软件不一定是最新版本， 可以手动加载软件的PPA源， 来下载最新的版本， 例如：
+1. 找到ipython的PPA， ppa:jtaylor/ipython
+2. 通过apt-get添加该PPA并安装
+{{{
+    sudo apt-add-repository ppa:jtaylor/ipython
+    sudo apt-get update
+    sudo apt-get install ipython
+}}}
+
 === Tricks ===
 *   查看Ubuntu版本  >lsb_release -d
 *   显示或隐藏文件管理器侧边栏      F9 toggle/

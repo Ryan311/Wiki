@@ -1,0 +1,31 @@
+%toc
+
+http://stackoverflow.com/questions/3220404/why-use-pip-over-easy-install
+
+Don't use easy_install, unless you like stabbing yourself in the face. Use pip.
+
+== 用easy_install和pip来安装第三方库很方便 ==
+它们的原理其实就是从Python的官方源pypi.python.org/pypi 下载到本地，然后解包安装。
+<br>不过因为某些原因，访问官方的pypi不稳定，很慢甚至访问不了。
+
+跟ubuntu的apt和centos的yum有各个镜像源一样，pypi也有。在国内的强烈推荐豆瓣的源
+    http://pypi.douban.com/simple/ 
+    
+注意后面要有/simple目录。
+
+使用镜像源很简单，用-i指定就行了：
+
+    easy_install -i http://pypi.douban.com/simple/ gevent
+    pip install -i http://pypi.douban.com/simple/ gevent
+
+如果觉得太麻烦，可以配制成默认：
+
+    linux下,修改~/.pip/pip.conf，如果没这文件则创建。
+    windows下，修改%HOMEPATH%\pip\pip.ini。
+    
+内容为：
+
+    [global]
+    index-url = http://pypi.douban.com/simple
+
+这样在使用pip来安装时，会默认使用此源。

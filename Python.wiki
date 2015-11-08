@@ -100,7 +100,7 @@ print "=> elasped lpop: %s s" % t.secs
 *   Show image in terminal when call Image.show() within PIL
     *   sudo apt-get install imagemagick
 *   [[Py2exe]]
-*   [[http://stackoverflow.com/questions/3220404/why-use-pip-over-easy-install|easy_install & pip]]
+*   [[easy_install & pip]]
 *   [[https://github.com/philipbjorge/EditREPL|EditREPL use vim in python interacive shell]]
 *   [[PythonVirtualEnviroment]]
 *   [[http://www.ibm.com/developerworks/cn/linux/l-cn-pythondebugger/|Debug]]

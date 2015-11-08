@@ -41,26 +41,16 @@
 *   JavaScipt Object Notation   HTTP请求在Web浏览器和其他应用程序之间发送数据的标准格式之一
 *   json.loads  将JSON字符串转换成Python形式
 *   json.dumps  将Python对象转换成JSON格式
-== lxml ==
-*   用来读写HTML和XML格式数据的库
-*   lxml.html   处理HTML
-*   lxml.objectify  处理XML
-== urllib2 ==
-== requests ==
-== sqlite3 ==
-*   SQLite是一款嵌入式的数据库
-== pymongo ==
-*  NoSQL数据库 
 == string ==
-=== translate ===
-*   table = string.maketrans(from, to)
-*   string.translate(table, delete)
-*   allchar = string.maketrans('','')
-=== case ===
-*   string.upper()
-*   string.lower()
-*   string.capitalize()
-*   string.title()
+*   translate
+    *   table = string.maketrans(from, to)
+    *   string.translate(table, delete)
+    *   allchar = string.maketrans('','')
+*   case
+    *   string.upper()
+    *   string.lower()
+    *   string.capitalize()
+    *   string.title()
 == struct ==
 == random ==
 *   random.getstate   random.setstate   -> 可以保存产生随机数的状态， 产生相同的随机数
@@ -71,6 +61,35 @@
 *   random.sample(x, k)    -> 在序列对象x中取出k个样本
 *   random.random()     -> 返回下一个随机数[0,1)之间
 *   random.uniform(a,b) -> 返回下一个在[a,b]之间的随机数
+
+= Internet Programming =
+
+= Web Programming =
+针对Web应用程序的开发， 包括Web客户端和服务器
+<br>Web客户端和服务器交互的语言是标准协议HTTP， HTTP是TCP/IP的上层协议。
+<br>它的职责是通过发送、接收HTTP消息来处理客户端的请求， 它属于无状态协议， 它不跟踪从一个客户端到另一个客户端的请求信息
+<br>使用cookie保存客户端的客户状态信息
+== urlparse ==
+用来操作URL字符串
+*   urlparse.urlparse(url)  分拆
+*   urlparse.urlunparse()   合并
+*   urlparse.urljoin()      拼接
+== lxml ==
+*   用来读写HTML和XML格式数据的库
+*   lxml.html   处理HTML
+*   lxml.objectify  处理XML
+== urllib ==
+提供在给定的URL地址下载数据的功能
+== urllib2 ==
+处理更复杂的URL打开总量
+== requests ==
+
+= Data Base =
+== sqlite3 ==
+*   SQLite是一款嵌入式的数据库
+== pymongo ==
+*  NoSQL数据库 
+
 
 
 = Third Party =
@@ -86,3 +105,6 @@
 *   Example
     *   https://bitbucket.org/haypo/hachoir/wiki/hachoir-metadata/code
     *   http://www.thehackeruniversity.com/2014/02/02/python-hachoir-tutorial
+== Scrapy ==
+*   http://scrapy.org/
+*   An open source and collaborative framework for extracting the data you need from websites. In a fast, simple, yet extensible way.

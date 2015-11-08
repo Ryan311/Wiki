@@ -1,0 +1,18 @@
+%toc
+
+= Symbolic mathematics =
+*   SymPy Tutorial   http://blog.csdn.net/zt_706/article/details/11475893
+*   Home Page       http://www.sympy.org/en/index.html
+*   Examples        https://github.com/sympy/sympy/wiki/Quick-examples
+
+= isympy控制台 =
+为了试验新功能，或当搞清楚如何做事时，你可以使用我们对IPython的特殊封装isympy(它位于/bin/isympy中，如果你正在从源码文件夹运行的话)，
+<br>它仅仅是一个已经导入相关sympy模块的标准python shell，定义了符号x,y,z和一些其它东西 
+
+= 用SymPy做计算器 =
+SymPy有三种内建的数值类型：浮点数、有理数和整数。
+
+== 有理数 ==
+有理数类用一对整数表示一个有理数：分子和分母，所以Rational(1,2)代表1/2,Rational(5,2)代表5/2等等。
+
+
