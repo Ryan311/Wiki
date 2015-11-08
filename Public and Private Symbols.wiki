@@ -1,0 +1,30 @@
+%toc
+
+http://blogs.msdn.com/b/usbcoreblog/archive/2013/06/29/wpp-blog-post.aspx#Including_TMF_information
+https://msdn.microsoft.com/en-us/library/windows/hardware/ff553493
+
+There are two types of symbol files (PDB): private PDBs and public PDBs. 
+<br>A private PDB is intended for internal use whereas a public PDB is used by the consumers of your binary.
+
+Before Windows 8, it was not possible to include formatting information (contained in TMF files) in public PDBs. 
+As a workaround, the TMF files had to be updated and uploaded frequently so that they were in-sync with the associated symbol files. 
+
+In Windows 8, the build and other WPP utilities have been enhanced to include trace messages in public PDBs. 
+You can use the symbol file to capture WPP trace messages without worrying about out-of-sync TMF and symbol files.
+
+== Including TMF information in public PDB files ==
+
+
+== PDBCopy ==
+https://msdn.microsoft.com/en-us/library/windows/hardware/ff553365%28v=vs.85%29.aspx
+The PDBCopy tool (pdbcopy.exe) is a command-line tool that removes private symbol information from a symbol file. 
+<br>It can also remove selected information from the public symbol table.
+
+> pdbcopy RtkBtfilter.pdb PublicBtFilter.pdb -p
+Remove private symbols from full symbol files and publicBtFilter contains only public symbols
+
+== SymChk ==
+https://msdn.microsoft.com/en-us/library/windows/hardware/ff558844%28v=vs.85%29.aspx
+SymChk (the Microsoft Symbol Checker tool), Symchk.exe, is a program that compares executable files to symbol files to verify that the correct symbols are available.
+
+

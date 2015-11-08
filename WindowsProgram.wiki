@@ -65,4 +65,5 @@ Current Symbol File System:
 == [[Windows Version]] ==
 == [[Bluetooth API]] ==
 == [[Device Notification]] == 
+== [[Public and Private Symbols]] ==
 == [[Windows Security and Identity]] ==
