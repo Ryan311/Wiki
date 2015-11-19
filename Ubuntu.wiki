@@ -14,6 +14,10 @@
 === Tricks ===
 *   查看Ubuntu版本  >lsb_release -d
 *   显示或隐藏文件管理器侧边栏      F9 toggle/
+*   gedit: https://wiki.gnome.org/Apps/Gedit
+    *   安装插件， sudo apt-get install gedit-plugins
+    *   进行个性化配置， 打造Python IDE,   http://www.douban.com/note/90973541/
+    *   How to write a gedit plugin：   https://wiki.gnome.org/Apps/Gedit/PluginsHowTos
 *   ubuntu unity, 已挂载的磁盘不显示在左边侧栏（启动器）
 {{{
     Ubuntu 默认总会将挂载的磁盘(硬盘分区)在桌面建立一捷径，Unity 桌面，则除了桌面外，还会在左边侧栏(Launcher)中也建一个捷径。

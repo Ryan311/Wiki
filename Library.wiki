@@ -51,6 +51,9 @@
     *   string.lower()
     *   string.capitalize()
     *   string.title()
+*   fill zero
+    *   string.zfill(width)
+    *   '12'.zfill(5)  -> '00012'
 == struct ==
 == random ==
 *   random.getstate   random.setstate   -> 可以保存产生随机数的状态， 产生相同的随机数
@@ -74,15 +77,19 @@
 *   urlparse.urlparse(url)  分拆
 *   urlparse.urlunparse()   合并
 *   urlparse.urljoin()      拼接
-== lxml ==
-*   用来读写HTML和XML格式数据的库
-*   lxml.html   处理HTML
-*   lxml.objectify  处理XML
 == urllib ==
 提供在给定的URL地址下载数据的功能
 == urllib2 ==
 处理更复杂的URL打开总量
 == requests ==
+== xml ==
+*   Python’s interfaces for processing XML are grouped in the xml package.
+*   xml.etree.ElementTree: the ElementTree API, a simple and lightweight XML processor
+*   xml.dom: the DOM API definition
+== lxml ==
+*   用来读写HTML和XML格式数据的库, 基于xml.etree.ElementTree
+*   lxml.html   处理HTML
+*   lxml.objectify  处理XML
 
 = Data Base =
 == sqlite3 ==
