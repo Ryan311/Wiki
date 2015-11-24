@@ -3,13 +3,20 @@
 == Ubuntu ==
 *   PPA:    https://launchpad.net/ubuntu/+ppas?
 直接在ubuntu源中下载到的软件不一定是最新版本， 可以手动加载软件的PPA源， 来下载最新的版本， 例如：
-1. 找到ipython的PPA， ppa:jtaylor/ipython
-2. 通过apt-get添加该PPA并安装
+<br>1. 找到ipython的PPA， ppa:jtaylor/ipython
+<br>2. 通过apt-get添加该PPA并安装
 {{{
     sudo apt-add-repository ppa:jtaylor/ipython
     sudo apt-get update
     sudo apt-get install ipython
 }}}
+*   apt-get
+    *   sudo apt-get install **** Fail --> E: Unable to correct problems, you have held broken packages.   
+    {{{// Fix it and then install again
+        sudo apt-get install --fix-broken
+        sudo apt-get autoclean
+        sudo apt-get autoremove
+    }}}
 
 === Tricks ===
 *   查看Ubuntu版本  >lsb_release -d
@@ -18,6 +25,13 @@
     *   安装插件， sudo apt-get install gedit-plugins
     *   进行个性化配置， 打造Python IDE,   http://www.douban.com/note/90973541/
     *   How to write a gedit plugin：   https://wiki.gnome.org/Apps/Gedit/PluginsHowTos
+*   文本比较工具， 类似Windows下的Beyond Compare
+    *   diffuse:    sudo apt-get install diffuse
+    *   meld:   sudo apt-get install meld
+*   smartgit --- git GUI
+    *   sudo add-apt-repository ppa:eugenesan/ppa
+    *   sudo apt-get update
+    *   sudo apt-get install smartgithg
 *   ubuntu unity, 已挂载的磁盘不显示在左边侧栏（启动器）
 {{{
     Ubuntu 默认总会将挂载的磁盘(硬盘分区)在桌面建立一捷径，Unity 桌面，则除了桌面外，还会在左边侧栏(Launcher)中也建一个捷径。

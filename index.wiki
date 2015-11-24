@@ -54,5 +54,3 @@
     *   [[http://www.pythonchallenge.com/|python challenge]]
     *   [[http://projecteuler.net/|Solve Problem in least code]]
     *   [[http://www.topcoder.com/]]
-
-

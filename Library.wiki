@@ -2,7 +2,13 @@
 = Python Build-in Library =
 ==  Build-in Types ==
 *   The principal built-in types are __numerics, sequences, mappings, files, classes, instances and exceptions__
-*   
+*   string object and unicode object
+    *   string object是由characters组成的sequence，而unicode object是Unicode code units组成的sequence。
+    *   string里的character是有多种编码方式的，比如单字节的ASCII，双字节的GB2312等等，再比如UTF-8
+    *   Unicode code unit是一个16-bit或者32-bit的数值，每个数值代表一个unicode符号。在python里，16-bit的unicode，对应的是ucs2编码。32-bit对应的是ucs4编码
+    *   print(string)的时候，如果string是按当前环境编码方式编码的，可以正常输出，不会乱码；如果string不是当前编码的，就会乱码。而print(unicode)是不会乱码的。why？应为print(unicode)的时候，会把unicode先转成当前编码，然后再输出。 
+    *   string转unicode或者unicode转string: string和unicode都有decode()和encode()方法。decode是string2unicode，encode自然就是unicode2string。
+    *   >>>import sys >>> sys.getdefaultencoding()     --> 缺省编码方式
 == Build-in functions ==
 *   str() repr() `` eval()   
 *   isinstance()    -> isinstance(anobj, basestring) 
@@ -14,6 +20,8 @@
     *   zip(*[]) == unzip   相当于将每个元素拆分， 然后再合并
     *   x = [1,2,3]; b = [2,3,4]; zipped = zip(x, y) : [(1,2), (2,3), (3,4)]
     *   lst = [[1,2,3], [2,3,4]]; zipped = zip(*lst) : [(1,2), (2,3), (3,4)]
+*   filter
+    *   filter(str.digit, targetStr) --> 从targetStr中提取数字
 == os ==
 *   This module provides a portable way of using operating system dependent functionality.
 *   提供与系统相关的功能， 在各平台通用可移植的能力

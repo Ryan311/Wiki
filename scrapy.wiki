@@ -2,10 +2,18 @@
 
 http://scrapy.org/
 <br> DOC:   http://scrapy-chs.readthedocs.org/zh_CN/latest/intro/tutorial.html
+<br> Scrapy核心架构与代码运行分析:  http://blog.csdn.net/u012150179/article/details/34441655
 
 = Install =
 *   sudo pip install scrapy
 
+= tutorial =
+*   Scrapy研究探索  http://blog.csdn.net/u012150179/article/details/32343635
+*   Scrapy安装、爬虫入门教程、爬虫实例  http://www.cnblogs.com/Shirlies/p/4536880.html
+*   python爬虫----（scrapy框架提高（1），自定义Request爬取）    http://my.oschina.net/lpe234/blog/342741
+*   Douban movies search: http://www.cnblogs.com/Shirlies/p/4536880.html
+*   自动爬取网页之（CrawlSpider）: http://blog.csdn.net/u012150179/article/details/34913315
+ 
 = Basic =
 
 == 新建爬虫项目 ==
@@ -64,11 +72,31 @@ Scrapy comes with its own mechanism for extracting data. They’re called XPath 
     *   response
     *   settings
 
-= tutorial =
-*   Scrapy研究探索  http://blog.csdn.net/u012150179/article/details/32343635
-*   Scrapy安装、爬虫入门教程、爬虫实例  http://www.cnblogs.com/Shirlies/p/4536880.html
-*   python爬虫----（scrapy框架提高（1），自定义Request爬取）    http://my.oschina.net/lpe234/blog/342741
-*   Douban movies search: http://www.cnblogs.com/Shirlies/p/4536880.html
+== Spiders ==
+Spiders，它是所有爬虫的基类，对于它的设计原则是只爬取start_url列表中的网页，而从爬取的网页中获取link并继续爬取的工作CrawlSpider类更适合。
+<br>CrawlSpider是Spider的派生类,与Spider类的最大不同是多了一个rules参数，其作用是定义提取动作。在rules中包含一个或多个Rule对象，Rule类与CrawlSpider类都位于scrapy.contrib.spiders模块中。
+
+== Command ==
+在项目的根目录， 可以使用的命令
+*   scrapy list --> 列出当前项目中所有可用的spider
+*   scrapy edit <spider>    --> 使用EDITOR中设定的编辑器编辑给定的Spider
+*   scrapy fetch <url>  --> 使用Scrapy下载器(downloader)下载给定的URL，并将获取到的内容送到标准输出。
+*   scrapy view <url>   --> 在浏览器中打开给定的URL，并以Scrapy spider获取到的形式展现
+*   scrapy shell <url>  --> 以给定的URL(如果给出)或者空(没有给出URL)启动Scrapy shell
+*   scrapy parse <url> [options] --> 获取给定的URL并使用相应的spider分析处理。如果您提供 --callback 选项，则使用spider的该方法处理，否则使用 parse
+*   scrapy settings [options]   --> 获取Scrapy的设定
+    *   $ scrapy settings --get BOT_NAME
+    *   $ scrapy settings --get DOWNLOAD_DELAY
+*   
+
+
+== 如何防止被ban之策略大集合 ==
+*   http://blog.csdn.net/u012150179/article/details/35774323
+*   策略一：设置download_delay
+*   策略二：禁止cookies
+*   策略三：使用user agent池
+*   策略四：使用IP池
+*   策略五：分布式爬取
 
 = XPath =
 *   http://www.runoob.com/xpath/xpath-tutorial.html
