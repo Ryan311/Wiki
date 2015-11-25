@@ -1,0 +1,302 @@
+%toc
+
+死锁发生的情况：
+
+1.  两个锁， 两个线程分别获得了一个锁， 并等待另一个锁
+2.  一个线程嵌套调用了一个锁
+
+ 
+实例：
+首先， 列出相关模块的所有线程
+ 
+{{{
+0: kd> !stacks 2 mbtusb
+Proc.Thread  .Thread  Ticks   ThreadState Blocker
+Max cache size is       : 1048576 bytes (0x400 KB)
+Total memory in cache   : 0 bytes (0 KB)
+Number of regions cached: 0
+0 full reads broken into 0 partial reads
+    counts: 0 cached/0 uncached, 0.00% cached
+    bytes : 0 cached/0 uncached, 0.00% cached
+** Prototype PTEs are implicitly decoded
+                            [84735540 Idle]
+                            [864c7020 System]
+   4.00002c  864eb4c0 0002e2d Blocked    nt!KiSwapContext+0x26
+                                        nt!KiSwapThread+0x266
+                                        nt!KiCommitThreadWait+0x1df
+                                        nt!KeWaitForSingleObject+0x393
+                                        Wdf01000!FxWaitLockInternal::AcquireLock+0x35
+                                        Wdf01000!imp_WdfWaitLockAcquire+0x106
+                                        mbtusb!RxWorkItemCallback+0x76
+                                        mbtusb!RxWorkItemCallback+0x76
+                                        Wdf01000!FxWorkItem::WorkItemHandler+0xa5
+                                        Wdf01000!FxWorkItem::WorkItemThunk+0x1b
+                                        nt!IopProcessWorkItem+0x23
+                                        nt!ExpWorkerThread+0x10d
+                                        nt!PspSystemThreadStartup+0x9e
+                                        nt!KiThreadStartup+0x19
+                            [86927030 MUTE.exe]
+ a40.000ba8  86a80d48 0002dc8 Blocked    nt!KiSwapContext+0x26
+                                        nt!KiSwapThread+0x266
+                                        nt!KiCommitThreadWait+0x1df
+                                        nt!KeWaitForSingleObject+0x393
+                                        Wdf01000!FxWaitLockInternal::AcquireLock+0x35
+                                        Wdf01000!imp_WdfWaitLockAcquire+0x106
+                                        mbtusb!EvtMuteReadIoQueueReadyNotification+0x5b
+                                        mbtusb!EvtMuteReadIoQueueReadyNotification+0x5b
+                                        Wdf01000!FxIoQueueIoState::Invoke+0x28
+                                        Wdf01000!FxIoQueue::ProcessReadyNotify+0x86
+                                        Wdf01000!FxIoQueue::DispatchEvents+0x38d
+                                        Wdf01000!FxIoQueue::Requeue+0x219
+                                        Wdf01000!imp_WdfRequestRequeue+0xa5
+                                        mbtusb!EvtMuteReadIoQueueReadyNotification+0x11e
+                                        mbtusb!EvtMuteReadIoQueueReadyNotification+0x11e
+                                        Wdf01000!FxIoQueueIoState::Invoke+0x28
+                                        Wdf01000!FxIoQueue::ProcessReadyNotify+0x86
+                                        Wdf01000!FxIoQueue::DispatchEvents+0x38d
+                                        Wdf01000!FxIoQueue::QueueRequestFromForward+0x19f
+                                        Wdf01000!FxIoQueue::ForwardRequestWorker+0xd4
+                                        Wdf01000!FxIoQueue::ForwardRequest+0x33
+                                        Wdf01000!imp_WdfRequestForwardToIoQueue+0x133
+                                        mbtusb!OsrFxEvtIoDeviceControl+0x474
+                                        mbtusb!OsrFxEvtIoDeviceControl+0x474
+                                        Wdf01000!FxIoQueue::DispatchRequestToDriver+0x3c0
+                                        Wdf01000!FxIoQueue::DispatchEvents+0x4af
+                                        Wdf01000!FxIoQueue::QueueRequest+0x204
+                                        Wdf01000!FxPkgIo::Dispatch+0x3ba
+                                        Wdf01000!FxDevice::Dispatch+0x155
+                                        Wdf01000!FxDevice::DispatchWithLock+0x77
+                                        nt!IofCallDriver+0x63
+                                        nt!IopSynchronousServiceTail+0x1f8
+                                        nt!IopXxxControlFile+0x6aa
+                                        nt!NtDeviceIoControlFile+0x2a
+                                        nt!KiFastCallEntry+0x12a
+                                        +0x76e264f4
+
+                            [9797c030 SearchFilterHo]
+}}}
+ 
+看到有两个都在处于Block状态， 且从代码中知道是在等待同一个锁RxLock，
+然后， 查找这个锁的信息， 将其中一个线程设为当前寄存器上下文线程
+
+{{{
+0: kd> .thread 86a80d48
+Implicit thread is now 86a80d48
+
+0: kd> k
+  *** Stack trace for last set context - .thread/.cxr resets it
+ChildEBP RetAddr  
+aeff57b8 84670b15 nt!KiSwapContext+0x26
+aeff57f0 8466f403 nt!KiSwapThread+0x266
+aeff5818 846692cf nt!KiCommitThreadWait+0x1df
+aeff5894 812195d7 nt!KeWaitForSingleObject+0x393
+aeff58bc 8121ac66 Wdf01000!FxWaitLockInternal::AcquireLock+0x35
+aeff58d8 8e19f4ad Wdf01000!imp_WdfWaitLockAcquire+0x106
+(Inline) -------- mbtusb!WdfWaitLockAcquire+0x13 [c:\program files\windows kits\8.0\include\wdf\kmdf\1.11\wdfsync.h @ 167]
+aeff5904 8126a4fd mbtusb!EvtMuteReadIoQueueReadyNotification+0x5b [c:\users\rui_huang\desktop\kmdf_fx2\c++\driver\device.c @ 552]
+aeff5918 8126c246 Wdf01000!FxIoQueueIoState::Invoke+0x28
+aeff5948 8121711f Wdf01000!FxIoQueue::ProcessReadyNotify+0x86
+aeff5968 8126b013 Wdf01000!FxIoQueue::DispatchEvents+0x38d
+aeff5994 81257a9e Wdf01000!FxIoQueue::Requeue+0x219
+aeff59b4 8e19f570 Wdf01000!imp_WdfRequestRequeue+0xa5
+(Inline) -------- mbtusb!WdfRequestRequeue+0xf [c:\program files\windows kits\8.0\include\wdf\kmdf\1.11\wdfrequest.h @ 1616]
+aeff59dc 8126a4fd mbtusb!EvtMuteReadIoQueueReadyNotification+0x11e [c:\users\rui_huang\desktop\kmdf_fx2\c++\driver\device.c @ 580]
+aeff59f0 8126c246 Wdf01000!FxIoQueueIoState::Invoke+0x28
+aeff5a20 8121711f Wdf01000!FxIoQueue::ProcessReadyNotify+0x86
+aeff5a40 812154b4 Wdf01000!FxIoQueue::DispatchEvents+0x38d
+aeff5a6c 8126ab0b Wdf01000!FxIoQueue::QueueRequestFromForward+0x19f
+aeff5a98 8126ace5 Wdf01000!FxIoQueue::ForwardRequestWorker+0xd4
+aeff5ab0 812577da Wdf01000!FxIoQueue::ForwardRequest+0x33
+aeff5ad8 8e1ba0e6 Wdf01000!imp_WdfRequestForwardToIoQueue+0x133
+(Inline) -------- mbtusb!WdfRequestForwardToIoQueue+0x10 [c:\program files\windows kits\8.0\include\wdf\kmdf\1.11\wdfrequest.h @ 1564]
+aeff5b04 8121766c mbtusb!OsrFxEvtIoDeviceControl+0x474 [c:\users\rui_huang\desktop\kmdf_fx2\c++\driver\ioctl.c @ 223]
+aeff5b44 81217241 Wdf01000!FxIoQueue::DispatchRequestToDriver+0x3c0
+aeff5b64 8121a9da Wdf01000!FxIoQueue::DispatchEvents+0x4af
+aeff5b84 8121896c Wdf01000!FxIoQueue::QueueRequest+0x204
+aeff5bb8 81212bc2 Wdf01000!FxPkgIo::Dispatch+0x3ba
+aeff5be0 81212a33 Wdf01000!FxDevice::Dispatch+0x155
+aeff5bfc 8463e4bc Wdf01000!FxDevice::DispatchWithLock+0x77
+aeff5c14 8483feee nt!IofCallDriver+0x63
+aeff5c34 8485ccd1 nt!IopSynchronousServiceTail+0x1f8
+aeff5cd0 8485f4ac nt!IopXxxControlFile+0x6aa
+aeff5d04 8464542a nt!NtDeviceIoControlFile+0x2a
+aeff5d04 76e264f4 nt!KiFastCallEntry+0x12a
+WARNING: Frame IP not in any known module. Following frames may be wrong.
+
+034ffe18 00000000 0x76e264f4
+查看栈处于EvtMuteReadIoQueueReadyNotification函数时的局部变量
+
+0: kd> dv
+          Queue = 0x79709dd0
+        Context = 0x86a4c190                    从Code中得知它表示device context
+         status = 0n0
+        NewNode = 0x84669549
+        request = 0x868f6228
+     RequestNum = 1
+         Buffer = <value unavailable>
+ 
+因为锁保存在Device Context中， 所以用dt命令查看device context内容
+
+0: kd> dt 0x86a4c190 DEVICE_CONTEXT
+
+mbtusb!DEVICE_CONTEXT
+   +0x000 UsbDeviceDescriptor : _USB_DEVICE_DESCRIPTOR
+   +0x014 UsbConfigurationDescriptor : 0x86a62628 _USB_CONFIGURATION_DESCRIPTOR
+   +0x018 UsbDevice        : 0x796f7118 WDFUSBDEVICE__
+   +0x01c WaitWakeEnable   : 2
+   +0x020 IsDeviceHighSpeed : 0 ''
+   +0x021 IsDeviceSuperSpeed : 0 ''
+   +0x022 SelectedAlternateSetting : 0 ''
+   +0x024 MaximumTransferSize : 0
+   +0x028 UsbDeviceTraits  : 0
+   +0x02c UsbdHandle       : 0x869c58d0 USBD_HANDLE__
+   +0x030 IsStaticStreamsSupported : 0 ''
+   +0x032 NumberOfStreamsSupportedByController : 0
+   +0x034 UsbAclInterface  : 0x7984d240 WDFUSBINTERFACE__
+   +0x038 UsbScoInterface  : 0x79590908 WDFUSBINTERFACE__
+   +0x03c EventPipe        : 0x7961cbd8 WDFUSBPIPE__
+   +0x040 AclInPipe        : 0x798a9db0 WDFUSBPIPE__
+   +0x044 AclOutPipe       : 0x6875a270 WDFUSBPIPE__
+   +0x048 DeviceNameMemory : 0x795e70a0 WDFMEMORY__
+   +0x04c DeviceName       : 0x86a18f98  "Realtek USB Driver for MindTree's Tool"
+   +0x050 LocationMemory   : 0x795f1878 WDFMEMORY__
+   +0x054 Location         : 0x86a0e7c0  "Port_#0001.Hub_#0001"
+   +0x058 EventPipeHandle  : 0x86a1df5c Void
+   +0x05c AclInPipeHandle  : 0x86a1df9c Void
+   +0x060 AclOutPipeHandle : 0x86a1df7c Void
+   +0x064 ScoInPipe        : 0x79615ae8 WDFUSBPIPE__
+   +0x068 ScoOutPipe       : 0x79a8fc88 WDFUSBPIPE__
+   +0x06c ScoInPipeHandle  : 0x8668cfdc Void
+   +0x070 ScoOutPipeHandle : 0x8668cfbc Void
+   +0x074 CmdTxWorkItem    : 0x7961ee40 WDFWORKITEM__
+   +0x078 AclDataTxWorkItem : 0x795ebde0 WDFWORKITEM__
+   +0x07c CmdTxQueue       : 0x795d3fe8 WDFQUEUE__
+   +0x080 AclDataTxQueue   : 0x795c61f8 WDFQUEUE__
+   +0x084 IsochWriteQueue  : 0x7958e4e8 WDFQUEUE__
+   +0x088 IsochReadQueue   : 0x795a6768 WDFQUEUE__
+   +0x090 ScoLinkHandle    : 0
+   +0x092 ScoRxStop        : 0 ''
+   +0x094 RxWorkItem       : 0x79737f58 WDFWORKITEM__
+   +0x098 RxQueue          : 0x86a6f890 _MEMORY_QUEUE
+   +0x09c RxLock           : 0x79589a98 WDFWAITLOCK__
+   +0x0a0 MuteReadQueue    : 0x79709dd0 WDFQUEUE__
+   +0x0a4 mReadCount       : 0
+   +0x0a8 ParaInfo         : _PARA_INFO
+   +0x8b4 btsnooper        : BtSnooper
+   +0xcf8 bWorkEnable      : 0x1 ''
+   +0xcf9 SymbolNameNum    : 0 ''
+}}}
+
+ 
+其中的RxLock就是我们要找的锁结构， 因为它是一个WDF Waitlock， 用wdfhandle查看信息
+
+
+{{{
+0: kd> !wdfkd.wdfhandle 0x79589a98
+Dumping WDFHANDLE 0x79589a98
+=============================
+Handle type is WDFWAITLOCK
+Refcount: 1
+Contexts:
+    <no associated contexts or attribute callbacks>
+
+Parent: !wdfhandle 0x795b3fe8, type is WDFDEVICE
+Owning device: !wdfdevice 0x795b3fe8
+
+!wdfobject 0x86a76560
+
+0: kd> !wdfobject 0x86a76560
+The type for object 0x86a76560 is FxWaitLock
+State: FxObjectStateCreated (0x1)
+!wdfhandle 0x79589a98
+dt FxWaitLock 0x86a76560
+
+Contexts:
+    <no associated contexts or attribute callbacks>
+
+Parent: !wdfobject 0x86a4c010, !wdfhandle 0x795b3fe8, type is WDFDEVICE
+Owning device: !wdfdevice 0x795b3fe8
+}}}
+ 
+再用dt查看FxWaitLock中的结构信息
+{{{
+0: kd> dt FxWaitLock 0x86a76560
+Wdf01000!FxWaitLock
+   +0x000 __VFN_table : 0x8127dda0
+   +0x004 m_Type           : 0x1023
+   +0x006 m_ObjectSize     : 0x48
+   +0x008 m_Refcnt         : 0n1
+   +0x00c m_Globals        : 0x867889f0 _FX_DRIVER_GLOBALS
+   +0x010 m_ObjectFlags    : 8
+   +0x010 m_ObjectFlagsByName : FxObject::<unnamed-tag>::<unnamed-type-m_ObjectFlagsByName>
+   +0x012 m_ObjectState    : 1
+   +0x014 m_ChildListHead  : _LIST_ENTRY [ 0x86a76574 - 0x86a76574 ]
+   +0x01c m_SpinLock       : MxLock
+   +0x020 m_ParentObject   : 0x86a4c010 FxObject
+   +0x024 m_ChildEntry     : _LIST_ENTRY [ 0x86a563dc - 0x868c80c4 ]
+   +0x02c m_DisposeSingleEntry : _SINGLE_LIST_ENTRY
+   +0x030 m_DeviceBase     : 0x86a4c010 FxDeviceBase
+   +0x030 m_Device         : 0x86a4c010 FxDevice
+   +0x034 m_Event          : MxEvent
+   +0x044 m_OwningThread   : 0x86a80d48 _KTHREAD
+}}}
+ 
+我们关心的是该锁当前是被哪个线程持有， m_OwningThread包含这个信息
+用!thread列出该线程：
+{{{
+0: kd> !thread 0x86a80d48
+THREAD 86a80d48  Cid 0a40.0ba8  Teb: 7ffdd000 Win32Thread: fdd13ac0 WAIT: (Executive) KernelMode Non-Alertable
+    86a76594  SynchronizationEvent
+Not impersonating
+DeviceMap                 8cc27b70
+Owning Process            86927030       Image:         MUTE.exe
+Attached Process          N/A            Image:         N/A
+Wait Start TickCount      65825          Ticks: 11720 (0:00:03:02.833)
+Context Switch Count      6              IdealProcessor: 0             
+UserTime                  00:00:00.000
+KernelTime                00:00:00.000
+Win32 Start Address 0x004b60b0
+Stack Init aeff5fd0 Current aeff57a0 Base aeff6000 Limit aeff3000 Call 0
+Priority 10 BasePriority 8 UnusualBoost 0 ForegroundBoost 2 IoPriority 2 PagePriority 5
+ChildEBP RetAddr  Args to Child              
+aeff57b8 84670b15 86a80d48 00000000 8472bd20 nt!KiSwapContext+0x26 (FPO: [Uses EBP] [0,0,4])
+aeff57f0 8466f403 86a80e08 86a80d48 86a76594 nt!KiSwapThread+0x266
+aeff5818 846692cf 86a80d48 86a80e08 00000000 nt!KiCommitThreadWait+0x1df
+aeff5894 812195d7 86a76594 00000000 00000000 nt!KeWaitForSingleObject+0x393
+aeff58bc 8121ac66 86a4c190 00000000 00000004 Wdf01000!FxWaitLockInternal::AcquireLock+0x35 (FPO: [Non-Fpo])
+aeff58d8 8e19f4ad 86788ad8 86a76560 00000000 Wdf01000!imp_WdfWaitLockAcquire+0x106 (FPO: [Non-Fpo])
+(Inline) -------- -------- -------- -------- mbtusb!WdfWaitLockAcquire+0x13 (Inline Function @ 8e19f4ad) (CONV: stdcall) [c:\program files\windows kits\8.0\include\wdf\kmdf\1.11\wdfsync.h @ 167]
+aeff5904 8126a4fd 79709dd0 86a4c190 868f6200 mbtusb!EvtMuteReadIoQueueReadyNotification+0x5b (FPO: [Non-Fpo]) (CONV: stdcall) [c:\users\rui_huang\desktop\kmdf_fx2\c++\driver\device.c @ 552]
+aeff5918 8126c246 79709dd0 86a4c190 00000001 Wdf01000!FxIoQueueIoState::Invoke+0x28 (FPO: [Non-Fpo])
+aeff5948 8121711f 868f6228 aeff5970 aeff5984 Wdf01000!FxIoQueue::ProcessReadyNotify+0x86 (FPO: [Non-Fpo])
+aeff5968 8126b013 86a03200 00000000 796defe8 Wdf01000!FxIoQueue::DispatchEvents+0x38d (FPO: [2,1,4])
+aeff5994 81257a9e 868f6228 86a4c190 00000000 Wdf01000!FxIoQueue::Requeue+0x219 (FPO: [1,3,4])
+aeff59b4 8e19f570 86788ad8 86921010 867889f0 Wdf01000!imp_WdfRequestRequeue+0xa5 (FPO: [Non-Fpo])
+(Inline) -------- -------- -------- -------- mbtusb!WdfRequestRequeue+0xf (Inline Function @ 8e19f570) (CONV: stdcall) [c:\program files\windows kits\8.0\include\wdf\kmdf\1.11\wdfrequest.h @ 1616]
+aeff59dc 8126a4fd 79709dd0 86a4c190 868f6200 mbtusb!EvtMuteReadIoQueueReadyNotification+0x11e (FPO: [Non-Fpo]) (CONV: stdcall) [c:\users\rui_huang\desktop\kmdf_fx2\c++\driver\device.c @ 580]
+aeff59f0 8126c246 79709dd0 86a4c190 00000001 Wdf01000!FxIoQueueIoState::Invoke+0x28 (FPO: [Non-Fpo])
+aeff5a20 8121711f 868f6228 aeff5a48 aeff5a64 Wdf01000!FxIoQueue::ProcessReadyNotify+0x86 (FPO: [Non-Fpo])
+aeff5a40 812154b4 86a59300 00000000 aeff5aa0 Wdf01000!FxIoQueue::DispatchEvents+0x38d (FPO: [2,1,4])
+aeff5a6c 8126ab0b 868f6228 86a593c0 867889f0 Wdf01000!FxIoQueue::QueueRequestFromForward+0x19f (FPO: [1,3,4])
+aeff5a98 8126ace5 86a59300 868f6228 86921010 Wdf01000!FxIoQueue::ForwardRequestWorker+0xd4 (FPO: [Non-Fpo])
+aeff5ab0 812577da 868f6228 86921010 00000004 Wdf01000!FxIoQueue::ForwardRequest+0x33 (FPO: [Non-Fpo])
+aeff5ad8 8e1ba0e6 86921010 796defe8 868f6228 Wdf01000!imp_WdfRequestForwardToIoQueue+0x133 (FPO: [Non-Fpo])
+(Inline) -------- -------- -------- -------- mbtusb!WdfRequestForwardToIoQueue+0x10 (Inline Function @ 8e1ba0e6) (CONV: stdcall) [c:\program files\windows kits\8.0\include\wdf\kmdf\1.11\wdfrequest.h @ 1564]
+aeff5b04 8121766c 795a6c38 796defe8 0000ffff mbtusb!OsrFxEvtIoDeviceControl+0x474 (FPO: [Non-Fpo]) (CONV: stdcall) [c:\users\rui_huang\desktop\kmdf_fx2\c++\driver\ioctl.c @ 223]
+aeff5b44 81217241 796defe8 aeff5b8c 86921010 Wdf01000!FxIoQueue::DispatchRequestToDriver+0x3c0 (FPO: [Non-Fpo])
+aeff5b64 8121a9da 86a59300 00000000 86a593c0 Wdf01000!FxIoQueue::DispatchEvents+0x4af (FPO: [2,1,4])
+aeff5b84 8121896c 86a59300 86921010 86a4c0d4 Wdf01000!FxIoQueue::QueueRequest+0x204 (FPO: [Non-Fpo])
+aeff5bb8 81212bc2 869e4008 86a7b640 869e4008 Wdf01000!FxPkgIo::Dispatch+0x3ba (FPO: [Non-Fpo])
+aeff5be0 81212a33 86a7b640 869e4008 8684bd80 Wdf01000!FxDevice::Dispatch+0x155 (FPO: [Non-Fpo])
+aeff5bfc 8463e4bc 86a7b640 869e4008 869e4008 Wdf01000!FxDevice::DispatchWithLock+0x77 (FPO: [Non-Fpo])
+aeff5c14 8483feee 8684bd80 869e4008 869e4150 nt!IofCallDriver+0x63
+aeff5c34 8485ccd1 86a7b640 8684bd80 00000000 nt!IopSynchronousServiceTail+0x1f8
+aeff5cd0 8485f4ac 86a7b640 869e4008 00000000 nt!IopXxxControlFile+0x6aa
+aeff5d04 8464542a 00000184 00000188 00000000 nt!NtDeviceIoControlFile+0x2a
+aeff5d04 76e264f4 00000184 00000188 00000000 nt!KiFastCallEntry+0x12a (FPO: [0,3] TrapFrame @ aeff5d34)
+WARNING: Frame IP not in any known module. Following frames may be wrong.
+034ffe18 00000000 00000000 00000000 00000000 0x76e264f4
+}}}
+ 
+由上可以看出， 该线程持有RxLock锁， 但是它又在等待这个锁， 形成了死锁。
+属于第二种情况， 一个线程嵌套使用锁。

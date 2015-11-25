@@ -80,6 +80,8 @@
 *   %dhist  返回目录访问历史
 *   %pdoc <obj name>        查看对象的pydoc
 *   %psource <obj name>     查看对象的源码，C扩展的话会有问题
+*   %pycat  <file name>     查看源代码文件
+*   %psearch                在当前上下文的命名空间中进行模糊搜索。
 *   %pdef <function name>   查看函数的声明
 *   %pfile <obj name>       查看所在的源码文件
 *   %logstart、%logoff      使用Log来记录会话

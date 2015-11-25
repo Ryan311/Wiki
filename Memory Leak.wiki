@@ -1,0 +1,142 @@
+%toc
+在Driver Verifier中， 将Special pool和Poor tracking选中， 就检测Memory Leak，
+
+当程序分配了内存但没有释放时， Driver Verifier就会检测到， 然后发生BSOD， Check Code是0xC4。
+
+分析Memory Leak Dump：
+{{{
+1: kd> !analyze -v
+
+*******************************************************************************
+
+*                                                                             *
+
+*                        Bugcheck Analysis                                    *
+
+*                                                                             *
+
+*******************************************************************************
+DRIVER_VERIFIER_DETECTED_VIOLATION (c4)
+A device driver attempting to corrupt the system has been caught.  This is
+because the driver was specified in the registry as being suspect (by the
+administrator) and the kernel has enabled substantial checking of this driver.
+If the driver attempts to corrupt the system, bugchecks 0xC4, 0xC1 and 0xA will
+be among the most commonly seen crashes.
+Arguments:
+Arg1: 00000062, A driver has forgotten to free its pool allocations prior to unloading.       Driver有没有释放的内存
+Arg2: 9fcf175c, name of the driver having the issue.
+Arg3: 8d521f70, verifier internal structure with driver information.
+Arg4: 00000002, total # of (paged+nonpaged) allocations that weren't freed.  共有两处分配的内存没有释放 
+    Type !verifier 3 drivername.sys for info on the allocations
+    that were leaked that caused the bugcheck.
+    
+通过命令!verifier 3 drivername.sys查看详细信息
+1: kd> !verifier 3 RtkBtfilter.sys                 
+Verify Level 209bb ... enabled options are:
+    Special pool
+    Special irql
+    All pool allocations checked on unload
+    Io subsystem checking enabled
+    Deadlock detection enabled
+    DMA checking enabled
+    Security checks enabled
+    Miscellaneous checks enabled
+    DDI compliance checking enabled
+
+Summary of All Verifier Statistics
+RaiseIrqls                             0x3c
+AcquireSpinLocks                       0xcbb84
+Synch Executions                       0x0
+Trims                                  0x9e64
+Pool Allocations Attempted             0x32d8cc
+Pool Allocations Succeeded             0x32d8cc
+Pool Allocations Succeeded SpecialPool 0x32d8cc
+Pool Allocations With NO TAG           0x0
+Pool Allocations Failed                0x0
+Resource Allocations Failed Deliberately   0x0
+Current paged pool allocations         0x2d for 00001242 bytes
+Peak paged pool allocations            0x3f for 0000A984 bytes
+Current nonpaged pool allocations      0x18b for 0001C88C bytes
+Peak nonpaged pool allocations         0x401 for 0004B737 bytes
+Driver Verification List
+
+Entry     State           NonPagedPool   PagedPool   Module
+84827aa0 Loaded&Unloaded  0000019f       00000000    rtkbtfilter.sys
+Current Pool Allocations  00000002    00000000
+Current Pool Bytes        0000019f    00000000
+Peak Pool Allocations     00000039    00000000
+Peak Pool Bytes           00007463    00000000
+PoolAddress  SizeInBytes    Tag       CallersAddress
+975eaee0     0x00000120     TBTR      9e9a9b6f
+}}}
+
+只有最后两行是我们关心的地方， 它指出没有释放的内存地址、大小、Tag、分配函数
+
+这里看到只有一处内存没有释放， 但Arg4是2， 实践证明Arg4是正确的。
+
+如果是在Driver中直接调用ExAllocatePoolWithTag， 这就简单了， 用ln查看CallerAddress(必须load 正确的PDB）
+
+1: kd> ln 9e9a9b6f
+
+f:\btsw\trunk\hostsw\win7-inbox-driver\rtkfilter\generic\os_windows.c(309)+0x13
+
+(9e9a9b50)   RtkBtfilter!OsAllocateRawMemory+0x29
+
+即可以看到分配这块内存的函数， 即ExAllocatePoolWithTag在哪里调用。
+
+但从上面看到， 在RtkBtfilter中， 我们包装了ExAllocatePoolWithTag这个函数用来分配内存， 所以用ln就没有用了， 我们想要知道在哪个函数中调用了OsAllocateRawMemory。
+ 
+直接通过Windbg命令无法找到内存分配位置， 需要在调用OsAllocateRawMemory时加入一些信息。
+
+Driver中， 实际分配函数是OsAllocateExtraMemory， Extra表示在分配时额外增加了些内存保存信息。
+
+{{{
+RT_STATUS
+OsAllocateExtraMemory(
+    OUT RT_VOID** ppBuffer,
+    IN RT_U32 BufferLen,
+    IN RT_MEMORY_TYPE Type,
+    IN RT_U32 LineNum,      
+    IN RT_S8* FuncStr
+    //可以看到将Line Number， function name作为参数传到了分配函数
+    )
+{
+    .............
+    RawLen = BufferLen + sizeof(MEM_HEAD);     每次分配会多出一个Mem_Head结构
+    OsAllocateRawMemory(&pRawBuffer, RawLen, Type);
+    if (NULL == pRawBuffer)
+    {
+        //since caller will send its debug message out, so set RTK_OS instead of RTK_ERROR
+        RT_DEBUG(TRACE_LEVEL_ERROR,RTK_OS,("OS: Allocat Memory Error"));
+        return Ret;
+    }
+    pMemHead = (MEM_HEAD*)(pRawBuffer);
+    OsZeroMemory(pMemHead, sizeof(MEM_HEAD));
+    pMemHead->LineNum = LineNum;                                          将LineNumber和FucName保存在这块内存的头部， 结构是Mem_Head
+    OsCopyMemory(pMemHead->FuncName, FuncStr, FUNCTION_NAME_LENGTH);
+    *ppBuffer = (RT_U8*)(pRawBuffer) + sizeof(MEM_HEAD);   
+    return RT_STATUS_SUCCESS;
+}
+}}}
+ 
+从上面的分配函数可知， 在内存的头部包含了分配函数的行号和函数名
+
+用db查看整块内存
+
+{{{
+1: kd> db 975eaee0    
+
+975eaee0  58 02 00 00 46 69 6c 74-65 72 50 72 6f 63 65 73  X...FilterProces
+975eaef0  73 43 6f 6d 6d 61 6e 64-43 6f 6d 70 6c 65 74 65  sCommandComplete
+975eaf00  45 76 65 6e 74 00 45 6e-61 62 6c 65 64 00 44 69  Event.Enabled.Di
+975eaf10  73 61 62 6c 65 64 00 cc-46 69 6c 74 65 72 50 72  sabled..FilterPr
+975eaf20  00 00 00 00 00 00 00 00-00 00 00 00 00 00 00 00  ................
+975eaf30  00 00 00 00 00 00 00 00-00 00 00 00 00 00 00 00  ................
+975eaf40  00 00 00 00 00 00 00 00-00 00 00 00 00 00 00 00  ................
+975eaf50  00 00 00 00 00 00 00 00-00 00 00 00 00 00 00 00  ................
+}}}
+
+58 02 00 00       表示Line Number    ==>   0x258 = 600行
+46 69 6c 74...  表示Function Name à FilterProcessCommandCompleteEvent
+
+即在函数FilterProcessCommandCompleteEvent中， 第600行的位置分配的内存没有释放。

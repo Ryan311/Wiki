@@ -35,7 +35,7 @@
     *   [[scikit-learn]] 
     *   [[scrapy]]
     *   [[DataBase]]
-    *   [[wireless]] [[Bluetooth]] [[BLE]] [[USB]] [[GPS]] [[ANT]] [[Zigbee]]
+    *   [[wireless]] [[Bluetooth]] [[BLE]] [[USB]] [[GPS]] [[ANT]] [[Zigbee]] [[LoRa]]
     *   [[http://www.ruanyifeng.com/blog/2011/12/ssh_remote_login.html|SSH]]
     *   [[OpenGL]] [[WebGL]] 
     *   [[CUDA]] [[OpenCL]]

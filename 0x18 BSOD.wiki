@@ -1,0 +1,201 @@
+%toc
+
+*0x18 BSOD*  indicates that the reference count of an object is illegal for the current state of the object.
+
+本例使用!address打印出内核中的地址信息， 然后搜索Arg2找出 the object实际是一个Thread.
+
+Check Code:
+{{{
+1: kd> !analyze -v
+
+REFERENCE_BY_POINTER (18)
+
+Arguments:
+
+Arg1: ffffe0017d053cd0, Object type of the object whose reference count is being lowered
+
+Arg2: ffffe0018059e040, Object whose reference count is being lowered
+
+Arg3: 0000000000000001, Reserved
+
+Arg4: ffffe0017f3317f8, Reserved
+
+         The reference count of an object is illegal for the current state of the object.
+
+         Each time a driver uses a pointer to an object the driver calls a kernel routine
+
+         to increment the reference count of the object. When the driver is done with the
+
+         pointer the driver calls another kernel routine to decrement the reference count.
+
+         Drivers must match calls to the increment and decrement routines. This bugcheck
+
+         can occur because an object's reference count goes to zero while there are still
+
+         open handles to the object, in which case the fourth parameter indicates the number
+
+         of opened handles. It may also occur when the object?s reference count drops below zero
+
+         whether or not there are open handles to the object, and in that case the fourth parameter
+
+         contains the actual value of the pointer references count.
+ }}}
+
+意思是说， Driver中使用一个object 的指针时， 都会通过内核函数将该对象的Reference加1， 当使用完后会将Ref减1。 异常的情况是一个对象的Ref为负，
+
+或者当对象的Ref为0时， 仍然有人在使用它。
+
+ 
+
+Arg2指出该Object的地址， 它是什么Object呢？
+
+可以用!address来看一下内核的地址信息
+
+{{{
+1: kd> !address –summary
+
+      BaseAddress      EndAddress+1        RegionSize         VaType            Usage
+
+---------------------------------------------------------------------------------------------------
+
+       0`00000000        0`7ffe0000        0`7ffe0000 UserRange                          
+
+       0`7ffe0000        0`7ffe1000        0`00001000 SystemSharedPage                   
+
+       0`7ffe1000     7ff6`5eb50000     7ff5`deb6f000 UserRange                          
+
+    7ff6`5eb50000     7ff6`5eb51000        0`00001000 UserRange              TEB          Thread: ffffe00183efa580
+
+    7ff6`5eb51000     7ff6`5eb52000        0`00001000 UserRange                          
+
+    7ff6`5eb52000     7ff6`5eb53000        0`00001000 UserRange              TEB          Thread: ffffe00183eb4080
+
+ 
+
+ffff8000`00000000 ffffb001`f6400000     3001`f6400000 SystemRange                        
+
+ffffb001`f6400000 ffffb001`f6440000        0`00040000 SystemRange            System Cache VACB: ffffe0017d16fad8 [\Extend\$RmMetadata\$TxfLog:$I30:$INDEX_ALLOCATION]
+
+ffffb001`f6440000 ffffb001`f6480000        0`00040000 SystemRange            System Cache VACB: ffffe0017d16fa38 [\$MftMirr]
+
+ffffb001`f6480000 ffffb001`f64c0000        0`00040000 SystemRange            System Cache VACB: ffffe0017d16fa10 [\$LogFile]
+
+ffffb001`f64c0000 ffffb001`f6500000        0`00040000 SystemRange            System Cache VACB: ffffe0017d17d070 [\$Mft]
+
+ffffb001`f6500000 ffffb001`f6540000        0`00040000 SystemRange            System Cache VACB: ffffe0017d16fa88 [\$LogFile]
+
+ffffb001`f6540000 ffffb001`f6580000        0`00040000 SystemRange            System Cache VACB: ffffe0017d16fbf0 [\$Secure:$SII:$INDEX_ALLOCATION]
+
+ffffb001`f6580000 ffffb001`f65c0000        0`00040000 SystemRange            System Cache VACB: ffffe0017d16fc18 [\:$I30:$INDEX_ALLOCATION]
+
+ 
+
+ffffd000`50442000 ffffd000`50448000        0`00006000 SystemRange            Stack        Thread: ffffe0017d192040; Process: ffffe0017d06f640
+
+ffffd000`56261000 ffffd000`56267000        0`00006000  SystemRange           Stack        Thread: ffffe0018059e040; Process: ffffe0017d06f640
+
+ffffd000`50606000 ffffd000`50607000        0`00001000 SystemRange                        
+
+ffffd000`50607000 ffffd000`5060d000        0`00006000 SystemRange            Stack        Thread: ffffe0017d430800; Process: ffffe0017d06f640
+
+ffffd000`5060d000 ffffd000`50614000        0`00007000 SystemRange                         
+
+ffffd000`50614000 ffffd000`5061a000        0`00006000 SystemRange            Stack        Thread: ffffe0017d10d040; Process: ffffe0017d06f640
+
+ffffd000`5061a000 ffffd000`5061b000        0`00001000 SystemRange                        
+
+ffffd000`5061b000 ffffd000`50621000        0`00006000 SystemRange            Stack        Thread: ffffe0017d10c040; Process: ffffe0017d06f640
+
+fffff801`cdb40000 fffff801`cdbe4000   0`000a4000 BootLoaded            Module       RtkBtfilter.sys [\SystemRoot\system32\DRIVERS\RtkBtfilter.sys]                                    
+
+                                                                                                                                  RtkBtfilter加载到内核中的地址空间
+
+fffff961`18000000 fffff961`1837f000        0`0037f000 SessionSpace           Module       win32kfull.sys [\SystemRoot\System32\win32kfull.sys]
+
+fffff961`184e0000 fffff961`184ea000        0`0000a000 SessionSpace           Module       TSDDD.dll [\SystemRoot\System32\TSDDD.dll]
+
+fffff961`184f0000 fffff961`1852c000        0`0003c000 SessionSpace           Module       cdd.dll [\SystemRoot\System32\cdd.dll]
+
+fffff961`186a0000 fffff961`186c3000        0`00023000 SessionSpace           Module       win32k.sys [\SystemRoot\System32\win32k.sys]
+}}}
+
+从上面的内容中搜索Arg2参数， 看到下面一行， 说明出问题的Object是一个Thread Object
+
+    ffffd000`56261000 ffffd000`56267000        0`00006000  SystemRange    Stack        Thread: ffffe0018059e040; Process: ffffe0017d06f640
+ 
+
+查看线程内容：
+{{{
+1: kd> !thread ffffe0018059e040
+
+THREAD ffffe0018059e040  Cid 0004.01c0  Teb: 0000000000000000 Win32Thread: 0000000000000000 WAIT: (Executive) KernelMode Non-Alertable
+
+    ffffe00180bfafb0  SynchronizationEvent
+
+    ffffe00180bfafc8  SynchronizationEvent
+
+    ffffe00180bfafe0  SynchronizationEvent
+
+    ffffe00180a3e820  NotificationEvent
+
+Not impersonating
+
+DeviceMap                 ffffc0002dc16620
+
+Owning Process            ffffe0017d06f640       Image:         System
+
+Attached Process          N/A            Image:         N/A
+
+Wait Start TickCount      946            Ticks: 165383 (0:00:43:04.109)
+
+Context Switch Count      1              IdealProcessor: 0            
+
+UserTime                  00:00:00.000
+
+KernelTime                00:00:00.000
+
+Win32 Start Address RTKVHD64 (0xfffff801cdd46018)
+
+Stack Init ffffd00056266c90 Current ffffd00056266810
+
+Base ffffd00056267000 Limit ffffd00056261000 Call 0
+
+Priority 31 BasePriority 8 UnusualBoost 0 ForegroundBoost 0 IoPriority 2 PagePriority 5
+
+Child-SP          RetAddr           : Args to Child                                                           : Call Site
+
+ffffd000`56266850 fffff801`9e8e06b9 : 2150183f`00000000 00000000`00000000 00000000`00000000 ffffe001`8059e140 : nt!KiSwapContext+0x76
+
+ffffd000`56266990 fffff801`9e8dfbc8 : 76f579e8`25877862 f38fe5d4`2de83bbb 00000000`00000000 d9ed6a7a`952a4fcd : nt!KiSwapThread+0x689
+
+ffffd000`56266a50 fffff801`9e8df0fa : 660bc9c0`65c9e586 00000000`00000004 fffff801`9eba2ab0 fa4496eb`00000001 : nt!KiCommitThreadWait+0x148
+
+ffffd000`56266ae0 fffff801`cdd460a6: 8be3ad67`00000004 ffffe001`80a3e7b0 ffffe001`7f032bd0 00000000`00000000 : nt!KeWaitForMultipleObjects+0x22a
+
+ffffd000`56266bb0 fffff801`9e9639f8 : ffffe001`8059e040 00000000`00000080 ffffe001`7d06f640 fffff801`9ec44740 : RTKVHD64+0x160a6
+
+ffffd000`56266c00 fffff801`9e9b56b6 : fffff801`9ebcd180 ffffe001`8059e040 fffff801`9ec44740 0f1d3215`fcfb5851 : nt!PspSystemThreadStartup+0x58
+
+ffffd000`56266c60 00000000`00000000 : ffffd000`56267000 ffffd000`56261000 00000000`00000000 00000000`00000000 : nt!KiStartSystemThread+0x16
+}}}
+ 
+
+这是一个RTKVHD64模块的一个Call Stack， 看样子像是RTKVHD64中自己启动的一个Thread Object。
+
+{{{
+1: kd> lmvm Rtkvhd64
+
+Browse full module list
+start             end                 module name
+fffff801`cdd30000 fffff801`ce1a9000   RTKVHD64   (no symbols)          
+    Loaded symbol image file: RTKVHD64.sys
+    Image path: \SystemRoot\system32\drivers\RTKVHD64.sys
+    Image name: RTKVHD64.sys
+    Browse all global symbols  functions  data
+    Timestamp:        Tue May 12 18:13:30 2015 (5551D24A)
+    CheckSum:         00450D95
+    ImageSize:        00479000
+Translations:     0000.04b0 0000.04e4 0409.04b0 0409.04e4
+}}}
+
+RTKVHD64.sys是声卡驱动
