@@ -6,6 +6,7 @@
 *   [[pandas]]
 *   [[matplotlib]]
 *   [[SciPy]]
+*   [[Sympy]]
 
 === Install ===
 *   sudo pip install ipython2

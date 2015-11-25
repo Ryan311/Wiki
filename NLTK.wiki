@@ -1,0 +1,8 @@
+%toc
+
+Home:   http://www.nltk.org/
+
+= Install =
+*   sudo pip install nltk
+*   import nltk; nltk.download() -> book    #Download book data
+*   set env -> .bashrc -> export NLTK_DATA="Download Path"

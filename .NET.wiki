@@ -5,3 +5,5 @@ Miscrosoft .NET框架是一个被称为框架类库(FCL, Framework Class Library
 
 CLR的具体实现形式是一个典型的Com服务器， 它的代码位于一个标准的用户模式Windows DLL中。 实际上， .NET框架的所有组件的实现形式都是标准的用户模式Windows
 DLL， 它们建立在非托管的Windows API函数之上(.NET框架中没有一个组件运行在内核模式下).
+
+[[Mono]]

@@ -2,7 +2,13 @@
 = Python Build-in Library =
 ==  Build-in Types ==
 *   The principal built-in types are __numerics, sequences, mappings, files, classes, instances and exceptions__
-*   
+*   string object and unicode object
+    *   string object是由characters组成的sequence，而unicode object是Unicode code units组成的sequence。
+    *   string里的character是有多种编码方式的，比如单字节的ASCII，双字节的GB2312等等，再比如UTF-8
+    *   Unicode code unit是一个16-bit或者32-bit的数值，每个数值代表一个unicode符号。在python里，16-bit的unicode，对应的是ucs2编码。32-bit对应的是ucs4编码
+    *   print(string)的时候，如果string是按当前环境编码方式编码的，可以正常输出，不会乱码；如果string不是当前编码的，就会乱码。而print(unicode)是不会乱码的。why？应为print(unicode)的时候，会把unicode先转成当前编码，然后再输出。 
+    *   string转unicode或者unicode转string: string和unicode都有decode()和encode()方法。decode是string2unicode，encode自然就是unicode2string。
+    *   >>>import sys >>> sys.getdefaultencoding()     --> 缺省编码方式
 == Build-in functions ==
 *   str() repr() `` eval()   
 *   isinstance()    -> isinstance(anobj, basestring) 
@@ -14,6 +20,8 @@
     *   zip(*[]) == unzip   相当于将每个元素拆分， 然后再合并
     *   x = [1,2,3]; b = [2,3,4]; zipped = zip(x, y) : [(1,2), (2,3), (3,4)]
     *   lst = [[1,2,3], [2,3,4]]; zipped = zip(*lst) : [(1,2), (2,3), (3,4)]
+*   filter
+    *   filter(str.digit, targetStr) --> 从targetStr中提取数字
 == os ==
 *   This module provides a portable way of using operating system dependent functionality.
 *   提供与系统相关的功能， 在各平台通用可移植的能力
@@ -41,6 +49,7 @@
 *   JavaScipt Object Notation   HTTP请求在Web浏览器和其他应用程序之间发送数据的标准格式之一
 *   json.loads  将JSON字符串转换成Python形式
 *   json.dumps  将Python对象转换成JSON格式
+<<<<<<< HEAD
 == lxml ==
 *   http://lxml.de/     不是标准库
 *   用来读写HTML和XML格式数据的库
@@ -58,15 +67,18 @@
 == pymongo ==
 *  NoSQL数据库 
 == string ==
-=== translate ===
-*   table = string.maketrans(from, to)
-*   string.translate(table, delete)
-*   allchar = string.maketrans('','')
-=== case ===
-*   string.upper()
-*   string.lower()
-*   string.capitalize()
-*   string.title()
+*   translate
+    *   table = string.maketrans(from, to)
+    *   string.translate(table, delete)
+    *   allchar = string.maketrans('','')
+*   case
+    *   string.upper()
+    *   string.lower()
+    *   string.capitalize()
+    *   string.title()
+*   fill zero
+    *   string.zfill(width)
+    *   '12'.zfill(5)  -> '00012'
 == struct ==
 == random ==
 *   random.getstate   random.setstate   -> 可以保存产生随机数的状态， 产生相同的随机数
@@ -77,6 +89,39 @@
 *   random.sample(x, k)    -> 在序列对象x中取出k个样本
 *   random.random()     -> 返回下一个随机数[0,1)之间
 *   random.uniform(a,b) -> 返回下一个在[a,b]之间的随机数
+
+= Internet Programming =
+
+= Web Programming =
+针对Web应用程序的开发， 包括Web客户端和服务器
+<br>Web客户端和服务器交互的语言是标准协议HTTP， HTTP是TCP/IP的上层协议。
+<br>它的职责是通过发送、接收HTTP消息来处理客户端的请求， 它属于无状态协议， 它不跟踪从一个客户端到另一个客户端的请求信息
+<br>使用cookie保存客户端的客户状态信息
+== urlparse ==
+用来操作URL字符串
+*   urlparse.urlparse(url)  分拆
+*   urlparse.urlunparse()   合并
+*   urlparse.urljoin()      拼接
+== urllib ==
+提供在给定的URL地址下载数据的功能
+== urllib2 ==
+处理更复杂的URL打开总量
+== requests ==
+== xml ==
+*   Python’s interfaces for processing XML are grouped in the xml package.
+*   xml.etree.ElementTree: the ElementTree API, a simple and lightweight XML processor
+*   xml.dom: the DOM API definition
+== lxml ==
+*   用来读写HTML和XML格式数据的库, 基于xml.etree.ElementTree
+*   lxml.html   处理HTML
+*   lxml.objectify  处理XML
+
+= Data Base =
+== sqlite3 ==
+*   SQLite是一款嵌入式的数据库
+== pymongo ==
+*  NoSQL数据库 
+
 
 
 = Third Party =
@@ -92,3 +137,6 @@
 *   Example
     *   https://bitbucket.org/haypo/hachoir/wiki/hachoir-metadata/code
     *   http://www.thehackeruniversity.com/2014/02/02/python-hachoir-tutorial
+== Scrapy ==
+*   http://scrapy.org/
+*   An open source and collaborative framework for extracting the data you need from websites. In a fast, simple, yet extensible way.

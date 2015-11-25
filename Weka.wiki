@@ -1,0 +1,9 @@
+%toc
+
+= Install and run =
+Download:  http://www.cs.waikato.ac.nz/ml/weka/downloading.html
+    weka-3-6-13.zip; 24.4 MB
+
+First unzip the zip file. This will create a new directory called weka-3-6-13. To run Weka, change into that directory and type
+
+    java -Xmx1000M -jar weka.jar

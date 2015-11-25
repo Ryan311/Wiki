@@ -1,0 +1,32 @@
+%toc
+
+= Tools =
+*   [[scikit-learn]]
+*   [[Weka]]
+
+= Machine Learning definitioin =
+*   Tom Mitchell(1998) Well-posed learning problem:
+A computer program is said to learn from experience E with respect to some task T and some performance measure P, if its performance on T, as measured by P, improves with experience E.
+
+= Resources =
+*    [[斯坦福大学公开课 ：机器学习课程]]
+http://open.163.com/special/opencourse/machinelearning.html
+
+*   一文读懂机器学习，大数据/自然语言处理/算法全有了……        http://www.36dsj.com/archives/20382
+ 
+*   推荐！国外程序员整理的机器学习资源大全
+http://www.oschina.net/news/53818/awesome-machine-learning
+
+*   Start to learn
+http://machinelearningmastery.com/start-here/
+http://machinelearningmastery.com/blog/
+http://machinelearningmastery.com/a-gentle-introduction-to-scikit-learn-a-python-machine-learning-library/
+
+*   Deep Learning（深度学习）学习笔记整理系列
+http://blog.csdn.net/zouxy09/article/details/8775360/
+
+*   API design for machine learning software: experiences from the scikit-learn project
+http://arxiv.org/pdf/1309.0238v1.pdf
+
+*   译文：机器学习算法基础知识
+http://www.36dsj.com/archives/8911?__=a464

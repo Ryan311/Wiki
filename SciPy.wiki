@@ -4,3 +4,5 @@
 *   sudo apt-get install gfortran libopenblas-dev liblapack-dev --> if no, show "no lapack/blas resources found"
 *   sudo pip install scipy
 
+Tutorial:   http://blog.csdn.net/zt_706/article/details/11476175
+

@@ -1,12 +1,23 @@
 %toc 
 
 http://scrapy.org/
+<br> DOC:   http://scrapy-chs.readthedocs.org/zh_CN/latest/intro/tutorial.html
+<br> Scrapy核心架构与代码运行分析:  http://blog.csdn.net/u012150179/article/details/34441655
 
 = Install =
 *   sudo pip install scrapy
 
-将网站将进爬虫：
-*   新建项目 (Project)：新建一个新的爬虫项目
+= tutorial =
+*   Scrapy研究探索  http://blog.csdn.net/u012150179/article/details/32343635
+*   Scrapy安装、爬虫入门教程、爬虫实例  http://www.cnblogs.com/Shirlies/p/4536880.html
+*   python爬虫----（scrapy框架提高（1），自定义Request爬取）    http://my.oschina.net/lpe234/blog/342741
+*   Douban movies search: http://www.cnblogs.com/Shirlies/p/4536880.html
+*   自动爬取网页之（CrawlSpider）: http://blog.csdn.net/u012150179/article/details/34913315
+ 
+= Basic =
+
+== 新建爬虫项目 ==
+新建项目 (Project)：新建一个新的爬虫项目
 scrapy startproject tutorial  
  
     在tutorial文件夹下的文件作用：
@@ -20,3 +31,78 @@ scrapy startproject tutorial
 *   明确目标（Items）：明确你想要抓取的目标
 *   制作爬虫（Spider）：制作爬虫开始爬取网页
 *   存储内容（Pipeline）：设计管道存储爬取内容
+
+
+== Scrapy主要包括了以下组件： ==
+*   引擎，用来处理整个系统的数据流处理，触发事务。
+*   调度器，用来接受引擎发过来的请求，压入队列中，并在引擎再次请求的时候返回。
+*   下载器，用于下载网页内容，并将网页内容返回给蜘蛛。
+*   蜘蛛，蜘蛛是主要干活的，用它来制订特定域名或网页的解析规则。
+*   项目管道，负责处理有蜘蛛从网页中抽取的项目，他的主要任务是清晰、验证和存储数据。当页面被蜘蛛解析后，将被发送到项目管道，并经过几个特定的次序处理数据。
+*   下载器中间件，位于Scrapy引擎和下载器之间的钩子框架，主要是处理Scrapy引擎与下载器之间的请求及响应。
+*   蜘蛛中间件，介于Scrapy引擎和蜘蛛之间的钩子框架，主要工作是处理蜘蛛的响应输入和请求输出。
+*   调度中间件，介于Scrapy引擎和调度之间的中间件，从Scrapy引擎发送到调度的请求和响应。
+{{images/scrapy.png}}
+
+== XPath Selector ==
+Scrapy comes with its own mechanism for extracting data. They’re called XPath selectors (or just “selectors”, for short) 
+<br>because they “select” certain parts of the HTML document specified by XPath expressions.
+<br>XPath is a language for selecting nodes in XML documents, which can also be used with HTML.
+
+{{{
+    from scrapy.selector import Selector
+
+    sel = Selector(response)
+    sites = sel.xpath('//ul[@class="directory-url"]/li')
+    
+    sel.xpath("//h1").extract()
+    sel.xpath("//p/text()").extract_unquoted()
+}}}
+
+
+== Scrapy Shell ==
+*   Launch the shell:    scrapy shell <url>
+*   Using the shell
+    *   shelp()
+    *   fetch(request_or_url):  fetch a new response from the given request or URL and update all related objects accordingly.
+    *   view(response):  open the given response in your local web browser
+*   Available Scrapy objects
+    *   spider
+    *   request
+    *   response
+    *   settings
+
+== Spiders ==
+Spiders，它是所有爬虫的基类，对于它的设计原则是只爬取start_url列表中的网页，而从爬取的网页中获取link并继续爬取的工作CrawlSpider类更适合。
+<br>CrawlSpider是Spider的派生类,与Spider类的最大不同是多了一个rules参数，其作用是定义提取动作。在rules中包含一个或多个Rule对象，Rule类与CrawlSpider类都位于scrapy.contrib.spiders模块中。
+
+== Command ==
+在项目的根目录， 可以使用的命令
+*   scrapy list --> 列出当前项目中所有可用的spider
+*   scrapy edit <spider>    --> 使用EDITOR中设定的编辑器编辑给定的Spider
+*   scrapy fetch <url>  --> 使用Scrapy下载器(downloader)下载给定的URL，并将获取到的内容送到标准输出。
+*   scrapy view <url>   --> 在浏览器中打开给定的URL，并以Scrapy spider获取到的形式展现
+*   scrapy shell <url>  --> 以给定的URL(如果给出)或者空(没有给出URL)启动Scrapy shell
+*   scrapy parse <url> [options] --> 获取给定的URL并使用相应的spider分析处理。如果您提供 --callback 选项，则使用spider的该方法处理，否则使用 parse
+*   scrapy settings [options]   --> 获取Scrapy的设定
+    *   $ scrapy settings --get BOT_NAME
+    *   $ scrapy settings --get DOWNLOAD_DELAY
+*   
+
+
+== 如何防止被ban之策略大集合 ==
+*   http://blog.csdn.net/u012150179/article/details/35774323
+*   策略一：设置download_delay
+*   策略二：禁止cookies
+*   策略三：使用user agent池
+*   策略四：使用IP池
+*   策略五：分布式爬取
+
+= XPath =
+*   http://www.runoob.com/xpath/xpath-tutorial.html
+*   XPath是一门在XML文档中查找信息的语言。
+*   XPath是XSLT中的主要元素。
+*   XQuery和XPointer均构建于XPath表达式之上。
+*   XPath 是一个 W3C 标准
+*   XPath 包含一个标准函数库
+*   在XPath中，有七种类型的节点：元素、属性、文本、命名空间、处理指令、注释以及文档（根）节点。XML 文档是被作为节点树来对待的。树的根被称为文档节点或者根节点。

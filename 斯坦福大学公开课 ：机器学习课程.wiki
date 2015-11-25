@@ -1,0 +1,6 @@
+%toc
+
+= Lesson 1 =
+*   Supervised Learning
+*   Unsupervised Learning
+*   Reinforcement Learning

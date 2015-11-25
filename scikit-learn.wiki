@@ -1,4 +1,22 @@
 %toc
+= Intro =
+Home:   http://scikit-learn.org/stable/index.html
+Tutorial:   http://blog.csdn.net/zt_706/article/details/11476049
+<br> scikit-learn是一个用于机器学习的 Python 模块，建立在SciPy基础之上，获得3-Clause BSD 开源许可证。
+
+== What is scikit-learn? ==
+Scikit-learn provides a range of supervised and unsupervised learning algorithms via a consistent interface in Python. 
+<br>It is licensed under a permissive simplified BSD license and is distributed under many Linux distributions, encouraging academic and commercial use.
+
+The library is built upon the SciPy (Scientific Python) that must be installed before you can use scikit-learn. This stack that includes:
+
+    [[NumPy]] Base n-dimensional array package
+    [[SciPy]] Fundamental library for scientific computing
+    [[Matplotlib]] Comprehensive 2D/3D plotting
+    [[IPython]] Enhanced interactive console
+    [[Sympy]] Symbolic mathematics
+    [[Pandas]] Data structures and analysis
+
 
 = Install =
 *   >sudo apt-get install build-essential python-dev python-setuptools python-numpy python-pandas python-scipy libatlas-dev libatlas3gf-base
@@ -7,3 +25,11 @@
 *   >sudo apt-get install python-matplotlib
 *   >python setup.py install scikit-learn
 *   or Download the source package from http://pypi.python.org/pypi/scikit-learn/, unpack the sources and cd into the source directory ==> python setup.py install
+
+= Usage =
+*   http://cda.pinggu.org/view/3074.html#
+{{{
+    from sklearn import datasets  
+    iris = datasets.load_iris()  
+    digits = datasets.load_digits() 
+}}}
