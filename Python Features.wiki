@@ -1,0 +1,11 @@
+%toc
+
+= Features =
+*   [[Iterator and Generator]] [[http://www.dabeaz.com/generators-uk/|Generator Tricks]] [[file://F:/Wiki/wiki2_html/GeneratorsUK.pdf|Generator!!!]]
+*   [[Decorator]]
+*   [[Closure]]
+*   [[Python Tricky]]
+*   [[http://www.cnblogs.com/moinmoin/archive/2011/03/10/lsit-comprehensions-generators.html|python列表解析和生成表达式]]
+*   [[遍历文件夹下的文件]]
+*   [[Distribute and Install package]]
+*   [[Parse cmd line argument]]

@@ -38,6 +38,10 @@
 *   sys.argv    -> 表示一个列表， 包含命令行参数， argv[0]是脚本名称
 *   sys.exit    -> 退出Python
 *   sys.getwindowsversion()     -> 获得当前Windows Version
+== contextlib ==
+*    contextlib.contextmanager(func)
+*    contextlib.nested(mgr1[, mgr2[, ...]])
+*    contextlib.closing(thing)
 == csv ==
 *   Commo Separated Values: The csv module implements classes to read and write tabular data in CSV format
 *   csv.reader  读入分隔符文件
