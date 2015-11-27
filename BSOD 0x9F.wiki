@@ -1,0 +1,450 @@
+%toc
+
+= 实例1 0x9F Arg1：0x03 =
+0: kd> !analyze -v
+
+*******************************************************************************
+
+*                                                                             *
+
+*                        Bugcheck Analysis                                    *
+
+*                                                                             *
+
+*******************************************************************************
+
+DRIVER_POWER_STATE_FAILURE (9f)
+
+A driver has failed to complete a power IRP within a specific time (usually 10 minutes).
+
+Arguments:
+
+Arg1: 0000000000000003, A device object has been blocking an Irp for too long a time                        Power IRP被Device卡住
+
+Arg2: fffffa800acd2440, Physical Device Object of the stack
+
+Arg3: fffff80000b9c3d8, nt!TRIAGE_9F_POWER on Win7, otherwise the Functional Device Object of the stack
+
+Arg4: fffffa800d2b2010, The blocked IRP               被卡住的IRP
+
+ 
+
+根据第四个参数IRP dump出Driver Stack
+
+0: kd> !irp fffffa800d2b2010
+
+Irp is active with 12 stacks 10 is current (= 0xfffffa800d2b2368)
+
+ No Mdl: No System Buffer: Thread 00000000:  Irp stack trace. 
+
+     cmd  flg cl Device   File     Completion-Context
+
+ [  0, 0]   0  0 00000000 00000000 00000000-00000000   
+
+            Args: 00000000 00000000 00000000 00000000
+
+ [  0, 0]   0  0 00000000 00000000 00000000-00000000   
+
+            Args: 00000000 00000000 00000000 00000000
+
+ [  0, 0]   0  0 00000000 00000000 00000000-00000000   
+
+            Args: 00000000 00000000 00000000 00000000
+
+ [  0, 0]   0  0 00000000 00000000 00000000-00000000   
+
+            Args: 00000000 00000000 00000000 00000000
+
+ [  0, 0]   0  0 00000000 00000000 00000000-00000000   
+
+            Args: 00000000 00000000 00000000 00000000
+
+ [  0, 0]   0  0 00000000 00000000 00000000-00000000   
+
+            Args: 00000000 00000000 00000000 00000000
+
+ [  0, 0]   0  0 00000000 00000000 00000000-00000000   
+
+            Args: 00000000 00000000 00000000 00000000
+
+ [  0, 0]   0  0 00000000 00000000 00000000-00000000   
+
+            Args: 00000000 00000000 00000000 00000000
+
+ [  0, 0]   0  0 00000000 00000000 00000000-00000000   
+
+            Args: 00000000 00000000 00000000 00000000
+
+>[ 16, 2]   0 e1 fffffa800acc4ab0 00000000 fffff88006e0e200-57ff53356f8 Success Error Cancel pending
+
+           \Driver\RtkBtFilter  RtkBtfilter!FilterPostProcessPowerIrpCompletionRoutine
+
+            Args: 00000000 00000001 00000003 00000000
+
+ [ 16, 2]   0 e1 fffffa800acc4ab0 00000000 00000000-00000000    pending
+
+           \Driver\RtkBtFilter
+
+            Args: 00000000 00000001 00000003 00000000
+
+ [  0, 0]   0  0 00000000 00000000 00000000-fffffa800d2b38b0   
+
+            Args: 00000000 00000000 00000000 00000000
+
+ 
+
+[16,2]是Power IRP， 该IRP被卡在了RtkBtfilter中，进一步看是哪个线程卡住
+
+0: kd> !stacks 2 RtkBtfilter
+
+Proc.Thread  .Thread  Ticks   ThreadState Blocker
+
+                            [fffff8000365a180 Idle]
+
+*** ERROR: Module load completed but symbols could not be loaded for intelppm.sys
+
+                            [fffffa8006c5a9e0 System]
+
+   4.000014  fffffa8006d62040 ffff6067 Blocked    nt!KiSwapContext+0x7a
+
+                                        nt!KiCommitThreadWait+0x1d2
+
+                                        nt!KeWaitForSingleObject+0x19f
+
+                                        Wdf01000!_FX_DRIVER_GLOBALS::WaitForSignal+0x99
+
+                                        Wdf01000!FxUsbPipeContinuousReader::CancelRepeaters+0x6a
+
+                                        Wdf01000!FxUsbPipe::WaitForSentIoToComplete+0xca
+
+                                        Wdf01000!FxIoTarget::Stop+0x51
+
+                                        Wdf01000!imp_WdfIoTargetStop+0x177
+
+                                        RtkBtfilter!BluetoothStopContReader+0x5a
+
+                                        RtkBtfilter!BluetoothStopContReader+0x5a
+
+                                        RtkBtfilter!FilterEvtDeviceD0Exit+0x12a
+
+                                        Wdf01000!FxPkgPnp::PowerGotoDxIoStopped+0x120
+
+                                        Wdf01000!FxPkgPnp::PowerGotoDNotZeroIoStopped+0x9
+
+                                        Wdf01000!FxPkgPnp::PowerEnterNewState+0x1d8
+
+                                        Wdf01000!FxPkgPnp::PowerProcessEventInner+0x13e
+
+                                        Wdf01000!FxPkgPnp::PowerProcessEvent+0x1b3
+
+                                        Wdf01000!FxPkgFdo::DispatchDeviceSetPower+0x117
+
+                                        Wdf01000!FxPkgPnp::Dispatch+0x2aa
+
+                                        Wdf01000!FxDevice::DispatchPreprocessedIrp+0x201
+
+                                        Wdf01000!imp_WdfDeviceWdmDispatchPreprocessedIrp+0x1d6
+
+                                        Wdf01000!FxDevice::Dispatch+0x106
+
+                                        Wdf01000!FxDevice::DispatchWithLock+0xa6
+
+                                        nt!IopPoHandleIrp+0x32
+
+                                        bthport!BthHandlePower+0x570
+
+                                        bthport!BthDispatchPower+0x1c
+
+                                        nt!PopIrpWorker+0x3c5
+
+                                        nt!PspSystemThreadStartup+0x5a
+
+                                        nt!KiStartSystemThread+0x16
+
+ 
+
+可以看到， 线程fffffa8006d62040中与Power相关， 该线程是在DeviceD0Exit中没有退出。
+
+ 
+= 实例2 0x9F    Arg1：0x04 =
+
+0: kd> !analyze -v
+
+*******************************************************************************
+
+*                                                                             *
+
+*                        Bugcheck Analysis                                    *
+
+*                                                                             *
+
+*******************************************************************************
+
+DRIVER_POWER_STATE_FAILURE (9f)
+
+A driver has failed to complete a power IRP within a specific time (usually 10 minutes).
+
+Arguments:
+
+Arg1: 0000000000000004, The power transition timed out waiting to synchronize with the Pnp
+
+    subsystem.
+
+Arg2: 0000000000000258, Timeout in seconds.
+
+Arg3: fffffa8006cd0040, The thread currently holding on to the Pnp lock.
+
+Arg4: fffff80000b9c3d0, nt!TRIAGE_9F_PNP on Win7
+
+ 
+
+Debugging Details:
+
+------------------
+
+Implicit thread is now fffffa80`06cd0040
+
+DRVPOWERSTATE_SUBCODE:  4
+
+FAULTING_THREAD:  fffffa8006cd0040
+
+DEFAULT_BUCKET_ID:  WIN7_DRIVER_FAULT
+
+BUGCHECK_STR:  0x9F
+
+PROCESS_NAME:  System
+
+CURRENT_IRQL:  2
+
+LOCK_ADDRESS:  fffff800036c6b80 -- (!locks fffff800036c6b80)
+
+Resource @ nt!PiEngineLock (0xfffff800036c6b80)    Exclusively owned
+
+    Contention Count = 6
+
+    NumberOfExclusiveWaiters = 1
+
+     Threads: fffffa8006cd0040-01<*>
+
+     Threads Waiting On Exclusive Access:
+
+              fffffa800b6f0b50      
+
+ 
+
+该BSOD是PNP Lock被锁住，也就是PNP IRP被线程Hold住没有返回，查看相关线程 Arg2
+
+kd> !thread fffffa8006cd0040
+
+THREAD fffffa8006cd0040  Cid 0004.0054  Teb: 0000000000000000 Win32Thread: 0000000000000000 WAIT: (Executive) KernelMode Non-Alertable
+
+    fffff800036c6968  Semaphore Limit 0x7fffffff
+
+Not impersonating
+
+DeviceMap                 fffff8a000008a70
+
+Owning Process            fffffa8006c5a9e0       Image:         System
+
+Attached Process          N/A            Image:         N/A
+
+Wait Start TickCount      148335         Ticks: 38462 (0:00:10:00.011)
+
+Context Switch Count      1321           IdealProcessor: 0  NoStackSwap
+
+UserTime                  00:00:00.000
+
+KernelTime                00:00:00.546
+
+Win32 Start Address nt!ExpWorkerThread (0xfffff800034cc140)
+
+Stack Init fffff880037b7c70 Current fffff880037b74e0
+
+Base fffff880037b8000 Limit fffff880037b2000 Call 0
+
+Priority 15 BasePriority 12 UnusualBoost 0 ForegroundBoost 0 IoPriority 2 PagePriority 5
+
+Child-SP          RetAddr           : Args to Child                                                           : Call Site
+
+fffff880`037b7520 fffff800`034b8612 : fffffa80`06cd0040 fffffa80`06cd0040 00000000`00000000 00000000`00000000 : nt!KiSwapContext+0x7a
+
+fffff880`037b7660 fffff800`034c998f : fffffa80`06cf0970 00000000`00000000 fffff800`00000000 00000000`00000000 : nt!KiCommitThreadWait+0x1d2
+
+fffff880`037b76f0 fffff800`035837d5 : fffffa80`0b07d200 00000000`00000000 fffff880`009b3100 00000000`00000000 : nt!KeWaitForSingleObject+0x19f
+
+fffff880`037b7790 fffff800`0386525e : fffff800`036c6940 fffff880`037b7864 00000000`00000000 00000000`00000001 : nt!PnpDeviceCompletionQueueGetCompletedRequest+0x35
+
+fffff880`037b77e0 fffff800`038b2278 : fffffa80`0b98ad90 fffffa80`0b98ad90 00000000`00000001 00000000`00000000 : nt!PnpDeviceCompletionProcessCompletedRequests+0x5e
+
+fffff880`037b7810 fffff800`038b2587 : fffffa80`0b98ad90 00000000`00000000 00000000`00000001 fffff800`0372fa18 : nt!PipProcessDevNodeTree+0x378
+
+fffff880`037b7a80 fffff800`035c5803 : 00000001`00000003 00000000`00000000 00000000`00000001 00000000`00000000 : nt!PiRestartDevice+0xc7
+
+fffff880`037b7ad0 fffff800`034cc251 : fffff800`035c54f0 fffff800`037bad01 fffffa80`06cd0000 00000000`00000000 : nt!PnpDeviceActionWorker+0x313
+
+fffff880`037b7b70 fffff800`03760ede : 00000000`00000000 fffffa80`06cd0040 00000000`00000080 fffffa80`06c5a9e0 : nt!ExpWorkerThread+0x111
+
+fffff880`037b7c00 fffff800`034b3906 : fffff880`03589180 fffffa80`06cd0040 fffff880`035940c0 00000000`00000000 : nt!PspSystemThreadStartup+0x5a
+
+fffff880`037b7c40 00000000`00000000 : fffff880`037b8000 fffff880`037b2000 fffff880`037b56a0 00000000`00000000 : nt!KiStartSystemThread+0x16
+
+没有实质的内容
+
+ 
+
+找该线程对应的IRP，用!irpfind， 并用线程fffffa8006cd0040搜索
+
+kd>!irpfind      查找系统中已分配的IRP
+
+……
+
+fffffa800b0c3010 [fffffa8006cd0040] irpStack: (1b, 0)  fffffa800b09c2e0 [ \Driver\WinUsb]
+
+……
+
+ 
+
+fffffa800b0c3010就是要找的线程对应的IRP
+
+0: kd> !irp fffffa800b0c3010
+
+Irp is active with 11 stacks 9 is current (= 0xfffffa800b0c3320)
+
+ No Mdl: No System Buffer: Thread fffffa8006cd0040:  Irp stack trace.  Pending has been returned
+
+     cmd  flg cl Device   File     Completion-Context
+
+ [  0, 0]   0  0 00000000 00000000 00000000-00000000   
+
+                 Args: 00000000 00000000 00000000 00000000
+
+ [  0, 0]   0  0 00000000 00000000 00000000-00000000   
+
+                 Args: 00000000 00000000 00000000 00000000
+
+ [  0, 0]   0  0 00000000 00000000 00000000-00000000   
+
+                 Args: 00000000 00000000 00000000 00000000
+
+ [  0, 0]   0  0 00000000 00000000 00000000-00000000   
+
+                 Args: 00000000 00000000 00000000 00000000
+
+ [  0, 0]   0  0 00000000 00000000 00000000-00000000   
+
+                 Args: 00000000 00000000 00000000 00000000
+
+ [  0, 0]   0  0 00000000 00000000 00000000-00000000   
+
+                 Args: 00000000 00000000 00000000 00000000
+
+ [ 1b, 0]   0  0 fffffa800b96e440 00000000 fffff88000e177f4-fffff880037d3b40   
+
+             \Driver\usbhub ACPI!ACPIRootIrpCompleteRoutine
+
+                 Args: 00000000 00000000 00000000 00000000
+
+ [ 1b, 0]   0  0 fffffa800aec1e40 00000000 00000000-00000000   
+
+             \Driver\ACPI
+
+                 Args: 00000000 00000000 00000000 00000000
+
+>[ 1b, 0]   0 e1 fffffa800b09c2e0 00000000 00000000-00000000    pending
+
+             \Driver\WinUsb
+
+                 Args: 00000000 00000000 00000000 00000000
+
+ [ 1b, 0]   0 e1 fffffa800b0ad970 00000000 00000000-00000000    pending
+
+             \Driver\WUDFRd
+
+                 Args: 00000000 00000000 00000000 00000000
+
+ [ 1b, 0]   0 e1 fffffa800b0ba690 00000000 fffff800035c2ed0-fffffa800b0c2340 Success Error Cancel pending
+
+             \Driver\scfilter     nt!PnpDeviceCompletionRoutine
+
+                 Args: 00000000 00000000 00000000 00000000
+
+ 
+
+可以看到该IRP是[1b,0], 它是IRP_MN_START_DEVICE，被卡在了WinUsb
+
+    再看一下是否与Bluetooth相关
+
+!devnode 0 1并用WUDFRd搜索
+
+DevNode 0xfffffa80077d7d90 for PDO 0xfffffa80076f5060
+
+          InstancePath is "PCI\VEN_8086&DEV_8C2D&SUBSYS_220E17AA&REV_04\3&42ffd25&0&D0"
+
+          ServiceName is "usbehci"
+
+          State = DeviceNodeStarted (0x308)
+
+          Previous State = DeviceNodeEnumerateCompletion (0x30d)
+
+          DevNode 0xfffffa800b47a780 for PDO 0xfffffa800b479050
+
+            InstancePath is "USB\ROOT_HUB20\4&3517e034&0"
+
+            ServiceName is "usbhub"
+
+            State = DeviceNodeStarted (0x308)
+
+            Previous State = DeviceNodeEnumerateCompletion (0x30d)
+
+            DevNode 0xfffffa800b73bd90 for PDO 0xfffffa800b8c5060
+
+              InstancePath is "USB\VID_8087&PID_8008\5&1e9c49e3&0&1"
+
+              ServiceName is "usbhub"
+
+              State = DeviceNodeStarted (0x308)
+
+              Previous State = DeviceNodeEnumerateCompletion (0x30d)
+
+              DevNode 0xfffffa800b98ad90 for PDO 0xfffffa800b96e440
+
+                InstancePath is "USB\VID_058F&PID_9540\6&7731a72&0&1"
+
+                ServiceName is "WUDFRd"
+
+                State = DeviceNodeStartPending (0x305)
+
+                Previous State = DeviceNodeResourcesAssigned (0x304)
+
+              DevNode 0xfffffa800b947010 for PDO 0xfffffa800c0f1440
+
+                InstancePath is "USB\VID_138A&PID_0017\1902200b85f6"
+
+                ServiceName is "WUDFRd"
+
+                State = DeviceNodeStarted (0x308)
+
+                Previous State = DeviceNodeEnumerateCompletion (0x30d)
+
+              DevNode 0xfffffa800c202560 for PDO 0xfffffa800c0d0060
+
+                InstancePath is "USB\VID_04F2&PID_B39B\0001"
+
+                ServiceName is "usbccgp"
+
+                State = DeviceNodeStarted (0x308)
+
+                Previous State = DeviceNodeEnumerateCompletion (0x30d)
+
+                DevNode 0xfffffa800c23d280 for PDO 0xfffffa800c249a00
+
+                  InstancePath is "USB\VID_04F2&PID_B39B&MI_00\7&1d41bf20&0&0000"
+
+                  ServiceName is "usbvideo"
+
+                  State = DeviceNodeStarted (0x308)
+
+                  Previous State = DeviceNodeEnumerateCompletion (0x30d)
+
+该USBHub上没有BT，所以该BSOD与BT没有关系
+

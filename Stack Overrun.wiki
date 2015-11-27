@@ -1,0 +1,205 @@
+%toc
+
+Security Cookie：
+
+VS8及以上编译器(VS2005及以上)Release版本中采用Cookie机制来防止stack overrun, /GS选项用于控制该功能， 默认打开。
+
+实际情况是在调用一个函数时， 会在函数栈上插入一个值， 在函数返回时检查该值是否发生变化， 以确定是否发生了stack overrun
+
+{{{
+    Low  address   
+    
+    local 2         ebp-C                     
+    local 1         ebp-8
+    cookie          ebp-4      ebp XOR cookie
+    caller ebp      ebp
+    return address  ebp+4
+    para 1          ebp+8
+    para 2          ebp+C
+    para 3          ebp+10
+    para 4          ebp+14                  
+    
+    High address
+}}}
+
+如上所示在ebp – 4的位置插入了一个cookie。
+
+
+ 
+*实例分析： Win7下搜索LE设备时出现BSOD*
+Dump File:  \\172.29.38.83\bt_sd3\Windows_DUMP\Customer\Lenovo_StackOverrun
+
+{{{
+CHECK CODE： DRIVER_OVERRAN_STACK_BUFFER (f7)   
+A driver has overrun a stack-based buffer.  This overrun could potentially
+allow a malicious user to gain control of this machine.
+DESCRIPTION
+A driver overran a stack-based buffer (or local variable) in a way that would
+have overwritten the function's return address and jumped back to an arbitrary
+address when the function returned.  This is the classic "buffer overrun"
+hacking attack and the system has been brought down to prevent a malicious user
+from gaining complete control of it.
+Do a kb to get a stack backtrace -- the last routine on the stack before the
+buffer overrun handlers and bugcheck call is the one that overran its local
+variable(s).
+Arguments:
+Arg1: 0000f883dfbeb906, Actual security check cookie from the stack
+Arg2: 0000f8832ce065cd, Expected security check cookie
+Arg3: ffff077cd31f9a32, Complement of the expected security check cookie
+Arg4: 0000000000000000, zero
+}}}
+ 
+
+从这里可以看到， 提示说发生了stack overrun， cookie值期望的是0000f8832ce065cd， 而实际得到的确是0000f883dfbeb906
+可以用命令得到cookie值， 在程序刚开始执行时初始化， 在执行期间是不变的
+
+    Kd>  x RtkBtfilter!__security_cookie
+    fffff880054a7790 RtkBtfilter!__security_cookie = 0x0000f8832ce065cd
+
+看到就是期望的值。
+ 
+
+打出错误发生时的call stack：
+{{{
+0: kd> k
+# Child-SP          RetAddr           Call Site
+00 fffff880`0a56f4f8 fffff880`05491d4e nt!KeBugCheckEx
+01 fffff880`0a56f500 fffff880`0548c092 RtkBtfilter!__report_gsfailure+0x26
+02 fffff880`0a56f540 fffff880`0548bae3 RtkBtfilter!LeBuildEIR+0x462
+03 fffff880`0a56f980 fffff880`0548c8c9 RtkBtfilter!LeAdvReportToMsEIR+0x187
+04 fffff880`0a56faa0 fffff880`0548a63d RtkBtfilter!LePostProcessAdvReport+0x51
+05 fffff880`0a56fb60 fffff880`0546bf7a RtkBtfilter!FilterLePostProcessHciEvent+0x125
+06 fffff880`0a56fba0 fffff880`0546f978 RtkBtfilter!FilterProcessEvent+0xf72
+07 fffff880`0a56fc50 fffff880`05471ae7 RtkBtfilter!BluetoothAnalyzeEvent+0x60
+08 fffff880`0a56fca0 fffff800`04b762ea RtkBtfilter!BluetoothEventThread+0x267
+09 fffff880`0a56fd00 fffff800`048ca8e6 nt!PspSystemThreadStartup+0x5a
+0a fffff880`0a56fd40 00000000`00000000 nt!KxStartSystemThread+0x16
+}}}
+ 
+
+看到是在调用LeBuildEIR函数时发生的栈溢出， 它的Child-SP是fffff880`0a56f540，也就是rsp，反汇编一下这个函数， 只看函数开头部分就可以
+
+
+{{{
+0: kd> uf RtkBtfilter!LeBuildEIR
+RtkBtfilter!LeBuildEIR [e:\svnworkspace\trunk\hostsw\win7-inbox-driver\rtkfilter\generic\filter_le_process.c @ 3631]:
+3631 fffff880`0548bc30 48895c2408      mov     qword ptr [rsp+8],rbx
+3631 fffff880`0548bc35 55              push    rbp
+3631 fffff880`0548bc36 56              push    rsi
+3631 fffff880`0548bc37 57              push    rdi
+3631 fffff880`0548bc38 4154            push    r12
+3631 fffff880`0548bc3a 4155            push    r13
+3631 fffff880`0548bc3c 4156            push    r14
+3631 fffff880`0548bc3e 4157            push    r15
+3631 fffff880`0548bc40 488dac2400fdffff lea     rbp,[rsp-300h]          rbp指针
+3631 fffff880`0548bc48 4881ec00040000   sub     rsp,400h             rsp指针
+3631 fffff880`0548bc4f 488b053abb0100 
+                        mov     rax,qword ptr [RtkBtfilter!__security_cookie (fffff880`054a7790)]
+3631 fffff880`0548bc56 4833c4          xor     rax,rsp
+3631 fffff880`0548bc59 488985f0020000  mov     qword ptr [rbp+2F0h],rax
+}}}
+
+关键看这三行， 先将cookie值放到rax， 再和rax异或， 然后放入[rbp+2F0]的位置
+
+{{{
+3631 fffff880`0548bc60 498bd8          mov     rbx,r8
+3631 fffff880`0548bc63 4889542440      mov     qword ptr [rsp+40h],rdx
+3633 fffff880`0548bc68 488d4c2461      lea     rcx,[rsp+61h]
+}}} 
+
+[rbp+2F0]的位置放入了一个值， 是Cookie异或rsp,  Rsp已知RSP = fffff880`0a56f540
+
+    则    【rsp+2f0】 =  fffff880`0a56f930
+    
+所以fffff880`0a56f930处存放的值应该是
+
+    cookie  XOR  rsp  =  0x0000f883`2ce065cd  or  fffff880`0a56f540 =  FFFF000326B6908D     // Right value
+
+查看Memory， 看到fffff880`0a56f930处的值是
+
+    ffff0003d5e84c46                         // 不一致， 所以这个值有被修改过
+ 
+
+下一步， 查看LeBuildEIR的局部变量：
+{{{
+kd> dv
+     Device = 0x00000000`00000000
+     EIRParaBuffer = 0xfffffa80`0bd132b0 "???"
+     AdvDataBuf = 0x00000000`00000003 "--- memory read error at address 0x00000000`00000003 ---"
+     bIsADFlagExist = 0n1 ''
+     EIR_Data = struct _EIR_DATA [5]
+     EIRRes = struct _HCI_EVENT_EXTENDED_INQUIRY_RESULT
+     i = 6
+     EIRDataNum = 6
+}}}
+ 
+
+看一下数组EIR_Data， 它是一个_IER_DATA结构的数组， 长度为5， 但是在循环时i已经为6了，
+
+显然超过了数组的访问范围。 具体来看一下是怎样它是怎样改变cookie的。
+ 
+
+查看EIR_data数组：
+{{{
+0: kd> dt EIR_Data -v
+Local var [AddrFlags 90  AddrOff 0000000000000160  Reg/Val rsp (7)] @ 0xfffff8800a56f6a0 Type _EIR_DATA[]
+[5] struct _EIR_DATA, 3 elements, 0x82 bytes                    0x82表示_EIR_DATA的包含的字节， sizeof(_EIF_DATA)
+   +0x000 Length           : 0x4 ''
+   +0x001 EIRDataType      : 0x9 ''
+   +0x002 Data             : union <unnamed-tag>, 11 elements, 0x80 bytes
+   
+0: kd> db 0xfffff8800a56f6a0+82
+fffff880`0a56f722  03 19 40 02 00 00 00 00-00 00 00 00 00 00 00 00  ..@.............
+fffff880`0a56f732  00 00 00 00 00 00 00 00-00 00 00 00 00 00 00 00  ................
+fffff880`0a56f742  00 00 00 00 00 00 00 00-00 00 00 00 00 00 00 00  ................
+
+0: kd> db 0xfffff8800a56f6a0+82*2
+fffff880`0a56f7a4  02 01 06 00 00 00 00 00-00 00 00 00 00 00 00 00  ................
+fffff880`0a56f7b4  00 00 00 00 00 00 00 00-00 00 00 00 00 00 00 00  ................
+fffff880`0a56f7c4  00 00 00 00 00 00 00 00-00 00 00 00 00 00 00 00  ................
+
+0: kd> db 0xfffff8800a56f6a0+82*3
+fffff880`0a56f826  02 0a 04 00 00 00 00 00-00 00 00 00 00 00 00 00  ................
+fffff880`0a56f836  00 00 00 00 00 00 00 00-00 00 00 00 00 00 00 00  ................
+fffff880`0a56f846  00 00 00 00 00 00 00 00-00 00 00 00 00 00 00 00  ................
+
+0: kd> db 0xfffff8800a56f6a0+82*4
+fffff880`0a56f8a8  03 03 03 18 00 00 00 00-00 00 00 00 00 00 00 00  ................
+fffff880`0a56f8b8  00 00 00 00 00 00 00 00-00 00 00 00 00 00 00 00  ................
+fffff880`0a56f8c8  00 00 00 00 00 00 00 00-00 00 00 00 00 00 00 00  ................
+
+0: kd> db 0xfffff8800a56f6a0+82*5
+fffff880`0a56f92a  09 16 0a 18 cd 74 46 4c-e8 d5 03 00 ff ff 32 53  .....tFL......2S
+fffff880`0a56f93a  47 05 80 f8 ff ff f8 7f-ed f2 7f 05 00 00 17 00  G...............
+fffff880`0a56f94a  00 00 00 00 00 00 00 c1-49 05 80 f8 ff ff 00 00  ........I.......
+}}} 
+
+根据EIR_DATA的定义， 我们列出每个元素的有效数据
+{{{
+[0]:  0x04 0x09
+[1]:  0x03 0x19 0x40 0x02
+[2]:  0x02 0x01 0x06
+[3]:  0x02 0x0a 0x04
+[4]:  0x03 0x03 0x03 0x18
+[5]:  0x09 0x16 0x0a 0x18 0xcd 0x74 0x46 0x4c 0xe8 0xd5 0x03
+}}}
+
+而实际数组只能容纳0-4即共5个元素， 对第6个的操作显然会超出数组的范围。 看一下， 这“第6个元素”的地址
+
+    fffff8800a56f92a  <<<< >>>>>  fffff8800a56f930    与cookie存放的地址如此接近
+
+查看Memory
+{{{
+fffff880`0a56f92a       09 16 0a 18 cd 74
+fffff880`0a56f930       46 4c e8 d5 03 00 ff ff  32 53 47 05 80 f8 ff ff f8 7f ed f2 7f 05 00 00 17 00 00
+}}}
+
+由此看到， 对数组超出部分的Copy操作覆盖了函数调用栈中cookie存放位置， Cookie存放位置的十六进制表示：
+
+    fffff880`0a56f930       ffff0003d5e84c46
+
+用ffff0003d5e84c46 和 rsp异或
+    ffff0003d5e84c46 XOR fffff880`0a56f540  =  F883DFBEB906 
+这个值也就是Arg1给出的错误的Cookie值
+
+这个例子对x64下的栈溢出情况作了分析， 与x86下的情况类似， 不同点是在x86下栈中保存的值是Security Cookie与ebp的异或。

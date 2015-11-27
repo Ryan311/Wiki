@@ -53,6 +53,23 @@
 *   JavaScipt Object Notation   HTTP请求在Web浏览器和其他应用程序之间发送数据的标准格式之一
 *   json.loads  将JSON字符串转换成Python形式
 *   json.dumps  将Python对象转换成JSON格式
+<<<<<<< HEAD
+== lxml ==
+*   http://lxml.de/     不是标准库
+*   用来读写HTML和XML格式数据的库
+*   lxml.html   处理HTML
+*   lxml.objectify  处理XML
+== urllib2 ==
+*   Python's standard lib for HTTP
+*   The urllib2 module defines functions and classes which help in opening URLs (mostly HTTP) in a complex world — basic and digest authentication, redirections, cookies and more.
+== requests ==
+*   http://cn.python-requests.org/zh_CN/latest/
+*   Python’s standard urllib2 module provides most of the HTTP capabilities you need, but the API is thoroughly broken. 
+*   The Requests package is recommended for a higher-level http client interface.
+== sqlite3 ==
+*   SQLite是一款嵌入式的数据库
+== pymongo ==
+*  NoSQL数据库 
 == string ==
 *   translate
     *   table = string.maketrans(from, to)
