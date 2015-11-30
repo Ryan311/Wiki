@@ -1,0 +1,122 @@
+%toc
+ 
+= Python2 Keywords =
+{{{
+    and       del       from      not       while
+    as        elif      global    or        with
+    assert    else      if        pass      yield
+    break     except    import    print
+    class     exec      in        raise
+    continue  finally   is        return
+    def       for       lambda    try
+}}}
+
+== yield ==
+*   [[http://www.ibm.com/developerworks/cn/opensource/os-cn-python-yield/index.html|Python yield 使用浅析]]  
+
+带有 yield 的函数就是一个 generator，它和普通函数不同，生成一个 generator 看起来像函数调用，但不会执行任何函数代码，直到对其调用
+<br>next()（在 for 循环中会自动调用 next()）才开始执行。虽然执行流程仍按函数的流程执行，但每执行到一个 yield 语句就会中断，并返回
+<br>一个迭代值，下次执行时从 yield 的下一个语句继续执行。看起来就好像一个函数在正常执行的过程中被 yield 中断了数次，每次中断都会通
+<br>过 yield 返回当前的迭代值。
+
+{{{class = "brush: python"
+def fab(max): 
+    n, a, b = 0, 0, 1 
+    while n < max: 
+        yield b 
+        a, b = b, a + b 
+        n = n + 1 
+
+for n in fab(5): 
+    print n
+}}}
+
+支持iterable的class, 与使用yield达到相同效果， 通过对比可以看到使用yield会简单很多
+{{{class = "brush: python"
+class Fab(object): 
+    def __init__(self, max): 
+        self.max = max 
+        self.n, self.a, self.b = 0, 0, 1 
+
+    def __iter__(self): 
+        return self 
+
+    def next(self): 
+        if self.n < self.max: 
+            r = self.b 
+            self.a, self.b = self.b, self.a + self.b 
+            self.n = self.n + 1 
+            return r 
+        raise StopIteration()
+}}}
+
+== with ==
+*   [[http://www.ibm.com/developerworks/cn/opensource/os-cn-pythonwith/index.html|浅谈Python的with语句]]
+
+with 语句是在 Python 2.5 版本引入的，从 2.6 版本开始成为缺省的功能。
+<br>with 语句作为 try/finally 编码范式的一种替代，用于对资源访问进行控制的场合。
+<br>with 语句适用于对资源进行访问的场合，确保不管使用过程中是否发生异常都会执行必要的“清理”操作，释放资源，比如文件使用后自动关闭、线程中锁的自动获取和释放等。
+
+{{{ 术语 
+    要使用 with 语句，首先要明白上下文管理器这一概念。有了上下文管理器，with 语句才能工作。
+    下面是一组与上下文管理器和with 语句有关的概念。
+
+    上下文管理协议（Context Management Protocol）：
+        包含方法 __enter__() 和 __exit__()，支持该协议的对象要实现这两个方法。
+
+    上下文管理器（Context Manager）：
+        支持上下文管理协议的对象，这种对象实现了 __enter__() 和 __exit__() 方法。
+    上下文管理器定义执行 with 语句时要建立的运行时上下文， 负责执行 with 语句块
+    上下文中的进入与退出操作。通常使用 with 语句调用上下文管理器， 也可以通过直
+    接调用其方法来使用。
+
+    运行时上下文（runtime context）：
+        由上下文管理器创建，通过上下文管理器的 __enter__() 和 __exit__() 方法实现，
+    __enter__() 方法在语句体执行之前进入运行时上下文，__exit__() 在 语句体执行完后
+    从运行时上下文退出。with 语句支持运行时上下文这一概念。
+
+    上下文表达式（Context Expression）：
+        with 语句中跟在关键字 with 之后的表达式，该表达式 要返回一个上下文管理器对象。
+    
+    语句体（with-body）：
+        with 语句包裹起来的代码块，在执行语句体之前会调用上下文管 理器的 __enter__()
+    方法，执行完语句体之后会执行 __exit__() 方法。
+}}}
+
+基本语法和工作原理
+{{{
+    with 语句的语法格式如下：
+    with context_expression [as target(s)]:
+        with-body
+
+    这里context_expression 要返回一个上下文管理器对象，该对象并不赋值给 as子句中的 target(s) ，如果指定了 as子句的话，
+    会将上下文管理器的 __enter__() 方法的返回值赋值给 target(s)。target(s) 可以是单个变量，或者由“()”括起来的元组
+    （不能是仅仅由“,”分隔的变量列表，必须加“()”）。
+}}}
+
+contextlib 模块
+{{{
+    contextlib 模块提供了3个对象：装饰器 contextmanager、函数 nested 和上下文管理器 closing。
+    使用这些对象，可以对已有的生成器函数或者对象进行包装，加入对上下文管理 协议的支持，避免
+    了专门编写上下文管理器来支持 with 语句。
+    
+    from contextlib import contextmanager
+    
+    @contextmanager
+    def demo():
+        print '[Allocate resources]'
+        print 'Code before yield-statement executes in __enter__'
+        yield '*** contextmanager demo ***'
+        print 'Code after yield-statement executes in __exit__'
+        print '[Free resources]'
+
+    with demo() as value:
+        print 'Assigned Value: %s' % value
+        
+    生成器函数中yield之前的语句在__enter__()方法中执行，yield之后的语句在__exit__()中执行，而yield产生的值赋给了as子句中的value变量。
+}}}
+
+== lambda ==
+== raise ==
+== try ==
+== exec ==

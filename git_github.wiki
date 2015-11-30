@@ -3,46 +3,81 @@
 = git =
 == Install or Update ==
 *Install*::
-sudo apt-get install git git-core
+sudo apt-get install git
 
 *Update*::
 git clone git://git.kernel.org/pug/scm/git/git.git
 
-== Create a local repository ==
+== Help ==
+# git help git
+# git help <command>
+# git help -a
+# git help -g
+
+== Create a local repository and trace new file ==
 # mkdir my_app
 # cd my_app
-# git init  // init current repository
-# git add . // add sources to repository in current dir
+# git init  // init a repository in current dir
+# git add test.txt // add new file to staged state
+# git add . // change Modified files and new files to staged state 
 # git commit -m "Add the original files"    // commit files to repo
-# git show  // show status
-# git log   // show all changes we've committed so far
+
+== Status and State ==
+*工作区*： 就是你在电脑上看到的目录，比如目录下testgit里的文件(.git隐藏目录版本库除外)。或者以后需要再新建的目录文件等等都属于工作区范畴。
+<br>*版本库(Repository)*：工作区有一个隐藏目录.git,这个不属于工作区，这是版本库。
+<br>其中版本库里面存了很多东西，其中最重要的就是stage(暂存区)，还有Git为我们自动创建了第一个分支master,以及指向master的一个指针HEAD。 
+
+# git status // show working tree status
+# git show  // show various types of objects
+# git log   // show commit log, changes we've committed so far,  从当前的版本开始到最远的commit log
+# git reflog  // show all committed logs, 与log的区别是， 只要commit过的log， 都会按时间顺序Show出来
+ 
+== Differences ==
+# git diff              // Changes between Modified and Staged 
+# git diff --cached     // Changes between Staged and last commit
+# git diff --staged     // same to --cached
+# git diff HEAD         // Changes between Modified and last commit
+# git diff HEAD *==* git diff + git diff --cached
+
+== Undo ==
+# git reset HEAD test.txt    // clear Staged content, or change Staged to Modified state
+# git checkout -- test.txt  // should have the file name,  give up changes since last stage
+# git reset --hard HEAD // give up all changes since the last commite
+# git reset HEAD test.txt + git checkout -- test.txt == git reset --hard HEAD
+
+== Version Revert ==
+# git reset --hard HEAD^    // revert to HEAD-1 commite
+# git reset --hard HEAD~n   // n >= 2, revert to nth commite
+# git reset --hard <commitID>  // revert to the specifiled commit, commitID can be show by git log or git reflog(the first line) 
+
+== rm file ==
+# git rm test.txt   // git status 看到删除的状态在Staged
+# git reset --hard HEAD     // Commit前， 恢复删除的文件
+
+# rm test.txt       // git status 看到删除的状态在Modifiled
+# git checkout -- test.txt  // Commit前， 恢复删除的文件
+
+# git rm test.txt
+# git commit -m "rm test.txt    // 提交的删除操作
+# git reset --hard HEAD^        // 只能使用Version Revert才能恢复之前删除的文件
+
+== branch ==
+== merge ==
+== stash ==
 
 == Remote Repositories ==
 # Create a new empty GitHub repository
-# Put our local repo to the GitHub server, we'll need to add a remote repository<br>git remote add origin https://github.com/Ryan311/MyWiki.git
-# push our local changes to origin repo on Github<br>git push -u origin master   //-u tells Git to remember the para
-# Pulling Remotely  other people commit and we want to see the changes<br>git pull origin master
-# git push  // push everything to the remote repository
+# Put our local repo to the GitHub server, we'll need to add a remote repository
+    # git remote add origin https://github.com/Ryan311/MyWiki.git   //关联一个远程库
+# push our local changes to origin repo on Github
+    # git push -u origin master   //-u tells Git to remember the para , 第一次要用-u 以后不需要
+# Pulling Remotely  other people commit and we want to see the changes
+    # git pull origin master
+# Push everything to the remote repository
+    # git push  
+# git remote
+# git remote -v
 
-== Differences ==
-# git diff HEAD
-# git diff --staged
-
-== Other ==
-# git reset octofamily/octodog.txt
-# git checkout -- octocat.txt
-# git brahch clean_up
-# git checkout clean_up
-# git rm '*.txt'    //removing all the things
-
-== ssh ==
-#   ssh-keygen
-#   GitHub中设置公钥
-    在GitHub中，依次点击Account settings（右上角倒数第二个图标） -> SSH Keys -> Add SSH Key，
-    将id_rsa.pub文件中的字符串复制进去，注意字符串中没有换行和空格。
-#   再次检查SSH连接情况：  ssh -T git@github.com
-    如果看到如下所示，则表示添加成功：
-    Hi Ryan311! You’ve successfully authenticated, but GitHub does not provide shell access.
 
 == work with two computers ==
 #   Computer A (had the original git repo)
@@ -64,7 +99,13 @@ git clone git://git.kernel.org/pug/scm/git/git.git
 *   将公钥Copy到GitHub中
 *   $ssh -T git@github.com ==> 登录
 *   $ssh -Tv git@github.com ==> 以诊断模式登录
-
+*   GitHub中设置公钥
+    *   在GitHub中，依次点击Account settings（右上角倒数第二个图标） -> SSH Keys -> Add SSH Key，
+    *   将id_rsa.pub文件中的字符串复制进去，注意字符串中没有换行和空格。
+    *   再次检查SSH连接情况：  ssh -T git@github.com
+    *   如果看到如下所示，则表示添加成功：
+    *   Hi Ryan311! You’ve successfully authenticated, but GitHub does not provide shell access.
+    
 === [[http://www.worldhello.net/doc/|GotGitHub]] ===
 === [[http://www.yangzhiping.com/tech/github.html|如何高效使用GitHub]]
 == [[https://help.github.com/articles/generating-ssh-keys|generate SSH key: noneed type username and password everytime]] ==

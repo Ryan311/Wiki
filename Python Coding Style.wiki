@@ -1,4 +1,5 @@
 %toc
+
 = Python Coding Style =
 *   http://docs.python-guide.org/en/latest/writing/style/
 *   [[http://blog.csdn.net/u012150179/article/details/34793833|PYTHON风格规范——Google 开源项目风格指南]]
