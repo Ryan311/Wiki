@@ -8,6 +8,13 @@ sudo apt-get install git
 *Update*::
 git clone git://git.kernel.org/pug/scm/git/git.git
 
+== Basic ==
+*   HEAD指向的就是当前分支, 通过git checkout name切换， HEAD指针也跟着指向name的分支
+*   Three State
+    *   Modified
+    *   Staged
+    *   Repo
+
 == Help ==
 # git help git
 # git help <command>
@@ -31,6 +38,7 @@ git clone git://git.kernel.org/pug/scm/git/git.git
 # git show  // show various types of objects
 # git log   // show commit log, changes we've committed so far,  从当前的版本开始到最远的commit log
 # git reflog  // show all committed logs, 与log的区别是， 只要commit过的log， 都会按时间顺序Show出来
+# git log --graph   // 查看分支合并图
  
 == Differences ==
 # git diff              // Changes between Modified and Staged 
@@ -61,9 +69,51 @@ git clone git://git.kernel.org/pug/scm/git/git.git
 # git commit -m "rm test.txt    // 提交的删除操作
 # git reset --hard HEAD^        // 只能使用Version Revert才能恢复之前删除的文件
 
-== branch ==
-== merge ==
-== stash ==
+== branch, merge, stash ==
+# git branch        //查看分支，会列出所有的分支，当前分支前面会添加一个星号
+# git branch dev    // 创建分支
+# git checkout dev  // 切换分支
+# git checkout -b dev   // –b参数表示创建并切换到分支dev, 上两个命令的组合
+# git branch -d dev     // 删除dev分支, 前提是该分支已经合并, 否则报错
+# git branch -D <name>  // 强行删除没有合并过的分支  
+
+# git merge dev     // 合并dev分支到当前分支
+# git merge –no-ff  -m “注释” dev   // 用”Fast forward”模式， 合并分支并删除分支后， 分支信息仍在
+
+*分支策略*：
+<br>master主分支应该是非常稳定的，也就是用来发布新版本，一般情况下不允许在上面干活，干活一般情况下在新建的dev分支上干活，
+<br>干完后，比如上要发布，或者说dev分支代码稳定后可以合并到主分支master上来。
+
+*bug分支*:
+在开发中，会经常碰到bug问题，那么有了bug就需要修复，在Git中，分支是很强大的，每个bug都可以通过一个临时分支来修复，
+<br>修复完成后，合并分支，然后将临时的分支删除掉。 比如开发中接到一个404 bug，可以创建一个404分支来修复它，但如果
+<br>当前的dev分支上的工作只完成了一半， 还无法提交。Git提供了一个stash功能，可以把当前工作现场 ”隐藏起来”，等以后
+<br>恢复现场后继续工作。
+# git stash     // 处于dev分支， 将当前的工作现场隐藏起来
+# git status    // 查看当前现场工作状态， 是空的了
+# git checkout -b issue-404     // 创建bug分支并切换到bug分支
+# ......        // 修复bug并提交
+# git checkout master   //切换回master分支
+# git merge --no-ff -m "merge bug fix 404" issue-404    // 将bug分支merge到主分支
+# git branch -d issue-404   // 删除bug分支
+# git checkoug dev  //切换回dev分支， 继续干活
+# git stath list    //查看stach内容
+# git stach apply   //恢复dev现场
+# git stach drop    //删除保存的stach内容
+# git stach pop     //以上两条命令之和， 恢复并删除
+
+
+== rebase ==
+# http://gitbook.liuhui998.com/4_2.html
+# git rebase用于把一个分支的修改合并到当前分支, 但不同于git merge!!!
+# git checkout mywork       //切换到mywork分支
+# git rebase origin         //把"mywork"分支里的每个提交(commit)取消掉，并把它们临时保存为补丁(patch)(放到".git/rebase"中),然后把"mywork"分支更新 到最新的"origin"分支，最后把保存的这些补丁应用到"mywork"分支上。
+# git rebase --continue     //出现冲突， 解决后继续执行后面操作
+# git rebase --abort        //终止rebase的行动, 回到rebase之前的状态
+
+*合并(merge)和用rebase所产生的历史的区别*：
+
+<br>{{images/GitRebase.png}}
 
 == Remote Repositories ==
 # Create a new empty GitHub repository
@@ -75,9 +125,29 @@ git clone git://git.kernel.org/pug/scm/git/git.git
     # git pull origin master
 # Push everything to the remote repository
     # git push  
-# git remote
-# git remote -v
+# git remote    // 查看远程库的信息
+# git remote -v // 查看远程库的详细信息
 
+== tag ==
+发布一个版本时，我们通常先在版本库中打一个标签，这样，就唯一确定了打标签时刻的版本.
+<br>Git的标签虽然是版本库的快照，但其实它就是指向某个commit的指针（跟分支很像,但是分支可以移动，标签不能移动），所以，创建和删除标签都是瞬间完成的。
+
+# git checkout master   // 切换到要打标签的分支上， 一般是master分支
+# git tag v1.0          // 打一个新标签， 默认标签是打在最新提交的commit上
+# git tag               // 查看标签
+# git tag name <commitID>   // 在指定某个commit上打标签
+# git show <tagname>    // 查看标签信息
+# git tag -a v0.1 -m "version 0.1 released" 3628164 //创建带有说明的标签， -a指定标签名， -m指定说明文字
+# git tag -d <tagname>  // 删除标签
+# git push origin <tagname>     // 将标签推送到远程
+# git push origin :refs/tags/<tagname>  // 先删除本地标签， 再用该命令删除远程的标签
+
+== [[http://blog.jobbole.com/76843/|Git工作流指南]] ==
+*   [[http://blog.jobbole.com/76847/|集中式工作流]]     // 同Subversion
+*   [[http://blog.jobbole.com/76857/|功能分支工作流]]   //核心思路是所有的功能开发应该在一个专门的分支，而不是在master分支上。
+*   [[http://blog.jobbole.com/76867/|Gitflow工作流]]    // 围绕项目发布的严格分支模型, 用于一个健壮的管理大型项目的框架
+*   [[http://blog.jobbole.com/76861/|Forking工作流]]
+*   [[http://blog.jobbole.com/76854/|Pull Request工作流]]
 
 == work with two computers ==
 #   Computer A (had the original git repo)
@@ -86,11 +156,18 @@ git clone git://git.kernel.org/pug/scm/git/git.git
 #   git pull origin master  (go to computer B)
 #   git push origin master
 
-== [[http://try.github.io/levels/1/challenges/1|Exercise on line]] ==
+== Advanced ==
+http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000/00137621280731812dec22ecc9b44f4b2ca1c680f181a5b000
+*   自定义Git
+*   忽略特殊文件
+*   配置别名
+*   搭建Git服务器
+
+== Links ==
+=== [[http://try.github.io/levels/1/challenges/1|Exercise on line]] ===
 === [[http://josephj.com/entry.php?id=308|more...]] ===
 === [[http://marklodato.github.io/visual-git-guide/index-zh-cn.html#basic-usage|图解Git]] ===
 === [[http://www.worldhello.net/gotgit/|Git权威指南]] ===
-
 ----------------------------------------------------------------------------------------------------------------------------------------
 = github =
 == ssh连接github.com的SSH服务 ==
@@ -106,8 +183,8 @@ git clone git://git.kernel.org/pug/scm/git/git.git
     *   如果看到如下所示，则表示添加成功：
     *   Hi Ryan311! You’ve successfully authenticated, but GitHub does not provide shell access.
     
-=== [[http://www.worldhello.net/doc/|GotGitHub]] ===
-=== [[http://www.yangzhiping.com/tech/github.html|如何高效使用GitHub]]
+== [[http://www.worldhello.net/doc/|GotGitHub]] ==
+== [[http://www.yangzhiping.com/tech/github.html|如何高效使用GitHub]] ==
 == [[https://help.github.com/articles/generating-ssh-keys|generate SSH key: noneed type username and password everytime]] ==
 == [[https://help.github.com/articles/working-with-ssh-key-passphrases|SSH key passphrases???]] ==
 == [[http://pages.github.com/|github pages]] ==
