@@ -3,7 +3,7 @@
 *   Author: *Guido van Rossum*      1991
 *   编程范型： 命令式编程、多范型、面向对象、函数式编程、面向切面编程
 *   型态系统： [[强类型]]、[[动态类型]]、[[duck typing]]
-*   [[http://blog.csdn.net/u012150179/article/details/34793833|PYTHON风格规范——Google 开源项目风格指南]]
+*   [[Python Coding Style]]
 *   [[Basic]]
 *   [[Data Types]]
 *   [[Library]]
@@ -16,7 +16,6 @@
     *   [[http://www.tummy.com/presentations/vimpython-20070225/|python&vim]]
     *   [[Python Core Programming]]
 *   [[https://github.com/philipbjorge/EditREPL|EditREPL use vim in python interacive shell]]
-*   [[Python Coding Style]]
 *   [[http://www.cnblogs.com/moinmoin/archive/2011/03/10/lsit-comprehensions-generators.html|python列表解析和生成表达式]]
 *   [[Iterator and Generator]] [[http://www.dabeaz.com/generators-uk/|Generator Tricks]] [[file://F:/Wiki/wiki2_html/GeneratorsUK.pdf|Generator!!!]]
 *   *Linux System Mining with Python* [[http://amitsaha.github.io/site/notes/articles/python_linux/article.html|English]] [[http://www.linuxeden.com/html/news/20130802/141990.html|Chinese]]
