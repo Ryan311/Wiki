@@ -9,3 +9,10 @@
 *   [[遍历文件夹下的文件]]
 *   [[Distribute and Install package]]
 *   [[Parse cmd line argument]]
+*   [[http://effbot.org/zone/python-for-statement.htm|For Statement]]
+    *  original     __getitem___  
+    *  new          ___iter___ and ___next___
+*   [[http://effbot.org/zone/python-with-statement.htm|With Statement]]
+    *   ___enter___ and ___exit___ 
+*   [[http://effbot.org/zone/python-getattr.htm|getattr Function]]
+    *   ___getattr___ 

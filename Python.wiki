@@ -10,8 +10,6 @@
 *   [[Library]]
 *   [[Useful Library]]
 *   [[Python Features]]
-*   [[http://www.ibm.com/developerworks/cn/linux/l-cn-pythondebugger/|Debug]]
-*   *Linux System Mining with Python* [[http://amitsaha.github.io/site/notes/articles/python_linux/article.html|English]] [[http://www.linuxeden.com/html/news/20130802/141990.html|Chinese]]
 *   [[Python Challenge]]
 *   [[http://legacy.python.org/dev/peps/|PEP]](Python增强建议书)
     *   PEP是Python Enhancement Proposals的缩写
@@ -31,6 +29,7 @@
         操作：
         在Python/Lib/site-package目录下创建一个MyModule.pth文件，其中内容为自定义的模块所在的路径。
     }}}
+*   [[http://blog.jobbole.com/88152/|一起来写个简单的解释器]]
 
 == [[http://www.oschina.net/translate/python-performance-analysis?cmp|Analyzing performance]] ==
 === time ===
@@ -109,19 +108,13 @@ IPython Notebook 是一种新兴的交互式数据分析与记录工具，它定
     *   As ipython notebook kernel must run as root while chrome can't run as root
         *   modify /usr/bin/google-chrome, add *--user-data-dir* in the end of last line
 *   [[http://www.lfd.uci.edu/~gohlke/pythonlibs/|Unofficial Windows Binaries for Python Extension Packages]]
+*   *Linux System Mining with Python* [[http://amitsaha.github.io/site/notes/articles/python_linux/article.html|English]] [[http://www.linuxeden.com/html/news/20130802/141990.html|Chinese]]
 
 == Books & Docs ==
 *   [[Python Cook Book]]
 *   [[http://www.tummy.com/presentations/vimpython-20070225/|python&vim]]
 *   [[Python Core Programming]]
 *   [[http://woodpecker.org.cn/diveintopython3/special-method-names.html|特殊方法 深入Python3]] [[http://www.cnblogs.com/vamei/archive/2012/11/19/2772441.html|Examples]]
-*   [[http://effbot.org/zone/python-for-statement.htm|For Statement]]
-    *  original     __getitem___  
-    *  new          ___iter___ and ___next___
-*   [[http://effbot.org/zone/python-with-statement.htm|With Statement]]
-    *   ___enter___ and ___exit___ 
-*   [[http://effbot.org/zone/python-getattr.htm|getattr Function]]
-    *   ___getattr___ 
 
 === Tools make live easier ===
 *   [[WppFormat]]
