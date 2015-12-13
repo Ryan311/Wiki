@@ -1,5 +1,6 @@
 %toc
 
+http://open.163.com/special/opencourse/machinelearning.html
 = Lesson 1 =
 *   Supervised Learning
 *   Unsupervised Learning

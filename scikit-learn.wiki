@@ -1,7 +1,7 @@
 %toc
 = Intro =
 Home:   http://scikit-learn.org/stable/index.html
-Tutorial:   http://blog.csdn.net/zt_706/article/details/11476049
+<br>Tutorial:   http://blog.csdn.net/zt_706/article/details/11476049
 <br> scikit-learn是一个用于机器学习的 Python 模块，建立在SciPy基础之上，获得3-Clause BSD 开源许可证。
 
 == What is scikit-learn? ==
@@ -17,6 +17,28 @@ The library is built upon the SciPy (Scientific Python) that must be installed b
     [[Sympy]] Symbolic mathematics
     [[Pandas]] Data structures and analysis
 
+== Data Sets ==
+A dataset is a dictionary-like object that holds all the data and some metadata about the data. 
+*   [[http://archive.ics.uci.edu/ml/datasets.html|Machine Learning Repository]]
+*   http://mldata.org/
+
+DataSet in scikit-learn:    http://scikit-learn.org/stable/datasets/index.html#datasets
+*   Toy datasets: a few small standard datasets that do not require to download any file from some external website.
+    *   load_boston() 	        Load and return the boston house-prices dataset (regression).
+    *   load_iris() 	        Load and return the iris dataset (classification).
+    *   load_diabetes() 	    Load and return the diabetes dataset (regression).
+    *   load_digits([n_class]) 	Load and return the digits dataset (classification).
+    *   load_linnerud() 	    Load and return the linnerud dataset (multivariate regression).
+*   Sample images:  The scikit also embed a couple of sample JPEG images
+    *   load_sample_images() 	        Load sample images for image manipulation.
+    *   load_sample_image(image_name) 	Load the numpy array of a single sample image
+*   Sample generators: scikit-learn includes various random sample generators that can be used to build artificial datasets of controlled size and complexity.
+    *   Generators for classification and clustering
+    *   Generators for regression
+    *   Generators for manifold learning
+    *   Generators for decomposition
+*   ......
+
 
 = Install =
 *   >sudo apt-get install build-essential python-dev python-setuptools python-numpy python-pandas python-scipy libatlas-dev libatlas3gf-base
@@ -27,9 +49,5 @@ The library is built upon the SciPy (Scientific Python) that must be installed b
 *   or Download the source package from http://pypi.python.org/pypi/scikit-learn/, unpack the sources and cd into the source directory ==> python setup.py install
 
 = Usage =
-*   http://cda.pinggu.org/view/3074.html#
-{{{
-    from sklearn import datasets  
-    iris = datasets.load_iris()  
-    digits = datasets.load_digits() 
-}}}
+*   [[An introduction to machine learning with scikit-learn]]
+*   [[Supervised learning]]

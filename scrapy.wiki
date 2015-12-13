@@ -3,6 +3,7 @@
 http://scrapy.org/
 <br> DOC:   http://scrapy-chs.readthedocs.org/zh_CN/latest/intro/tutorial.html
 <br> Scrapy核心架构与代码运行分析:  http://blog.csdn.net/u012150179/article/details/34441655
+<br> Test WebSite:  [[http://www.17500.cn/ssq/all.php|乐彩网 - 双色球开奖历史数据]]
 
 = Install =
 *   sudo pip install scrapy
@@ -98,6 +99,10 @@ Spiders，它是所有爬虫的基类，对于它的设计原则是只爬取star
 *   策略四：使用IP池
 *   策略五：分布式爬取
 
+= My Projects =
+*   doubleBall2
+*   w3school
+
 = XPath =
 *   http://www.runoob.com/xpath/xpath-tutorial.html
 *   XPath是一门在XML文档中查找信息的语言。
@@ -106,3 +111,5 @@ Spiders，它是所有爬虫的基类，对于它的设计原则是只爬取star
 *   XPath 是一个 W3C 标准
 *   XPath 包含一个标准函数库
 *   在XPath中，有七种类型的节点：元素、属性、文本、命名空间、处理指令、注释以及文档（根）节点。XML 文档是被作为节点树来对待的。树的根被称为文档节点或者根节点。
+
+

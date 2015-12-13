@@ -55,10 +55,12 @@
 *   %xdel variable  删除variable
 *   %reset      删除interactive命名空间中的全部变量/名称
 *   %run        执行python脚本
+*   %run -d file.py      调试执行python脚本, ipython集成了Python内置的pdb调试器, 并增强了其功能
 *   %prun       执行Python语句并计算每个函数的执行时间, cProfile
 *   %lprun      逐行分析函数性能, %lprun -f func1 -f func2 statement_to_profile
 *   %mprun      
-*   %pdb        启动调试器
+*   %pdb        出现异常后自动启动调试器
+*   %debug      在异常发生之后执行会调用"事后"调试器
 *   %edit
     *   ?%edit  查看使用方法
     *   %edit -p | _    打开上次编辑的临时文件
@@ -86,6 +88,24 @@
 *   %pdef <function name>   查看函数的声明
 *   %pfile <obj name>       查看所在的源码文件
 *   %logstart、%logoff      使用Log来记录会话
+
+== IPython Debug Command ==
+*   help    显示命令列表
+*   help command    显示command的文档
+*   c(ontinue)      恢复程序的执行
+*   q(uit)          退出调试器
+*   b(reak) number  在当前文件的第number行设置一个断点
+*   b path/to/file.py:number    在指定文件的第number行设置一个断点
+*   s(tep)      单步进入函数调用
+*   n(ext)      执行当前行
+*   u(p)/d(own) 在函数调用栈中向上或向下移动
+*   a(rgs)      显示当前函数的参数
+*   debug statement     在新的(递归)调试器中调用语句statement
+*   l(ist) statement    显示当前行， 以及当前栈级别上的上下文参考代码
+*   w(here)     打印当前位置完整栈跟踪
+*   enable number   使能第number个断点
+*   disable number  禁用第number个断点
+*   cl[ear] [number]  删除全部或某个断点
 
 == IPython shortcuts for line_profiler and memory_profiler ==
 *   http://www.huyng.com/posts/python-performance-analysis/

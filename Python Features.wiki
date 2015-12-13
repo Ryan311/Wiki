@@ -1,6 +1,7 @@
 %toc
 
 = Features =
+*   [[Python字符编码]]
 *   [[Iterator and Generator]] [[http://www.dabeaz.com/generators-uk/|Generator Tricks]] [[file://F:/Wiki/wiki2_html/GeneratorsUK.pdf|Generator!!!]]
 *   [[Decorator]]
 *   [[Closure]]
@@ -9,6 +10,10 @@
 *   [[遍历文件夹下的文件]]
 *   [[Distribute and Install package]]
 *   [[Parse cmd line argument]]
+*   [[正则表达式]]
+*   [[Python线程]]
+*   [[函数式编程]]
+*   [[Python自省(反射)]]
 *   [[http://effbot.org/zone/python-for-statement.htm|For Statement]]
     *  original     __getitem___  
     *  new          ___iter___ and ___next___

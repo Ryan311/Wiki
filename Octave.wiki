@@ -23,6 +23,7 @@ http://www.gnu.org/software/octave/
 }}}
 
 = Doc =
-http://www.gnu.org/software/octave/doc/interpreter/
-http://wenku.baidu.com/view/e98c991da300a6c30c229fe3.html?re=view
+*   http://wenku.baidu.com/view/e98c991da300a6c30c229fe3.html?re=view
+*   http://www.gnu.org/software/octave/doc/interpreter/
+*   http://wenku.baidu.com/view/e98c991da300a6c30c229fe3.html?re=view
     

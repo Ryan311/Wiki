@@ -9,6 +9,7 @@
 *   [[Keywords]]
 *   [[Library]]
 *   [[Useful Library]]
+*   [[Python Debug]]
 *   [[Python Features]]
 *   [[Python Challenge]]
 *   [[http://legacy.python.org/dev/peps/|PEP]](Python增强建议书)
@@ -89,7 +90,6 @@ print "=> elasped lpop: %s s" % t.secs
 *   [[easy_install & pip]]
 *   [[https://github.com/philipbjorge/EditREPL|EditREPL use vim in python interacive shell]]
 *   [[PythonVirtualEnviroment]]
-*   [[http://www.ibm.com/developerworks/cn/linux/l-cn-pythondebugger/|Debug]]
 *   [[http://www.lfd.uci.edu/~gohlke/pythonlibs/|Unofficial Windows Binaries for Python Extension Packages]]
 *   [[http://www.pythonforbeginners.com/basics/ipython-a-short-introduction/|IPython]] ===
     *   Tab completion              " very useful

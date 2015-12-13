@@ -1,3 +1,46 @@
 %toc
 
-show()  在IPython中显示Plot视图
+Home:   http://matplotlib.org/#
+<br>Gallery     http://matplotlib.org/gallery.html
+
+= Intro =
+matplotlib 是python最著名的绘图库，它提供了一整套和matlab相似的命令API，十分适合交互式地进行制图。 
+<br>而且也可以方便地将它作为绘图控件，嵌入GUI应用程序中。 它的文档相当完备，并且 Gallery页面 中有上百
+<br>幅缩略图，打开之后都有源程序。因此如果你需要绘制某种类型的图，只需要在这个页面中浏览/复制/粘贴一下，
+<br>基本上都能搞定。
+
+matplotlib的pyplot子库提供了和matlab类似的绘图API，方便用户快速绘制2D图表.
+    import matplotlib.pyplot as plt
+
+pylab模块:
+<br>matplotlib还提供了名为pylab的模块，其中包括了许多numpy和pyplot中常用的函数，方便用户快速进行计算和绘图，可以用于IPython中的快速交互式使用。
+
+Example:
+*   plt.figure(figsize=(8,4))   figsize参数可以指定绘图对象的宽度和高度，单位为英寸
+*   plt.plot(x,y,label="$sin(x)$",color="red",linewidth=2)
+label : 给所绘制的曲线一个名字，此名字在图示(legend)中显示。只要在字符串前后添加"$"符号，matplotlib就会使用其内嵌的latex引擎绘制的数学公式。
+<br>color : 指定曲线的颜色
+<br>linewidth : 指定曲线的宽度
+*   plt.xlabel("Time(s)")       设置X轴的文字
+*   plt.ylabel("Volt")          设置Y轴的文字
+*   plt.title("PyPlot First Example")   设置图表的标题
+*   plt.ylim(-1.2,1.2)          设置Y轴的范围
+*   plt.legend()                显示图示
+*   plt.show()                  显示出我们创建的所有绘图对象
+
+= 绘制多轴图 =
+一个绘图对象(figure)可以包含多个轴(axis)，在Matplotlib中用轴表示一个绘图区域，可以将其理解为子图。
+<br>我们可以使用subplot函数快速绘制有多个轴的图表。subplot函数的调用形式如下：
+    subplot(numRows, numCols, plotNum)
+
+subplot将整个绘图区域等分为numRows行 * numCols列个子区域，然后按照从左到右，从上到下的顺序对每个子区域进行编号，左上的子区域的编号为1。
+<br>如果numRows，numCols和plotNum这三个数都小于10的话，可以把它们缩写为一个整数，例如subplot(323)和subplot(3,2,3)是相同的。
+
+*   fig.add_subplot(111)
+These are subplot grid parameters encoded as a single integer. 
+<br>For example, "111" means "1x1 grid, first subplot" and "234" means "2x3 grid, 4th subplot".
+<br>Alternative form for add_subplot(111) is add_subplot(1, 1, 1).
+
+= Study =
+*   [[http://blog.csdn.net/rumswell/article/details/11731003|matplotlib绘制动画的示例]]
+*   [[http://old.sebug.net/paper/books/scipydoc/matplotlib_intro.html|matplotlib-绘制精美的图表]]

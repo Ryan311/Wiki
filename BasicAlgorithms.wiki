@@ -1,0 +1,8 @@
+%toc
+
+= Least Sequare =
+*   [[http://blog.csdn.net/jairuschan/article/details/7517773/|最小二乘法多项式曲线拟合原理与实现]]
+*   Python Sample:  ML/LeastSequare/*.py
+
+= K-means =
+*   [[http://blog.csdn.net/jairuschan/article/details/7516989|数据挖掘基础:K-Means算法的原理与Python实现]]

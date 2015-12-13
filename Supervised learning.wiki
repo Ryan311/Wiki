@@ -1,0 +1,15 @@
+%toc
+
+= Supervised learning = 
+*   The problem solved in supervised learning:
+Supervised learning consists in learning the link between two datasets: 
+<br>the observed data X and an external variable y that we are trying to predict, 
+<br>usually called “target” or “labels”. Most often, y is a 1D array of length n_samples.
+
+All supervised estimators in scikit-learn implement a fit(X, y) method to fit the model 
+<br>and a predict(X) method that, given unlabeled observations X, returns the predicted labels y.
+
+*   classification and regression
+If the prediction task is to classify the observations in a set of finite labels, in other words 
+<br>to “name” the objects observed, the task is said to be a classification task. On the other hand, 
+<br>if the goal is to predict a continuous target variable, it is said to be a regression task.

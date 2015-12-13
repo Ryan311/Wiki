@@ -1,0 +1,73 @@
+%toc
+
+http://scikit-learn.org/stable/tutorial/basic/tutorial.html
+
+== Training set and testing set ==
+{{{
+    Machine learning is about learning some properties of a data set and applying them to new data. This is why a common practice in machine
+learning to evaluate an algorithm is to split the data at hand into two sets, one that we call the training set on which we learn data properties
+and one that we call the testing set on which we test these properties.
+}}}
+
+== Example dataset ==
+scikit-learn comes with a few standard datasets
+*   the [[https://en.wikipedia.org/wiki/Iris_flower_data_set|iris]] and [[http://archive.ics.uci.edu/ml/datasets/Pen-Based+Recognition+of+Handwritten+Digits|digits]] datasets for classification
+*   the [[http://archive.ics.uci.edu/ml/datasets/Housing|boston]] house prices dataset for regression.
+{{{class = "brush: python"
+    >>> from sklearn import datasets
+    >>> iris = datasets.load_iris()
+    >>> digits = datasets.load_digits()
+}}}
+
+A dataset is a dictionary-like object that holds all the data and some metadata about the data. 
+<br>This data is stored in the .data member, which is a n_samples, n_features array
+
+== Learning and Predicting ==
+*   digits
+{{{class = "brush: python"
+# support vector classification(SVM)
+>>> from sklearn import svm
+>>> clf = svm.SVC(gamma=0.001, C=100.)
+# clf is a classifier, it must learn from the model
+>>> clf.fit(digits.data[:-1], digits.target[:-1])  
+SVC(C=100.0, cache_size=200, class_weight=None, coef0=0.0,
+  decision_function_shape=None, degree=3, gamma=0.001, kernel='rbf',
+  max_iter=-1, probability=False, random_state=None, shrinking=True,
+  tol=0.001, verbose=False)
+# predict new values
+>>> clf.predict(digits.data[-1:])
+array([8])
+}}}
+
+*   iris
+{{{class = "brush: python"
+>>> from sklearn import svm
+>>> from sklearn import datasets
+>>> clf = svm.SVC()
+>>> iris = datasets.load_iris()
+>>> X, y = iris.data, iris.target
+>>> clf.fit(X, y)  
+SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0,
+  decision_function_shape=None, degree=3, gamma='auto', kernel='rbf',
+  max_iter=-1, probability=False, random_state=None, shrinking=True,
+  tol=0.001, verbose=False)
+
+# using pickle to maintain classifier
+>>> import pickle
+>>> s = pickle.dumps(clf)
+>>> clf2 = pickle.loads(s)
+>>> clf2.predict(X[0:1])
+array([0])
+>>> y[0]
+0
+
+# using joblib instead of pickle, but can only save to file
+>>> from sklearn.externals import joblib
+>>> joblib.dump(clf, 'filename.pkl') 
+# using it in another process
+>>> clf = joblib.load('filename.pkl')
+}}}
+
+*   [[http://scikit-learn.org/stable/auto_examples/classification/plot_digits_classification.html#example-classification-plot-digits-classification-py|Recognizing hand-written digits]]
+
+

@@ -1,0 +1,4 @@
+%toc
+
+Home:   http://marvin.is/
+Github: https://github.com/PrincetonVision/marvin
