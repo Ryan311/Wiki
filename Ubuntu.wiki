@@ -34,10 +34,48 @@
         *   apt-get source package  下载该包的源代码
         *   sudo apt-get clean && sudo apt-get autoclean 清理无用的包
         *   sudo apt-get check 检查是否有损坏的依赖
+        *   sudo apt-get autoremove 删除系统不再使用的独立软件
 
 === Tricks ===
 *   查看Ubuntu版本  >lsb_release -d
 *   显示或隐藏文件管理器侧边栏      F9 toggle/
+*   Ubuntu14.04备份
+    *   http://www.cnblogs.com/stemon/p/5041205.html
+    *   备份
+    {{{
+        第一步：打开一个终端，并运行 sudo su（回车后要求输入密码）
+        第二步：继续在终端中输入 cd /(注意中间有一个空格)
+        第三步：（开始备份系统）
+        在终端中输入：
+            #tar cvpzf Ubuntu.tgz -–exclude=/proc –-exclude=/lost+found –-exclude=/Ubuntu.tgz –-exclude=/mnt –-exclude=/sys –-exclude=/media /
+        
+        ‘tar’ 是用来备份的程序
+        c - 新建一个备份文档
+        v - 详细模式， tar程序将在屏幕上实时输出所有信息。
+        p - 保存许可，并应用到所有文件。
+        z - 采用‘gzip’压缩备份文件，以减小备份文件体积。
+        f - 说明备份文件存放的路径， Ubuntu.tgz 是本例子中备份文件名。
+        “/”是我们要备份的目录，在这里是整个文件系统。
+        
+        Bzip2来压缩文件，Bzip2比gzip的压缩率高，但是速度慢一些:
+            #tar cvpjf Ubuntu.tar.bz2 –-exclude=/proc –-exclude=/lost+found –-exclude=/Ubuntu.tar.bz2 –-exclude=/mnt –-exclude=/sys –-exclude=/media /
+    }}}
+    *   还原
+    {{{
+        切换到root用户，并把文件“Ubuntu.tgz”拷贝到分区的根目录下。
+        在 Linux中有一件很美妙的事情，就是你可以在一个运行的系统中恢复系统，而不需要用boot-cd来专门引导。
+        当然，如果你的系统已经挂掉不能启动了， 你可以用Live CD来启动，效果是一样的。
+        
+        使用下面的命令来恢复系统：
+            tar xvpfz Ubuntu.tgz -C /
+
+        如果你的档案文件是使用Bzip2压缩的，应该用：
+            tar xvpfj Ubuntu.tar.bz2 -C /
+        
+        参数x是告诉tar程序解压缩备份文件。 -C 参数是指定tar程序解压缩到的目录。
+        创建你剔除的目录：
+            mkdir /proc /lost+found /mnt /sys /media
+    }}}
 *   terminal命令行提示符太长， 修改.bashrc， 加入
     *   export PS1='\u@\w\$ '
     *   保存后， source .bashrc

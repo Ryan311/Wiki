@@ -5,6 +5,13 @@
 *   [[http://www.doudoulinux.org/web/english/index.html|DouDouLinux]]
  
 == Linux Command ==
+*   Shutdown
+    *   shutdown -r now     关机后重启
+    *   shutdown -h now     关机后不重启
+    *   shutdown -r +10     10分钟后重启
+    *   shutdown -r 10:00   10点钟重启
+    *   shutdown -h +10     10分钟后关机
+    *   shutdown -h 10:00   10点钟关机
 *   [[https://wiki.gnome.org/action/show/Apps/Nautilus?action=show&redirect=Nautilus|Nautilus]]: the file manager for GNOME desktop
     *   F9  打开/隐藏侧边栏
     *   Ctrl+L  在文件浏览器中呼出地址栏

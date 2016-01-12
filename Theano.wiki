@@ -1,0 +1,7 @@
+%toc
+
+Home:   http://deeplearning.net/software/theano/
+
+基于Python的深度学习的框架和库: http://www.csdn.net/article/2015-08-01/2825362
+
+2008年诞生于蒙特利尔理工学院，Theano派生出了大量深度学习Python软件包，最著名的包括Blocks和Keras。

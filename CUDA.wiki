@@ -1,0 +1,6 @@
+%toc
+
+= PyCuda =
+*   http://mathema.tician.de/software/pycuda/
+*   http://www.cnblogs.com/platero/p/3993877.html
+*   http://www.tuicool.com/articles/yiaei27

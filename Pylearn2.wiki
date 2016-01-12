@@ -1,0 +1,10 @@
+%toc
+
+Home:   http://deeplearning.net/software/pylearn2/
+
+Pylearn2 is a machine learning library. Most of its functionality is built on top of Theano. This means you can write Pylearn2 plugins (new models, algorithms, etc) using mathematical expressions, and Theano will optimize and stabilize those expressions for you, and compile them to a backend of your choice (CPU or GPU).
+
+scikit-neuralnetwork:   
+*   https://github.com/aigamedev/scikit-neuralnetwork
+*   http://scikit-neuralnetwork.readthedocs.org/en/latest/index.html
+*   scikit-neuralnetwork是对pylearn2的神经网络封装，兼容scikit-learn

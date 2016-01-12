@@ -32,7 +32,7 @@
     *   [[Blender]] [[GIMP]]
     *   Matlab [[Scilab]] [[Octave]]
 *   Tech
-    *   [[Machine Learning]] [[BasicAlgorithms]] [[scikit-learn]] [[MXNet]] [[NLTK]] [[Weka]] [[OpenCV]]
+    *   [[Machine Learning]] [[BasicAlgorithms]] [[scikit-learn]] [[MXNet]] [[NLTK]] [[Weka]] [[OpenCV]] [[Theano]] [[Pylearn2]]
     *   [[scrapy]]
     *   [[DataBase]]
     *   [[wireless]] [[Bluetooth]] [[BLE]] [[USB]] [[GPS]] [[ANT]] [[Zigbee]] [[LoRa]]

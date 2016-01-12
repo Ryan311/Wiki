@@ -2,13 +2,26 @@
 
 Home:   http://tensorflow.org/
 
-Install:
+= Install: =
 {{{
     # For CPU-only version
-    $ pip install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.5.0-cp27-none-linux_x86_64.whl
+    $ sudo pip install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.5.0-cp27-none-linux_x86_64.whl
 
     # For GPU-enabled version (only install this version if you have the CUDA sdk installed)
-    $ pip install https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.5.0-cp27-none-linux_x86_64.whl
+    $ sudo pip install https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.5.0-cp27-none-linux_x86_64.whl
+    
+    # Source
+    $ 克隆 TensorFlow 仓库
+    $ git clone --recurse-submodules https://github.com/tensorflow/tensorflow
+    --recurse-submodules 参数是必须得, 用于获取 TesorFlow 依赖的 protobuf 库.
 }}}
+
+= Usage =
+*   使用图 (graph) 来表示计算任务.
+*   在被称之为 会话 (Session) 的上下文 (context) 中执行图.
+*   使用 tensor 表示数据.
+*   通过 变量 (Variable) 维护状态.
+*   使用 feed 和 fetch 可以为任意的操作(arbitrary operation) 赋值或者从其中获取数据.
+
 
 

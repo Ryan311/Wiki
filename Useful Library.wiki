@@ -11,6 +11,9 @@
 *   is nicer testing for python
 *   pip install nose
 *   https://nose.readthedocs.org/en/latest/
+== jieba ==
+*   sudo pip install jieba
+*   中文分词系统
 
 === Web Framework for Python ===
 ==== Web.py ====

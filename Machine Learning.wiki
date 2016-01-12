@@ -1,23 +1,24 @@
 %toc
 
-= Tools =
-*   [[scikit-learn]]
-*   [[Weka]]
-
 = Machine Learning definitioin =
 *   Tom Mitchell(1998) Well-posed learning problem:
 A computer program is said to learn from experience E with respect to some task T and some performance measure P, if its performance on T, as measured by P, improves with experience E.
+
+分类与回归:
+<br>分类和回归的区别在于输出变量的类型。
+<br>定量输出称为回归，或者说是连续变量预测；
+<br>定性输出称为分类，或者说是离散变量预测。
+<br>分类的目标是离散的，回归的目标是连续的。
 
 = Resources =
 *   [[http://www.36dsj.com/archives/29515|机器学习工作职位需要的7项技能]]
 *   [[http://www.36dsj.com/archives/20382|一文读懂机器学习，大数据/自然语言处理/算法全有了……]]
 *   [[斯坦福大学公开课 ：机器学习课程]]
-*   [[http://www.oschina.net/news/53818/awesome-machine-learning|推荐！国外程序员整理的机器学习资源大全]]
-*   Start to learn
+*   [[http://machinelearningmastery.com/|Get Started and Kick-Ass in Machine Learning]]
     *   http://machinelearningmastery.com/start-here/
     *   http://machinelearningmastery.com/blog/
     *   http://machinelearningmastery.com/a-gentle-introduction-to-scikit-learn-a-python-machine-learning-library/
-*   [[http://blog.csdn.net/zouxy09/article/details/8775360/|Deep Learning（深度学习）学习笔记整理系列]]
+*   [[http://www.oschina.net/news/53818/awesome-machine-learning|推荐！国外程序员整理的机器学习资源大全]]
 *   [[http://arxiv.org/pdf/1309.0238v1.pdf|API design for machine learning software: experiences from the scikit-learn project]]
 *   [[http://www.36dsj.com/archives/8911?__=a464|译文：机器学习算法基础知识]]
 *   [[https://iamtrask.github.io/|A Machine Learning Craftsmanship Blog]]
@@ -33,3 +34,8 @@ A computer program is said to learn from experience E with respect to some task 
 *   IBM:        [[SystemML]]
 *   三星:       [[Veles]]
 *   Princeton Vision Group:     [[Marvin]]
+
+= Deep Learning = 
+*   [[http://www.36dsj.com/archives/37254|十个值得一试的开源深度学习框架]] 
+*   [[http://toutiao.com/i6235958464481329665/|深度学习统治人工智能？附深度学习十大顶级框架]]
+*   [[Deep Learning（深度学习）学习笔记整理系列|http://blog.csdn.net/zouxy09/article/details/8775360/]] 

@@ -88,7 +88,7 @@ argmax, argmin, argsort, max, min, ptp, searchsorted, sort
 choose, compress, cumprod, cumsum, inner, fill, imag, prod, put, putmask, real, sum 
 
 *   基本统计
-cov, mean, std, var 
+cov, mean(均值), std, var 
 
 *   基本线性代数
 cross, dot, outer, svd, vdot
@@ -119,6 +119,14 @@ NumPy比普通Python序列提供更多的索引功能。除了索引整数和切
 numpy.random模块对Python内置的random进行了补充， 增加了一些高效生成多种概率分布的样本值的函数。
 *   seed        确定随机数生成器的种子
 *   permutation 返回一个序列的随机排列或返回一个随机排列的范围
+{{{// from sklearn
+    >>> np.random.seed(0)
+    >>> indices = np.random.permutation(len(iris_X))
+    >>> iris_X_train = iris_X[indices[:-10]]
+    >>> iris_y_train = iris_y[indices[:-10]]
+    >>> iris_X_test  = iris_X[indices[-10:]]
+    >>> iris_y_test  = iris_y[indices[-10:]]
+}}}
 *   shuffle     对一个序列就地随机排列
 *   rand        产生均匀分布的样本值
 *   randint     从给定的上下限范围内随机选取整数

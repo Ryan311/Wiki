@@ -13,3 +13,69 @@ All supervised estimators in scikit-learn implement a fit(X, y) method to fit th
 If the prediction task is to classify the observations in a set of finite labels, in other words 
 <br>to “name” the objects observed, the task is said to be a classification task. On the other hand, 
 <br>if the goal is to predict a continuous target variable, it is said to be a regression task.
+
+== Nearest neighbor and the curse of dimensionality ==
+*   KNN
+{{{class = "brush: python"
+>>> import numpy as np
+>>> from sklearn import datasets
+>>> iris = datasets.load_iris()
+>>> iris_X = iris.data
+>>> iris_y = iris.target
+>>> np.unique(iris_y)
+
+>>> # Split iris data in train and test data
+>>> # A random permutation, to split the data randomly
+>>> np.random.seed(0)
+>>> indices = np.random.permutation(len(iris_X))
+>>> iris_X_train = iris_X[indices[:-10]]
+>>> iris_y_train = iris_y[indices[:-10]]
+>>> iris_X_test  = iris_X[indices[-10:]]
+>>> iris_y_test  = iris_y[indices[-10:]]
+>>> # Create and fit a nearest-neighbor classifier
+>>> from sklearn.neighbors import KNeighborsClassifier
+>>> knn = KNeighborsClassifier()
+>>> knn.fit(iris_X_train, iris_y_train) 
+KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform')
+>>> knn.predict(iris_X_test)
+array([1, 2, 1, 0, 0, 0, 2, 1, 2, 0])
+>>> iris_y_test
+array([1, 1, 1, 0, 0, 0, 2, 1, 2, 0])
+}}}
+
+== Linear regression ==
+{{{class = "brush: python"
+>>> from sklearn import datasets
+>>> diabetes = datasets.load_diabetes()
+>>> diabetes_X_train = diabetes.data[:-20]
+>>> diabetes_X_test  = diabetes.data[-20:]
+>>> diabetes_y_train = diabetes.target[:-20]
+>>> diabetes_y_test  = diabetes.target[-20:]
+
+>>> from sklearn import linear_model
+>>> regr = linear_model.LinearRegression()
+>>> regr.fit(diabetes_X_train, diabetes_y_train)
+LinearRegression(copy_X=True, fit_intercept=True, n_jobs=1, normalize=False)
+>>> print(regr.coef_)
+[   0.30349955 -237.63931533  510.53060544  327.73698041 -814.13170937
+  492.81458798  102.84845219  184.60648906  743.51961675   76.09517222]
+
+>>> # The mean square error
+>>> np.mean((regr.predict(diabetes_X_test)-diabetes_y_test)**2)
+2004.56760268...
+
+>>> # Explained variance score: 1 is perfect prediction
+>>> # and 0 means that there is no linear relationship
+>>> # between X and Y.
+>>> regr.score(diabetes_X_test, diabetes_y_test) 
+0.5850753022690...
+}}}
+
+== Support vector machines (SVMs) ==
+*   kernels:
+    *   Linear kernel:  svc = svm.SVC(kernel = 'linear')
+    *   Polynomial kernel:  svc = svm.SVC(kernel='poly', degree=3)
+    *   RBF kernel(Radial Basis Function):  svc = svm.SVC(kernel='rbf')
+
