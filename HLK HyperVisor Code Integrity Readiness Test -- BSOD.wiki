@@ -1,0 +1,145 @@
+%toc
+
+= [HLK] DF - HyperVisor Code Integrity Readiness Test Fail -- BSOD =
+== Dump Analyze ==
+{{{
+kd> !analyze -v
+    DRIVER_VERIFIER_DETECTED_VIOLATION (c4)
+    A device driver attempting to corrupt the system has been caught.  This is
+    because the driver was specified in the registry as being suspect (by the
+    administrator) and the kernel has enabled substantial checking of this driver.
+    If the driver attempts to corrupt the system, bugchecks 0xC4, 0xC1 and 0xA will
+    be among the most commonly seen crashes.
+    Arguments:
+    Arg1: 0000000000002000, subclass of driver violation.
+    Arg2: fffff800c94c4c57
+    Arg3: 0000000000000000
+    Arg4: 0000000052534254
+    
+
+    BUGCHECK_STR:  0xc4_2000
+    DEFAULT_BUCKET_ID:  WIN8_DRIVER_FAULT
+    PROCESS_NAME:  System
+    CURRENT_IRQL:  0
+    ANALYSIS_VERSION: 6.3.9600.16384 (debuggers(dbg).130821-1623) x86fre
+    LOCK_ADDRESS:  fffff80333d596a0 -- (!locks fffff80333d596a0)
+    Resource @ nt!PiEngineLock (0xfffff80333d596a0)    Exclusively owned
+        Contention Count = 4
+        NumberOfExclusiveWaiters = 2
+         Threads: ffffe001a85fa040-01<*> 
+         Threads Waiting On Exclusive Access:
+                  ffffe001a85fc040       ffffe001a96cc280       
+    1 total locks, 1 locks currently held
+    PNP_TRIAGE: 
+        Lock address  : 0xfffff80333d596a0
+        Thread Count  : 1
+        Thread address: 0xffffe001a85fa040
+        Thread wait   : 0x1cf
+    LAST_CONTROL_TRANSFER:  from fffff80334156aec to fffff80333b68c20
+
+kd> k
+    Child-SP          RetAddr           Call Site
+    ffffd000`b8b50bd8 fffff803`34156aec nt!KeBugCheckEx
+    ffffd000`b8b50be0 fffff803`33c63b9b nt!VerifierBugCheckIfAppropriate+0x3c
+    ffffd000`b8b50c20 fffff803`3414d810 nt!VfReportIssueWithOptions+0x103
+    ffffd000`b8b50c70 fffff803`33c62b56 nt!VfCheckPoolType+0x90
+    ffffd000`b8b50cb0 fffff800`c834410a nt!VfCheckNxPoolType+0x12
+    (Inline Function) --------`-------- Wdf01000!FxVerifierCheckNxPoolType+0x2e150 [d:\th\minkernel\wdf\framework\shared\inc\private\km\fxverifierkm.h @ 68]
+    ffffd000`b8b50ce0 fffff800`c94c4c57 Wdf01000!imp_WdfMemoryCreate+0x2e25a [d:\th\minkernel\wdf\framework\shared\core\fxmemorybufferapi.cpp @ 135]
+    ffffd000`b8b50d80 fffff800`c94c4436 RtkBtfilter+0x4c57
+    ffffd000`b8b50e30 fffff800`c94c2bbc RtkBtfilter+0x4436
+    ffffd000`b8b50e70 fffff800`c94c181c RtkBtfilter+0x2bbc
+    ffffd000`b8b50eb0 fffff800`c82f55fa RtkBtfilter+0x181c
+    (Inline Function) --------`-------- Wdf01000!FxIoQueueIoInternalDeviceControl::Invoke+0x43 [d:\th\minkernel\wdf\framework\shared\inc\private\common\fxioqueuecallbacks.hpp @ 273]
+    ffffd000`b8b50f20 fffff800`c82f4efe Wdf01000!FxIoQueue::DispatchRequestToDriver+0x23a [d:\th\minkernel\wdf\framework\shared\irphandlers\io\fxioqueue.cpp @ 3324]
+    ffffd000`b8b50fd0 fffff800`c82f3d9e Wdf01000!FxIoQueue::DispatchEvents+0x3ae [d:\th\minkernel\wdf\framework\shared\irphandlers\io\fxioqueue.cpp @ 3100]
+}}}
+
+== Cause ==
+该测项是Win10 HLK中新加的， 用之前的跑过HLK的Driver， 只要测试该项就会BSOD， 而且发生BSOD后， 
+<br>重启后插入BT， 还会发生BSOD， 且Dump相同。 从dump中的failure stack看到， crash发生在WdfMemoryCreate,
+<br>也就是分配内存的时候。 根据该项的Detail描述， 它应该和Win10 Device Guard相关。 
+<br>与Device Guard兼容的Driver， 分配非分布内存时应该使用NonPagedPoolNx， 表示内存不可执行， 而不能用NonPagedPool
+
+== Solution ==
+#   自定义宏：NonPagedPoolNx该tag是从Win8开始支持的， Driver中可以宏控制， 当Build Win7 Driver时， 使用NonPagedPool， Win8以后Driver， 使用NonPagedPoolNx
+#   MSFT提供的[[https://msdn.microsoft.com/en-us/library/windows/hardware/hh920394%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396|NX Pool Opt-In Mechanisms]]: Use one of several porting aids to easily "opt in" to use the NonPagedPoolNx pool type by default.
+    *   Single Binary Opt-In: POOL_NX_OPTIN     --  单个Driver， 在Win7和Win8+都能运行
+{{{
+To use this opt-in mechanism, do the following:
+
+1. Define POOL_NX_OPTIN = 1 for all source files that you want to opt-in. 
+To do this, include the following preprocessor definition in the appropriate
+property page for your driver project:
+    C_DEFINES=$(C_DEFINES) -DPOOL_NX_OPTIN=1
+
+2. In your DriverEntry (or equivalent) routine, include the following function call:
+    ExInitializeDriverRuntime(DrvRtPoolNxOptIn);
+    
+Implementation details:
+POOL_NX_OPTIN works by replacing NonPagedPool with a global POOL_TYPE variable, 
+ExDefaultNonPagedPoolType, which is initialized either to NonPagedPoolNx (for Windows 8
+and later versions of Windows) or to NonPagedPoolExecute (for earlier versions of Windows).
+}}}
+    *   Multiple Binary Opt-In: POOL_NX_OPTIN_AUTO  --  在Win7和Win8+， 生成不同的Driver, 我们的RtkBtfilter属于这个情况
+{{{
+To use this opt-in mechanism:
+Define POOL_NX_OPTIN_AUTO=1 for all source files that you want to opt-in. Include the
+following preprocessor definition in the appropriate property page for your driver project:
+    C_DEFINES=$(C_DEFINES) -DPOOL_NX_OPTIN_AUTO=1 
+
+Implementation details:
+The POOL_NX_OPTIN_AUTO definition redefines the NonPagedPool constant name to NonPagedPoolNx.
+The redefined pool type is still a compile-time constant.  The macro that converts instances 
+of the NonPagedPool constant name to NonPagedPoolNx also converts instances of 
+NonPagedPoolCacheAligned to NonPagedPoolNxCacheAligned.
+}}}
+    *   Selective Opt-Out: POOL_NX_OPTOUT   --  Opt-In mechamism是针对全部的File的， 如果想在某个文件中使Opt-In不起作用， 用Opt-Out宏
+{{{
+To use the POOL_NX_OUTPUT opt-out mechanism to override the opt-in mechanism in a selected
+source file, add the following definition to this file:
+    #define POOL_NX_OPTOUT 1
+
+This definition overrides the global opt-in settings in the selected file, and prevents 
+instances of the NonPagedPool constant name from being replaced. Insert this definition 
+into the file before the first instance of NonPagedPool in the file.
+}}}
+
+= DF - HyperVisor Code Integrity Readiness Test =
+Verifies that drivers are compatible with Windows HyperVisor Code Integrity feature
+
+Test details Specifications:
+*   Device.Devfund.DeviceGuard
+*   Filter.Driver.DeviceGuard.DriverCompatibility
+
+All kernel drivers must be built to be compatible with *Device Guard*
+{{{
+Windows 10 has a new feature called Device Guard that gives organizations the ability to lock down devices in a way that provides 
+advanced malware protection against new and unknown malware variants as well as Advanced Persistent Threats (APTs). Device Guard 
+can use hardware technology and virtualization to isolate the Code Integrity (CI) decision-making function from the rest of the 
+Windows operating system. When using virtualization-based security to isolate Code Integrity, the only way kernel memory can become
+executable is through a Code Integrity verification. This means that kernel memory pages can never be Writable and Executable (W+X)
+and executable code cannot be directly modified. 
+}}}
+
+How to build compatible drivers with Device Guard
+{{{
+Since memory pages and sections can never be writable and executable, the first step is to ensure a clear separation of data and 
+code and not to attempt to directly modify code pages.
+*   Opt-in to NX by default
+*   Use NX APIs/flags for memory allocation - NonPagedPoolNx
+*   Don’t use sections that are both writable and executable
+*   Don’t attempt to directly modify executable system memory
+*   Don’t use dynamic code in kernel  
+*   Don’t load data files as executable
+*   Section Alignment must be a multiple of 0x1000 (PAGE_SIZE). E.g. DRIVER_ALIGNMENT=0x1000
+
+Use the latest version of the WDK and Visual Studio 2015 to produce compatible drivers when using default settings. Visual Studio 
+2013 currently marks the INIT section as RWX. This will be patched soon, but is still compatible as Windows 10 will automatically
+strip the write permission (W) from the INIT section.
+}}}
+
+More details:
+*   [[http://blogs.msdn.com/b/windows_hardware_certification/archive/2015/05/22/driver-compatibility-with-device-guard-in-windows-10.aspx|Driver compatibility with Device Guard in Windows 10]]
+
+

@@ -44,3 +44,4 @@
 *   [[Resource Leak]]
 *   [[0x18 BSOD]]
 *   [[Memory Leak]]
+*   [[HLK HyperVisor Code Integrity Readiness Test -- BSOD]]

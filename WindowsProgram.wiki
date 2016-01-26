@@ -67,3 +67,4 @@ Current Symbol File System:
 == [[Device Notification]] == 
 == [[Public and Private Symbols]] ==
 == [[Windows Security and Identity]] ==
+== [[Windows Audio]] ==

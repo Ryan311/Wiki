@@ -1,0 +1,39 @@
+%toc
+
+= 数字音频相关参数 =
+“样本”: 是表现某一时间点上波形振幅的一个值——它仅仅是一个数字。
+<br>“样本大小(samplesize)”: 样本大小表示用多少的字节位数(bits)来计量波形振幅值。样本越大， 样本振幅值起接近实际值， 音质也就越好。
+<br>“采样频率”: 表明我们采集波形样本的频率。它的计量单位是赫兹(Hz)或每秒样本数。显然，采样频率越高，采样的波形就越接近真实的波形，所以声音的音质也就越好。 
+<br>“声道(channels)”: 
+<br> CD品质的音频采样频率是44100Hz，样本大小是16bits,意味着1M的音频数据只能持续约6秒的时间。 
+
+= Win32 API =
+== [[https://msdn.microsoft.com/en-us/library/windows/desktop/dd798671%28v=vs.85%29.aspx|Simple Audio Playback]] ==
+| MessageBeep  | Plays the sound that corresponds to a specified system-alert level.                                                 |
+| sndPlaySound | Plays the sound that corresponds to the system sound entered in the registry or the contents of the specified file. |
+| PlaySound    | Provides all the functionality of sndPlaySound and can directly access resources.                                   |
+
+=== PlaySound & snPlaySound ===
+This function plays a sound specified by a file name, resource, or system event. 
+<br>The sndPlaySound function plays a waveform sound specified either by a file name or by an entry in the registry or the WIN.INI file. 
+
+    BOOL WINAPI PlaySound( 
+      LPCSTR pszSound, 
+      HMODULE hmod, 
+      DWORD fdwSound 
+    );
+
+*   三种方法来调用PlaySound函数
+    *   第一种方法是直接播出声音文件，相应的代码为：
+        PlaySound("c:\\media\\test.wav", NULL, SND_FILENAME | SND_ASYNC);
+        注意参数中的路径使用两个连续的反斜杠转义代表一个反斜杠。
+    *   第二种方法是把声音文件加入到资源中，然后从资源中播放声音。Visual C++支持WAVE型资源，用户在资源视图中单击鼠标右键并选择Import命令，
+        然后在文件选择对话框中选择test.wav文件，则该文件就会被加入到WAVE资源中。 假定声音资源的ID为IDR_STARTWIN，则下面的调用同样会输出启动声音：
+        PlaySound((LPCTSTR)IDR_STARTWIN, AfxGetInstanceHandle(), SND_RESOURCE | SND_ASYNC);
+    *   第三种方法是用PlaySound播放系统声音，Windows启动的声音是由SystemStart定义的系统声音，因此可以用下面的方法播放启动声音：
+        PlaySound("SystemStart",NULL,SND_ALIAS|SND_ASYNC);
+        
+=== waveOutOpen ===
+https://msdn.microsoft.com/zh-cn/subscriptions/dd797880.aspx
+Example:    Work//G:\Projects\wmpTest
+
