@@ -313,6 +313,9 @@ an application calls a Win32 file I/O function(such as CreateFile, ReadFileEx, o
 *   从MSFT服务器下载Public PDB
     *   Symchk.exe <binary file> /s SRV*<local directory to download symbols to>*<symbol server>
     *   Example:     symchk C:\windows\system32\drivers\hidclass.sys /s SRV*C:\Symbols*http://msdl.microsoft.com/downloads/symbols
+*   XCOPY   XCOPY是COPY的扩展 
+    *   http://www.ynpxrz.com/n614941c2025.aspx
+    *   http://www.jb51.net/article/29055.htm
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 == [[Work Debug]] ==

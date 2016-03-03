@@ -1,0 +1,25 @@
+%toc
+
+DOC:    https://msdn.microsoft.com/en-us/library/ms725500%28v=vs.85%29.aspx
+
+== Register ==
+*   
+
+
+== INI File ==
+配置文件是*.ini， 与traceview相似。 建议方式是写到注册表中
+*   Write configuration to ini 
+    *   WritePrivateProfileSection
+    *   WritePrivateProfileString
+    *   WritePrivateProfileStruct
+    *   WriteProfileSection
+    *   WriteProfileString
+*   Read configuration to ini
+    *   GetPrivateProfileInt
+    *   GetPrivateProfileSection
+    *   GetPrivateProfileSectionNames 
+    *   GetPrivateProfileString
+    *   GetPrivateProfileStruct
+    *   GetProfileInt
+    *   GetProfileSection
+    *   GetProfileString

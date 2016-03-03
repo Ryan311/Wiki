@@ -33,6 +33,8 @@ This function plays a sound specified by a file name, resource, or system event.
     *   第三种方法是用PlaySound播放系统声音，Windows启动的声音是由SystemStart定义的系统声音，因此可以用下面的方法播放启动声音：
         PlaySound("SystemStart",NULL,SND_ALIAS|SND_ASYNC);
         
+*    需要加入头文件Mmsystem.h (include Windows.h),  加入库Winmm.lib
+ 
 === waveOutOpen ===
 https://msdn.microsoft.com/zh-cn/subscriptions/dd797880.aspx
 Example:    Work//G:\Projects\wmpTest

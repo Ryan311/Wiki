@@ -68,3 +68,4 @@ Current Symbol File System:
 == [[Public and Private Symbols]] ==
 == [[Windows Security and Identity]] ==
 == [[Windows Audio]] ==
+== [[Windows Registry Functions]] ==

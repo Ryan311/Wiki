@@ -141,7 +141,55 @@ MFC是微软基础类库的简称，是微软公司实现的一个c++类库，�
 *   获取文件名,文件类型,文件长度,文件路径   virtual CString GetFileName( ) const, virtual CString GetFileTitle( ) const, virtual CString GetFilePath( ) const, virtual DWORD GetLength( ) const;throw( CFileException );
 
 == Experience with MFC ==
-study note when write MAP sample UI
+*   ShellExecute:   https://msdn.microsoft.com/en-us/library/windows/desktop/bb762153%28v=vs.85%29.aspx
+    *   ShellExecute(NULL, L"explorer", g_Worker, NULL，NULL, SW_SHOWNORMAL);   // 在程序中打开一个目录， File Location
+*   动态加载Dll
+    *   AfxLoadLibrary(DecoderFilePath)
+    *   获得dll中的函数， m_DecoderFunc = (AUDIO_DECODER)GetProcAddress(hDll,"AudioDecoder");
+*   三种类型的Dll， http://www.cnblogs.com/duanshuiliu/archive/2012/07/05/2577402.html
+    *   Dll中导出函数时， 最好用extern "C" __declspec(dllexport) void Func()形式， 
+    *   即以C的函数符号名导出该函数， 如果不加的话就会以C++的形式给出， 比较复杂
+    *   查看Dll中导出函数， 用VS Tools->Visual studio 2008 Command Prompt, d:\dumpbin /exports a.dll
+    *   CString类型不能向dll传递 请转换为char* 或lpctstr或BSTR http://blog.csdn.net/wangqiulin123456/article/details/8114638
+    *   用const CString &Path 是可以的！！！， 最好还是用BSTR
+    *   CString <==> LPTSTR     http://blog.sina.com.cn/s/blog_5d2412000100om0p.html
+*   CStringArray        CString数组   
+*   map     #include <map>
+{{{
+    Map中的元素是自动按key升序排序
+    使用枚举器查找或删除指定元素:
+    1)map中元素的查找：
+       find()函数返回一个迭代器指向键值为key的元素，如果没找到就返回指向map尾部的迭代器。        
+       map<int ,string >::iterator l_it;; 
+       l_it=maplive.find(112);
+       if(l_it==maplive.end())
+            cout<<"we do not find 112"<<endl;
+       else cout<<"wo find 112"<<endl;
+    2)map中元素的删除：
+       如果删除112；
+       map<int ,string >::iterator l_it;;
+       l_it=maplive.find(112)[[;]]
+       if(l_it==maplive.end())
+            cout<<"we do not find 112"<<endl;
+       else  maplive.erase(l_it);  //delete 112;
+}}}
+*   CFileFind， 该类的成员函数根据其操作特性划分为3类：查找操作类、获得文件属性类、判断文件属性类。
+    *   Example:    https://msdn.microsoft.com/en-us/library/scx99850%28v=vs.80%29.aspx
+{{{
+    CFileFind fileFind;
+    if(!fileFind.FindFile(g_WorkDir))
+    {// dir not exist
+        if(!CreateDirectory(g_WorkDir, NULL))
+        {// create dir
+            //create dir fail
+        }
+    }
+}}}
+*   GetCurrentDirectory, GetModuleFileName， SHGetSpecialFolderLocation
+    *   GetCurrentDirectory, 只是获取当前的目录，当计算机重新启动后，当前的路径一般为系统目录， 因此系统启动后，使用该函数只能获取当前的目录，而不是应用程序所在的目录。
+    *   GetModuleFileName, 获得程序App所在的目录
+    *   SHGetSpecialFolderLocation， 获得系统特殊路径函数,  #include "shlobj.h" //包含头文件
+    *   More Shell API: https://msdn.microsoft.com/en-us/library/bb773177%28v=vs.85%29.aspx#
 *   MessageBox
 {{{
     http://blog.sina.com.cn/s/blog_6217219f0100remq.html
@@ -302,6 +350,14 @@ study note when write MAP sample UI
         去掉CString右边的特定字符用TrimRight
         CString str="!!!!!lengquan!!quan!!";
         str.TrimRight('!');
+    }}}
+    *   CString.SpanIncluding   提取包含在指定串中的一个子串
+        *   可以检验字符串的合法性，是否是我们要求的字符
+    {{{
+        if ( strTarget == strTarget.SpanIncluding( _T("0123456789") ) )   
+        {  
+            // 字符串由数字构成，符合要求  
+        }  
     }}}
 *   ListCtrl
 {{{
@@ -628,3 +684,11 @@ study note when write MAP sample UI
 	pPbapDlg->Create(IDD_PBAPCLIENT_DIALOG); //创建一个非模态对话框  
 	pPbapDlg->ShowWindow(SW_SHOWNORMAL); //显示非模态对话框 
     }}}
+*   CRegKey
+    *   路径格式： #define SERVICE_LE_UI_PATCH     L"Software\\Realtek\\"       前面不能有\\， 后面必须有\\
+{{{
+    LeDeviceKey.DeleteValue(CString(L"Ediv"));  // Delete Value
+    LeDeviceKey.DeleteSubKey(m_BDAddrStr);	// only delete empty subkey
+    LeDeviceKey.RecurseDeleteKey(m_BDAddrStr);	// can delete non-empty subkey
+}}}
+
