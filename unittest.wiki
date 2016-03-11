@@ -1,0 +1,154 @@
+%toc
+
+Python Doc: https://docs.python.org/2.7/library/unittest.html?highlight=unittest#module-unittest
+<br>Python自动单元测试框架PyUnit: http://blog.chinaunix.net/uid-22312037-id-3929835.html
+
+= Basic =
+在Python中进行单元测试需要用到自动单元测试框架PyUnit，Python2.1及其以后的版本都将PyUnit作为一个标准模块
+
+PyUnit测试用例TestCase:
+软件测试中最基本的组成单元式测试用例（test case），PyUnit使用TestCase类来表示测试用例，并要求所有用于执行测试的类都必须从该类继承。
+TestCase子类实现的测试代码应该是自包含的（self contained），即测试用例既可以单独运行，也可以和其它测试用例构成集合共同运行。
+TestCase类中常用的函数或方法有：
+*   setUp：进行测试前的初始化工作。
+*   tearDown：执行测试后的清除工作。
+*   failedinfo：表示不成立打印信息faliedinfo，为可选参数。
+*   self.assertEqual(value1, value2, failedinfo)：会无条件的导致测试失败，不推荐使用。
+*   self.assertTrue(, failedinfo)：断言value1 == value2。
+*   self.assertFalse(, failedinfo)：断言value为真。
+*   self.assertRaises(ValueError, self.widget.resize, -1, -1)：断言肯定发生异常，如果没发生异常，则为测试失败。参数1为异常，参数2为抛出异常的调用对象，其余参数为传递给可调用对象的参数。
+PyUnit测试框架在运行一个测试用例时，TestCase子类定义的setUp()、runTest()和tearDown()方法被依次执行，最简单的测试用例只需要覆盖runTest()方法来执行特定的测试代码就可以了。
+
+测试类
+{{{"class = python"
+    #widget.py
+    #将要被测试的类Widget
+    class Widget:
+        def __init__(self, size = (40, 40)):
+            self._size = size
+        def getSize(self):
+            return self._size
+        def resize(self, width, height):
+            if width < 0  or height < 0:
+                raise ValueError, "illegal size"
+            self._size = (width, height)
+        def dispose(self):
+            pass
+}}}
+== 静态方法 ==
+一个测试用例只对软件模块中一个方法进行测试，采用覆盖runTest()方法来构造测试用例，这在PyUnit中称之为静态方法，举例说明如下：
+{{{"class = python"
+    #static.py
+    from widget import Widget
+    import unittest
+    
+    #执行测试的类
+    class WidgetTestCase(unittest.TestCase):
+        def runTest(self):
+            widget = Widget()
+            self.assertEqual(widget.getSize(), (40, 40))
+            
+    #测试
+    if __name__ == "__main__":
+        testCase = WidgetTestCase()
+        testCase.runTest()
+}}}
+如果采用静态方法，Python程序员就不得不为每个要测试的方法编写一个测试类，该类通过覆盖runTest()方法来执行测试，并在每个测试类中生成一个待测试的对象，这样会非常繁琐与笨拙。
+
+== 动态方法 ==
+鉴于静态方法的缺陷，PyUnit提供了另一种高帅富的解决方法，即动态方法，只编写一个测试类来完成对整个软件模块的测试，这样对象的初始化工作可以在setUp()方法中完成，
+<br>而资源的释放则可以在tearDown()方法中完成，举例说明如下：
+{{{"class = python"
+    #dynamic.py     
+    from widget import Widget
+    import unittest
+    
+    class WidgetTestCase(unittest.TestCase):
+        def setUp(self):
+            self.widget = Widget()
+        def tearDown(self):
+            self.widget.dispose()
+            self.widget = None
+        def testSize(self):
+            self.assertEqual(self.widget.getSize(), (40, 40))
+        def testResize(self):
+            self.widget.resize(100, 100)
+            self.assertEqual(self.widget.getSize(), (100, 100))
+}}}
+动态方法不再覆盖runTest()方法，而是为测试类编写多个测试方法，按照惯例这些方法通常以test开头但这不是必须的，在创建TestCase子类的实例时
+<br>必须给出测试方法的名称来为PyUnit测试框架指明运行该测试用例时应该调用测试类中的哪些方法，这通常会结合测试用例集TestSuite一起使用。
+
+== 测试用例集TestSuite ==
+完整的单元测试很少只执行一个测试用例，开发人员通常需要编写多个测试用例才能对某一软件功能进行比较完成的测试，这些相关的测试用例称为一个测试用例集，在PyUnit中是用
+TestSuite类来表示的。PyUinit测试框架允许Python程序员在单元测试代码中定义一个名为suite()的全局函数，并将其作为整个单元测试的入口，PyUnit通过调用它来完成整个测试过程：
+{{{"class = python"
+    def suite():
+        suite = unittest.TestSuite()
+        suite.addTest(WidgetTestCase("testSize"))
+        suite.addTest(WidgetTestCase("testResize"))
+        return suite
+}}}
+        
+也可以直接定义一个TestSuite的子类，并在其初始化方法__init__中完成所有测试用例的添加：
+{{{"class = python"
+    class WidgetTestSuite(unittest.TestSuite)
+        def __init__(self):
+            unittest.TestSuite.__init__(self, map(WidgetTestCase, ("testSize", "testResize")))
+    
+    这样只需要在suite()方法中返回该类的一个实例就可以了：
+    def suite():
+        return WidgetTestSuite()
+}}}
+
+在PyUnit测试框架中，TestSuite类可以看成是TestCase类的一个容器，用来对多个测试用例进行组织，这样多个测试用例可以自动在一次测试中全部完成。
+事实上，TestSuite除了可以包含TestCase外，也可以包含TestSuite，从而可以构成一个更庞大的测试用例集：
+{{{"class = python"
+    suite1 = mysuite1.TheTestSuite()
+    suite2 = mysuite2.TheTestSuite()
+    alltests = unittest.TestSuite((suite1, suite2))
+}}}
+
+== 实施测试TestRunner ==
+编写测试用例（TestCase）并将它们组织成测试用例集（TestSuite）的最终目的只有一个：实施测试并获得最终结果。PyUnit使用TestRunner类作为测试用例的基本执行环境，
+来驱动整个单元测试过程。但是Python开发人员在进行单元测试时一般不直接使用TestRunner类，而是使用其子类TextTestRunner来完成测试，并将测试结果以文本方式显示出来。
+举例说明如下：
+{{{"class = python"
+    #text_runner.py
+    
+    from widget import Widget
+    import unittest
+    
+    #执行测试的类
+    class WidgetTestCase(unittest.TestCase):
+        def setUp(self):
+            self.widget = Widget()
+        def tearDown(self):
+            self.widget.dispose()
+            self.widget = None
+        def testSize(self):
+            self.assertEqual(self.widget.getSize(), (40, 40))
+        def testResize(self):
+            self.widget.resize(100, 100)
+            self.assertEqual(self.widget.getSize(), (100, 100))
+            
+    #测试
+    if __name__ == "__main__":
+        #构造测试集            
+        suite = unittest.TestSuite()
+        suite.addTest(WidgetTestCase("testSize"))
+        suite.addTest(WidgetTestCase("testResize"))
+        #执行测试
+        runner = unittest.TextTestRunner()
+        runner.run(suite)
+    
+
+    #如果Python程序员能够按照约定（以test开头）来命令所有的测试方法，那么只需要在测试模块的最后加入如下几行代码即可：
+    if __name__ == "__main__":
+        unittest.main()
+}}}
+使用如下命令执行该单元测试：
+
+    $python text_runner.py
+            
+默认情况下，TextTestRunner将结果输出到sys.stdout/sys.stderr上，但是如果在创建TextTestRunner类实例时将一个文件对象传递给了构造函数，则输出结果将被重定向到该文件中。
+
