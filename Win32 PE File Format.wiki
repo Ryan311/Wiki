@@ -1,0 +1,92 @@
+%toc
+
+= DOC =
+<br>深入理解 WIN32 PE 文件格式(1): http://www.cppblog.com/shaoxie1986/articles/126142.html
+<br>深入理解 WIN32 PE 文件格式(2): http://blog.csdn.net/sqcfj/article/details/5997576
+<br>逆向工程（一）：汇编、逆向工程基础篇:   http://www.tuicool.com/articles/naqmMry
+<br>逆向工程（二）：从一个简单的实例来了解PE文件:   http://www.07net01.com/security/2015/12/1004834.html
+<br>MSDN --- Microsoft Portable Executable and Common Object File Format Specification
+
+= Basic =
+PE文件一个方便的特点是磁盘上的数据结构和加载到内存中的数据结构是相同的。加载一个可执行文件到内存中 (例如，通过调用LoadLibrary)主要就是映射一个PE文件中的几个确定的区域到地址空间中。
+因此，一个数据结构比如IMAGE_NT_HEADERS (稍后我将会解释)在磁盘上和在内存中是一样的。关键的一点是如果你知道怎么在一个PE文件中找到一些东西，当这个PE文件被加载到内存中后你几乎能找到相同的信息。
+
+对于64位的Windows， PE格式只是进行了很少的修改。这种新的格式被叫做PE32+。没有加入新的域，只有一个域被去除。剩下的改变只是一些域从32位扩展到了64位。
+
+EXE和DLL文件之间的不同完全是语义上的。它们都使用完全相同的PE格式。仅有的区别是用了一个单个的位来指出这个文件应该被作为EXE还是一个DLL。
+
+要注意到PE文件并不仅仅是被映射到内存中作为一个内存映射文件。代替的，Windows加载器分析这个PE文件并决定映射这个文件的哪些部分。
+当映射到内存中时文件中偏移位置较高的数据映射到较高的内存地址处。一个项目在磁盘文件中的偏移也许不同于它被加载到内存中时的偏移。
+然而，所有被表现出来的信息都允许你进行从磁盘文件偏移到内存偏移的转换。
+
+描述PE格式（以及COFF文件）的主要地方是在WINNT.H文件中。在这个头文件中，你可以找到要和PE文件一起工作所必须的每个结构定义，枚举，和#define定义。
+
+从API的角度来说，Microsoft的IMAGEHLP.DLL 提供了读取和编辑PE文件的机制。 
+
+PE文件的节:
+<br>一个PE文件中通常至少有两个节：一个代码节，一个数据节。一般地，在一个PE文件中至少有一个其它类型的数据节。
+节有两种对齐值，一个是在磁盘文件中的偏移, 另一个是在内存中的偏移。PE文件头指定了这两个对齐值，它们可以是不同的。 每个节起始于那个对齐值的倍数的位置。
+*   在PE文件中，典型的对齐值是0x200。因此，每个节开始于一个0x200的倍数的文件偏移处。
+*   加载到内存中，节总是起始于至少一个页边界。就是说，当一个PE节被映射到内存中后，每个节的第一个字节都符合一个内存页。对于x86 CPUs，页是4KB，而IA-64，页是8KB
+
+相对虚拟地址(RVA):  
+(目标地址) 0x401000 - (加载地址)0x400000 = (RVA)0x1000.
+
+数据目录:
+在可执行文件中有许多数据结构需要被快速定位。一些明显的例子是导入表，导出表，资源，和基址重定位表。所有这些众所周知的数据结构都可通过一致的方式被找到，就是数据目录。
+数据目录是一个由16个结构组成的数组。每个数组元素都预定义了它所代表的含意。IMAGE_DIRECTORY_ENTRY_ xxx 定义了数据目录的数组索引
+
+
+= PE文件结构 = 
+*   MS-DOS头 
+    PE文件以一个传统的MS-DOS头开头，被称为IMAGE_DOS_HEADER。其中只有两个重要的值，它们是e_magic和e_lfanew。e_lfanew域包含PE头的文件偏移。
+e_magic域(一个WORD)必须被设为0x5A4D。对于这个值有个常量定义，叫做IMAGE_DOS_SIGNATURE。用ASCII字符表示, 0x5A4D就是“MZ”，这是MS-DOS最初设计者之一Mark Zbikowski名子的首字母大写。 
+
+*   IMAGE_NT_HEADERS头 
+    IMAGE_NT_HEADERS 结构是存储 PE 文件细节信息的主要位置。它的偏移由这个文件开头的 IMAGE_DOS_HEADER 的 e_lfanew 域给出。实际上有两个版本的IMAGE_NT_HEADER 结构，一个用于32位可
+执行文件，另一个用于64位版本。它们之间的区别很小，在讨论中我将认为它们是相同的。区别这两种格式的唯一正确的、由Microsoft 认可的方法是通过 IMAGE_OPTIONAL_HEADER 结构（马上就会
+讲到）的 Magic 域的值。 IMAGE_NT_HEADER由三个字段组成：
+
+    typedef struct _IMAGE_NT_HEADERS {
+        DWORD Signature;
+        IMAGE_FILE_HEADER FileHeader;
+        IMAGE_OPTIONAL_HEADER32 OptionalHeader;
+    } IMAGE_NT_HEADERS32, *PIMAGE_NT_HEADERS32;
+
+在一个有效的PE文件中，Signature字段的值是0x00004550，用ASCII表示就是“PE00”。 #define IMAGE_NT_SIGNATURE定义了这个值。第二个域是一个IMAGE_FILE_HEADER类型的结构，
+它包含了关于这个文件的一些基本的信息，最重要的是其中一个域指出了其后的可选数据的大小。在PE文件中，这个可选数据是必须的，但仍然被称为IMAGE_OPTIONAL_HEADER。 
+
+IMAGE_FILE_HEADER 
+| 大小  | 域                   | 描述                                                                                                                                                                                                                                                          |
+| WORD  | Machine              | 可执行文件的目标CPU。通常的值是： IMAGE_FILE_MACHINE_I386 0x014c // Intel 386 IMAGE_FILE_MACHINE_IA64 0x0200 // Intel 64                                                                                                                                      |
+| WORD  | NumberOfSections     | 指出节表中有多少个节。节表紧跟在IMAGE_NT_HEADERS之后。                                                                                                                                                                                                        |
+| DWORD | TimeDateStamp        | 指出这个文件被创建的时间。这个值是用格林尼治时间(GMT)计算的自从1970年1月1日以来所经过的秒数。这个值比文件系统的日期/时间更准确地指出了文件被创建的时间。使用_ctime 函数(对时区敏感)可以很容易地把这个值转换为人们可读的字符串形式。另一个有用的函数是gmtime。 |
+| DWORD | PointerToSymbolTable | COFF符号表的文件偏移，描述于Microsoft规范的5.4节。COFF符号表在PE文件中很少见，因为出现了新的调试格式。Visual Studio .NET之前，可通过指定链接器选项/DEBUGTYPE:COFF来创建COFF符号表。COFF符号表几乎总是会出现在OBJ文件中。如果没有符号表则设此值为0。           |
+| DWORD | NumberOfSymbols      | 如果存在COFF符号表，此域表示其中的符号的数目。COFF符号是一个固定大小的结构，要找到COFF符号表的末尾就必须用到此域。紧跟COFF符号之后是一个用来保存较长符号名的字符串表。                                                                                        |
+| WORD  | SizeOfOptionalHeader | IMAGE_FILE_HEADER 之后的可选数据的大小。在PE文件中，这个数据称为IMAGE_OPTIONAL_HEADER。这个大小在32位和64位的文件中是不同的。对于32位PE文件，这个域通常是224。对于64位PE32+文件，它通常是240。然而，这些值只是所要求的最小值，更大的值也可能会出现。          |
+| WORD  | Characteristics      | 一组指示文件属性的位标。这些标记的有效值是定义于WINNT.H文件中的IMAGE_FILE_xxx值。一些常用的值在图4中列出。                                                                                                                                                    |
+
+
+*   节表 IMAGE_SECTION_HEADER
+IMAGE_NT_HEADERS之后紧跟着节表, IMAGE_SECTION_HEADER提供了和它关联的节的信息，包括位置，长度和属性。 在IMAGE_FILE_HEADER结构中的NumberOfSections 域中提供了IMAGE_SECTION_HEADER 结构的数目。 
+
+IMAGE_SECTION_HEADER
+| 大小  | 域                   | 描述                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| BYTE  | Name[8]              | 节的ASCII名称。节名不保证一定是以NULL结尾的。如果你指定了长于8个字符的节名，链接器会把它截短为8个字符。在OBJ文件中存在一个机制允许更长的节名。节名通常以一个句点开始，但这并不是必须的。节名中有一个“$”时链接器会对之进行特殊处理。前面带有“$”的相同名字的节将会被合并。合并的顺序是按照“$”后面字符的字母顺序进行合并的。关于名字中带有“$”的节以及这些节怎样被合并有很多的主题，但这些细节已超出本文所讨论的范围了。 |
+| DWORD | Misc.VirtualSize     | 指出实际被使用的节的大小。这个域的值可以大于或小于SizeOfRawData域的值。如果VirtualSize的值大，SizeOfRawData就是可执行文件中已初始化数据的大小，剩下的字节用0填充。在OBJ文件中这个域被设为0。                                                                                                                                                                                                                                 |
+| DWORD | VirtualAddress       | 在可执行文件中，是节被加载到内存中后的RVA。在OBJ文件中应该被设为0。                                                                                                                                                                                                                                                                                                                                                          |
+| DWORD | SizeOfRawData        | 在可执行文件或OBJ文件中该节所占用的字节大小。对于可执行文件，这个值必须是PE头中给出的文件对齐值的倍数。如果是0，则说明这个节中的数据是未初始的。                                                                                                                                                                                                                                                                             |
+| DWORD | PointerToRawData     | 节在磁盘文件中的偏移。对于可执行文件，这个值必须是PE头部给出的文件对齐值的倍数。                                                                                                                                                                                                                                                                                                                                             |
+| DWORD | PointerToRelocations | 节的重定位数据的文件偏移。只用于OBJ文件，在可执行文件中被设为0。对于OBJ文件，如果这个域的值不为0的话，它就指向一个IMAGE_RELOCATION结构数组。                                                                                                                                                                                                                                                                                 |
+| DWORD | PointerToLinenumbers | 节的COFF样式行号的文件偏移。如果非0，则指向一个IMAGE_LINENUMBER结构数组。只在COFF行号被生成时使用。                                                                                                                                                                                                                                                                                                                          |
+| WORD  | NumberOfRelocations  | PointerToRelocations 指向的重定位的数目。在可执行文件中应该是0。                                                                                                                                                                                                                                                                                                                                                             |
+| WORD  | NumberOfLinenumbers  | NumberOfRelocations 域指向的行号的数目。只在COFF行号被生成时使用。                                                                                                                                                                                                                                                                                                                                                           |
+| DWORD | Characteristics      | 被或到一起的一些标记，用来表示节的属性。这些标记中很多都可以通过链接器选项/SECTION来设置。                                                                                                                                                                                                                                                                                                                                   |
+
+
+
+= Tool =
+*   在它们之中有包含于Visual Studio中的Dumpbin，
+*   包含于Platform SDK的Depends, 有一个检查一个文件的导入表和导出表的简洁的方式。
+*   PEBrowse专业版是一个很优秀的免费的PE观察器。
+*   PEDUMP程序功能也很全面，实现了几乎Dumpbin的所有功能。 

@@ -1,0 +1,5 @@
+%toc
+
+提高你的Python能力：理解单元测试:   https://segmentfault.com/a/1190000000400091
+
+Python自动单元测试框架PyUnit:   http://blog.chinaunix.net/uid-22312037-id-3929835.html
