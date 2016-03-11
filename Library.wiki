@@ -126,6 +126,12 @@
 == pymongo ==
 *  NoSQL数据库 
 
+== pycrypto ==
+*   Python Cryptography Toolkit
+*   This is a collection of both secure hash functions (such as SHA256 and RIPEMD160), and various encryption algorithms (AES, DES, RSA, ElGamal, etc.).
+== hashlib ==
+*   hashlib是个专门提供hash算法的库，现在里面包括md5, sha1, sha224, sha256, sha384, sha512
+*   md5经常用来做用户密码的存储。而sha1则经常用作数字签名。
 
 
 = Third Party =

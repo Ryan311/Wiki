@@ -1,5 +1,125 @@
 %toc
 
+Spec:  http://dbus.freedesktop.org/doc/dbus-specification.html
+<br> dbus-python tutorial:  http://dbus.freedesktop.org/doc/dbus-python/doc/tutorial.html
+<br> Tutorial:  http://blog.csdn.net/fmddlmyy/article/details/3585730
+<br> Dbus基础:  http://blog.csdn.net/eastmoon502136/article/details/10044993
+<br>            http://www.cnblogs.com/wzh206/archive/2010/05/13/1734901.html
+
+== Intro ==
+<br>D-Bus是针对桌面环境优化的IPC（interprocess communication ）机制，用于进程间的通信或进程与内核的通信。
+<br>支持dbus的系统都有两个标准的消息总线：系统总线和会话总线。系统总线用于系统与应用的通信。会话总线用于应用之间的通信。
+<br>与直接使用socket不同，D-Bus是面向消息的协议。 D-Bus的所有功能都是通过在连接上流动的消息完成的。
+
+D-Bus是三层架构的进程间通信系统，其中包括：
+*   接口层：接口层由函数库libdbus提供，进程可通过该库使用D-Bus的能力。
+*   总线层：总线层实际上是由D-Bus总线守护进程提供的。它在Linux系统启动时运行，负责进程间的消息路由和传递，其中包括Linux内核和Linux桌面环境的消息传递。
+*   包装层：包装层一系列基于特定应用程序框架的Wrapper库。 如dbus-python, libdbus-glib
+
+
+D-Bus有四种类型的消息:
+*   signal          -- 信号是最基本的消息，注册的进程可简单地发送信号到总线上，其他进程通过总线读取消息。
+*   method_call     -- 方法调用是通过总线传递参数，执行另一个进程接口函数的机制，用于某个进程控制另一个进程。 
+*   method_return   -- 方法返回是注册的进程在收到相关信息后，自动做出反应的机制，由回调函数实现。
+*   error           -- 错误是信号的一种，是注册进程错误处理机制之一。 
+
+服务：  服务（Services）是进程注册的抽象。进程注册某个地址后，即可获得对应总线的服务。D-Bus提供了服务查询接口，进程可通过该接口查询某个服务是否存在。或者在服务结束时自动收到来自系统的消息。
+
+
 == Install ==
 *   sudo apt-get install libdbus-glib1.0-dev libdbus-glib1.0-cil-dev
 
+
+== Tool ==
+*   d-feet,  查看系统中的dbus
+    *   sudo apt-get install d-feet
+*   dbus提供的工具    
+    *   dbus-send: 发送消息, $bus-send [--system | --session] --type=method_call --print-reply --dest=连接名 对象路径 接口名.方法名 参数类型:参数值 参数类型:参数值
+    *   dbus-monitor: 监视总线上流动的消息
+
+
+== DBus-Python ==
+*Making method calls*:
+<br>D-Bus applications can export objects for other applications' use. To start working with an object in another application, you need to know:
+*   The bus name. This identifies which application you want to communicate with. You'll usually identify applications by a well-known name, which is a dot-separated string starting with a reversed domain name, such as org.freedesktop.NetworkManager or com.example.WordProcessor.
+*   The object path. Applications can export many objects - for instance, example.com's word processor might provide an object representing the word processor application itself and an object for each document window opened, or it might also provide an object for each paragraph within a document.  To identify which one you want to interact with, you use an object path, a slash-separated string resembling a filename. For instance, example.com's word processor might provide an object at / representing the word processor itself, and objects at /documents/123 and /documents/345 representing opened document windows.
+
+
+*Proxy objects*:
+<br>To interact with a remote object, you use a proxy object. This is a Python object which acts as a proxy or "stand-in" for the remote object - when you call a method on a proxy object, this causes dbus-python to make a method call on the remote object, passing back any return values from the remote object's method as the return values of the proxy method call.
+<br>To obtain a proxy object, call the get_object method on the Bus. 
+{{{
+    import dbus
+    bus = dbus.SystemBus()
+    proxy = bus.get_object('org.freedesktop.NetworkManager',
+                           '/org/freedesktop/NetworkManager/Devices/eth0'Interfaces and methods)
+}}}
+
+*Interfaces and methods*:
+<br>D-Bus uses interfaces to provide a namespacing mechanism for methods. An interface is a group of related methods and signals (more on signals later), identified by a name which is a series of dot-separated components starting with a reversed domain name. For instance, each NetworkManager object representing a network interface implements the interface org.freedesktop.NetworkManager.Devices, which has methods like getProperties.
+{{{class : "type = python"
+To call a method, call the method of the same name on the proxy object, passing in the interface name via the dbus_interface keyword argument:
+
+    import dbus
+    bus = dbus.SystemBus()
+    eth0 = bus.get_object('org.freedesktop.NetworkManager',
+                          '/org/freedesktop/NetworkManager/Devices/eth0')
+    props = eth0.getProperties(dbus_interface='org.freedesktop.NetworkManager.Devices')
+    # props is a tuple of properties, the first of which is the object path
+
+As a short cut, if you're going to be calling many methods with the same interface, you can construct a dbus.Interface object and call methods on that, without needing to specify the interface again:
+
+    import dbus
+    bus = dbus.SystemBus()
+    eth0 = bus.get_object('org.freedesktop.NetworkManager',
+                          '/org/freedesktop/NetworkManager/Devices/eth0')
+    eth0_dev_iface = dbus.Interface(eth0,
+        dbus_interface='org.freedesktop.NetworkManager.Devices')
+    props = eth0_dev_iface.getProperties()
+    # props is the same as before
+}}}
+
+*Data types*:
+<br>Unlike Python, D-Bus is statically typed -- dbus-python types
+*   Basic types
+*   Container types:  array, struct, dictionary, variant
+
+*Event loop or "main loop"*:
+*   Currently, the only main loop supported by dbus-python is GLib(a global default main loop).
+{{{class : "type = python"
+    from dbus.mainloop.glib import DBusGMainLoop
+    DBusGMainLoop(set_as_default=True)
+}}}
+*   PyQt v4.2 and later includes support for integrating dbus-python with the Qt event loop.
+{{{class : "type = python" 
+    from dbus.mainloop.qt import DBusQtMainLoop
+    DBusGMainLoop(set_as_default=True)
+}}}
+
+*Making asynchronous calls*:
+<br>To make a call asynchronous, pass two callables as keyword arguments reply_handler and error_handler to the proxy method. The proxy method will immediately return None. At some later time, when the event loop is running, one of these will happen: either
+*    the reply_handler will be called with the method's return values as arguments; or
+*    the error_handler will be called with one argument, an instance of DBusException representing a remote exception.
+*   Example: example-async-client.py and example-service.py
+
+*Signal matching*:
+<br>To receive signals, the Bus needs to be connected to an event loop. Signals will only be received while the event loop is running.
+<br>Signal matching, to respond to signals, you can use the add_signal_receiver method. 
+
+*Receiving signals from a proxy object*:
+<br>Proxy objects have a special method connect_to_signal which arranges for a callback to be called when a signal is received from the corresponding remote object.
+
+*Exporting objects*:
+*   Objects made available to other applications over D-Bus are said to be exported. All subclasses of dbus.service.Object are automatically exported.
+*   To export objects, the Bus needs to be connected to an event loop 
+*   Exporting methods with dbus.service.method
+{{{class : "type = python"
+    class Example(dbus.service.Object):
+    def __init__(self, object_path):
+        dbus.service.Object.__init__(self, dbus.SessionBus(), path)
+
+    @dbus.service.method(dbus_interface='com.example.Sample',
+                         in_signature='v', out_signature='s')
+    def StringifyVariant(self, variant):
+        return str(variant)
+}}}

@@ -22,6 +22,9 @@
     *   [[Python]] [[Python3]] [[PyQt]] [[Cython]] [[IPython]] [[Canopy]] [[Anaconda]] [[Sage]]
     *   [[Erlang]] 
     *   [[HTML]] [[JavaScript]] [[CSS]] [[LAMP]]
+    *   [[RabbitMQ]] [[DBUS]] 
+    *   [[Makefile]]
+    *   [[Nose]]
 *   Tools
     *   [[Vim]] [[Eclipse]] [[Vimer]] [[Sumblime]] [[QtCreator]] [[MonoDevelop]]
     *   [[Visual Studio]] [[Windbg]] [[Visual Code Studio]]
@@ -42,7 +45,7 @@
     *   [[Cloud Compute]]  [[OpenStack]]
     *   [[Security]]
     *   [[TCP_IP]]
-    *   [[BlueZ]] [[DBUS]] 
+    *   [[BlueZ]] 
     *   [[Charset]]
     *   [[REST]] [[http://tidesdk.multipart.net/docs/user-dev/generated/??,??,|TideSDK]] XML JSON 
 

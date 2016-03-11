@@ -14,6 +14,10 @@
 == jieba ==
 *   sudo pip install jieba
 *   中文分词系统
+== qrcode ==
+*   https://pypi.python.org/pypi/qrcode/5.1
+*   python-qrcode是个用来生成二维码图片的第三方模块，依赖于 PIL 模块和 qrcode 库。
+*   http://www.cnblogs.com/linjiqin/p/4140455.html
 
 === Web Framework for Python ===
 ==== Web.py ====

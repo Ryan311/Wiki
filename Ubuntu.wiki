@@ -76,6 +76,11 @@
         创建你剔除的目录：
             mkdir /proc /lost+found /mnt /sys /media
     }}}
+*   Latex
+    *   sudo apt-get install texlive-full
+    *   sudo apt-get install texmaker       // 编辑器
+    *   Full command to install latex:
+    *   sudo apt-get install gedit-latex-plugin texlive-fonts-recommended latex-beamer texpower texlive-pictures texlive-latex-extra texpower-examples imagemagick
 *   terminal命令行提示符太长， 修改.bashrc， 加入
     *   export PS1='\u@\w\$ '
     *   保存后， source .bashrc
@@ -228,7 +233,6 @@
     *   添加右键菜单以管理 员打开：
         *   sudo apt-get install nautilus-gksu     
     *   添加右键菜单打开终端：
-    * w To Install SysMonitor Indicator 0.4.6 On Ubuntu 14.04 Trusty Tahr
         *   sudo apt-get install nautilus-open-terminal
     *   添加右键菜单图片转换：
         *   sudo apt-get install nautilus-image-converter
