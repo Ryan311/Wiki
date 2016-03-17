@@ -7,6 +7,7 @@
 == CLang ==
 *   http://clang.org/
 *   http://www.ibm.com/developerworks/cn/opensource/os-cn-clang/
+*   Clang 中文用户手册: https://github.com/oxnz/clang-user-manual/wiki/Clang-%E4%B8%AD%E6%96%87%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C
 
 
 clang的优点有很多的资料介绍，经过试用简要总结几点
@@ -21,6 +22,7 @@ clang的优点有很多的资料介绍，经过试用简要总结几点
 *   使用 LLVM 框架创建一个工作编译器
     *   http://www.ibm.com/developerworks/cn/opensource/os-createcompilerllvm1/index.html
     *   http://www.ibm.com/developerworks/cn/opensource/os-createcompilerllvm2/
+*   为什么人人都该懂点LLVM: http://geek.csdn.net/news/detail/37785
 
 
 

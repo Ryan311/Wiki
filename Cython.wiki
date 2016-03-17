@@ -1,5 +1,80 @@
 %toc
 
-http://cython.org/
+Doc:    http://cython.org/
+<br> Book:  *OReilly.Cython A Guide for Python Programmers.pdf*
 
+Cython is Python with C data types
+Cython is Python: Almost any piece of Python code is also valid Cython code. (There are a few Limitations, but this approximation will serve for now.) 
+<br>The Cython compiler will convert it into C code which makes equivalent calls to the Python/C API.
+
+== Install ==
 *   pip install cython
+
+== vim syntax ==     
+*   https://github.com/tshirtman/vim-cython
+*   修改/usr/share/vim/vim74/filetype.vim, 搜索Pyrex， 将对应行注释掉
+*   在.vim/ftdect目录中加入cython.vim
+{{{ 
+    //cython.vim
+    au BufRead,BufNewFile *.pyx set filetype=cython
+}}}
+*   将vim-cython下载到的文件copy到.vim目录下
+
+== Building Cython module using distutils ==
+http://docs.cython.org/src/userguide/language_basics.html#language-basics
+*   Source
+{{{"class = python"
+    # hello.pyx
+    def say_hello_to(name):
+        print("Hello %s!" % name)
+}}}
+*   setup.py
+{{{
+    from distutils.core import setup
+    from Cython.Build import cythonize
+    setup(
+        name = 'Hello world app',
+        ext_modules = cythonize("hello.pyx"),
+    )
+}}}
+*   python setup.py build_ext --inplace
+*   from hello import say_hello_to
+
+= Language Basics =
+== C variable and type definitions ==
+The cdef statement is used to declare C variables, either local or module-level:
+{{{
+    cdef int i, j, k
+    cdef float f, g[42], *h
+}}}
+and C struct, union or enum types:
+{{{
+    cdef struct Grail:
+        int age
+        float volume
+
+    cdef union Food:
+        char *spam
+        float *eggs
+
+    cdef enum CheeseType:
+        cheddar, edam,
+        camembert
+
+    cdef enum CheeseState:
+        hard = 1
+        soft = 2
+        runny = 3
+    
+    ##declare a variable pointing to a Grail you would write:
+    cdef Grail *gp
+}}}
+There is also a ctypedef statement for giving names to types, e.g.:
+{{{
+    ctypedef unsigned long ULong
+    ctypedef int* IntPtr
+}}}
+
+There are two kinds of function definition in Cython:
+*   Python functions are defined using the def statement, as in Python. They take Python objects as parameters and return Python objects.
+*   C functions are defined using the new cdef statement. They take either Python objects or C values as parameters, and can return either Python objects or C values.

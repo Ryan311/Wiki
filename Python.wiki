@@ -11,6 +11,7 @@
 *   [[Useful Library]]
 *   [[Python Debug]]
 *   [[Python Features]]
+*   [[Python Extension]]
 *   [[Python Challenge]]
 *   [[http://legacy.python.org/dev/peps/|PEP]](Python增强建议书)
     *   PEP是Python Enhancement Proposals的缩写

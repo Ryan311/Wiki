@@ -8,7 +8,7 @@ VC中默认调用是 __cdecl 方式，Windows API 使用 __stdcall 调用方式�
 
 *   __cdecl (C Default Calling Convention)：
     <br>
-    1>  压栈顺序: 函参数按从右到左的顺序传递，放于栈中
+    1>  压栈顺序: 函数参数按从右到左的顺序传递，放于栈中
     <br>
     2>  参数栈维护: 栈的清空由主调函数完成
     <br>
@@ -50,8 +50,8 @@ VC中默认调用是 __cdecl 方式，Windows API 使用 __stdcall 调用方式�
 C和C++对应不同的调用约定，产生的修饰符也各不相同
 | Call Convention | Modifier:  C or extern "C" | C Example: void test(int n) | Modifier: .cpp, .cxx           | C++ Example: void test(int n) |
 | __cdecl         | _functionname              | _test                       | ?functionname@YA...@Z          | ?test@YAXH@Z                  |
-| __stdcall       | _functionname@number       | _test@1                     | ?functionname@YG...@Z          | ?test@YGXH@Z                  |
-| __fastcall      | @functionname@number       | @test@1                     | ?functionname@YI...@Z          | ?test@YIXH@Z                  |
+| __stdcall       | _functionname@number       | _test@4                     | ?functionname@YG...@Z          | ?test@YGXH@Z                  |
+| __fastcall      | @functionname@number       | @test@4                     | ?functionname@YI...@Z          | ?test@YIXH@Z                  |
 | __thiscall      |                            |                             | ?functionname@className@@...@Z |                               |
 
 1. 对于C++编译器， 普通非类成员函数修饰符的...表示参数表， 它的拼写有些复杂, 拼写代码如下：

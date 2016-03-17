@@ -1,0 +1,10 @@
+%toc
+
+*   打字训练
+    *   sudo apt-get install typespeed
+*   Kid loves it
+    *   sudo apt-get install tuxpaint
+    *   sudo apt-get install tuxtype
+    *   sudo apt-get install tuxmath
+    *   sudo apt-get install GCompris
+    *   InkScape    画图软件

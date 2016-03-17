@@ -13,7 +13,7 @@ STL（Standard Template Library），即标准模板库，是一个具有工业�
 *   算法（Algorithm），是用来操作容器中的数据的模板函数。例如，STL用sort()来对一个vector中的数据进行排序，用find()来搜索一个list中的对象，函数本身与他们操作的数据的结构和类型无关，因此他们可以在从简单数组到高度复杂容器的任何数据结构上使用；
 *   仿函数（Function object，仿函数(functor)又称之为函数对象（function object），其实就是重载了()操作符的struct，没有什么特别的地方
 *   迭代适配器（Adaptor）
-*   空间配制器（allocator）其中主要工作包括两部分1.对象的创建与销毁    2.内存的获取与释放
+*   空间配制器（allocator）其中主要工作包括两部分   1.对象的创建与销毁    2.内存的获取与释放
 
 = Details =
 == STL Container ==

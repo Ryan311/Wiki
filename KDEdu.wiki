@@ -1,0 +1,14 @@
+%toc
+
+HOME:    https://edu.kde.org/
+
+Preschool Applications
+*   sudo apt-get install Blinken
+*   sudo apt-get install Klettres
+*   sudo apt-get install Pairs
+
+School
+*   sudo apt-get install kTouch
+
+University
+*   
