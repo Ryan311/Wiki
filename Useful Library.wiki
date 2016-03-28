@@ -14,9 +14,36 @@
 == jieba ==
 *   sudo pip install jieba
 *   中文分词系统
+== hachoir ==
+*   https://bitbucket.org/haypo/hachoir/wiki/Home
+    *   能够解析Mp3、jpeg等等文件的MetaData并打印出来， 对二进制文件的字节处理
+*   Install
+    {{{
+        sudo apt-get install    python-hachoir-core python-hachoir-metadata python-hachoir-parser 
+                                python-hachoir-urwid python-hachoir-subfile python-hachoir-regex 
+                                python-hachoir-wx 
+    }}}
+*   Example
+    *   https://bitbucket.org/haypo/hachoir/wiki/hachoir-metadata/code
+    *   http://www.thehackeruniversity.com/2014/02/02/python-hachoir-tutorial
+== Scrapy ==
+*   http://scrapy.org/
+*   An open source and collaborative framework for extracting the data you need from websites. In a fast, simple, yet extensible way.
+== [[http://www.scipy.org/|Scipy]] ==
+*   SciPy (pronounced “Sigh Pie”) is a Python-based ecosystem of opensource software for mathematics, science, and engineering. 
+*   NumPy是一个定义了数值数组和矩阵类型和它们的基本运算的语言扩展。
+*   SciPy是另一种使用NumPy来做高等数学、信号处理、优化、统计和许多其它科学任务的语言扩展。
+*   Matplotlib是一个帮助绘图的语言扩展。
+*   [[http://reverland.org/python/2012/08/24/scipy/#scipynumpymatplotlib|Example]]
 
-=== Web Framework for Python ===
-==== Web.py ====
+== [[http://pypy.org/|PyPy]] ==
+*   JIT(Just in time)   compile -> cache -> run
+
+== [[http://pybrain.org/docs/index.html|Pybrain]] ==
+
+
+== Web Framework for Python ==
+=== Web.py ===
 http://webpy.org/ ::
 "Django lets you write web apps in Django. TurboGears lets you write web apps in TurboGears. Web.py lets you write web apps in Python."
 
@@ -42,7 +69,7 @@ Start the server::
     $python code.py
     <br>$python code.py 1234
 
-==== Django ====
+=== Django ===
 *   *Install*
 *   *Command*
 Create Project::
@@ -77,15 +104,5 @@ Other::
     如果安装ipython，manage.py shell会默认使用它。
 * [[http://showmedo.com/videotutorials/video?name=1100000&fromSeriesID=110|Wiki over Django]]
 
-=== [[http://www.scipy.org/|Scipy]] ===
-*   SciPy (pronounced “Sigh Pie”) is a Python-based ecosystem of opensource software for mathematics, science, and engineering. 
-*   NumPy是一个定义了数值数组和矩阵类型和它们的基本运算的语言扩展。
-*   SciPy是另一种使用NumPy来做高等数学、信号处理、优化、统计和许多其它科学任务的语言扩展。
-*   Matplotlib是一个帮助绘图的语言扩展。
-*   [[http://reverland.org/python/2012/08/24/scipy/#scipynumpymatplotlib|Example]]
 
-=== [[http://pypy.org/|PyPy]] ===
-*   JIT(Just in time)   compile -> cache -> run
 
-=== [[http://pybrain.org/docs/index.html|Pybrain]] ===
-*   

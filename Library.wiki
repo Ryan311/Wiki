@@ -53,7 +53,6 @@
 *   JavaScipt Object Notation   HTTP请求在Web浏览器和其他应用程序之间发送数据的标准格式之一
 *   json.loads  将JSON字符串转换成Python形式
 *   json.dumps  将Python对象转换成JSON格式
-<<<<<<< HEAD
 == lxml ==
 *   http://lxml.de/     不是标准库
 *   用来读写HTML和XML格式数据的库
@@ -93,6 +92,9 @@
 *   random.sample(x, k)    -> 在序列对象x中取出k个样本
 *   random.random()     -> 返回下一个随机数[0,1)之间
 *   random.uniform(a,b) -> 返回下一个在[a,b]之间的随机数
+== [[https://docs.python.org/2.7/howto/logging.html|logging]] ==
+*   Logging is a means of tracking events that happen when some software runs.
+*   Logging provides a set of convenience functions for simple logging usage. These are debug(), info(), warning(), error() and critical().
 
 = Internet Programming =
 
@@ -125,22 +127,3 @@
 *   SQLite是一款嵌入式的数据库
 == pymongo ==
 *  NoSQL数据库 
-
-
-
-= Third Party =
-== hachoir ==
-*   https://bitbucket.org/haypo/hachoir/wiki/Home
-    *   能够解析Mp3、jpeg等等文件的MetaData并打印出来， 对二进制文件的字节处理
-*   Install
-    {{{
-        sudo apt-get install    python-hachoir-core python-hachoir-metadata python-hachoir-parser 
-                                python-hachoir-urwid python-hachoir-subfile python-hachoir-regex 
-                                python-hachoir-wx 
-    }}}
-*   Example
-    *   https://bitbucket.org/haypo/hachoir/wiki/hachoir-metadata/code
-    *   http://www.thehackeruniversity.com/2014/02/02/python-hachoir-tutorial
-== Scrapy ==
-*   http://scrapy.org/
-*   An open source and collaborative framework for extracting the data you need from websites. In a fast, simple, yet extensible way.
