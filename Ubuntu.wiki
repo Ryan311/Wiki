@@ -76,6 +76,11 @@
         创建你剔除的目录：
             mkdir /proc /lost+found /mnt /sys /media
     }}}
+*   Latex
+    *   sudo apt-get install texlive-full
+    *   sudo apt-get install texmaker       // 编辑器
+    *   Full command to install latex:
+    *   sudo apt-get install gedit-latex-plugin texlive-fonts-recommended latex-beamer texpower texlive-pictures texlive-latex-extra texpower-examples imagemagick
 *   terminal命令行提示符太长， 修改.bashrc， 加入
     *   export PS1='\u@\w\$ '
     *   保存后， source .bashrc
@@ -228,7 +233,6 @@
     *   添加右键菜单以管理 员打开：
         *   sudo apt-get install nautilus-gksu     
     *   添加右键菜单打开终端：
-    * w To Install SysMonitor Indicator 0.4.6 On Ubuntu 14.04 Trusty Tahr
         *   sudo apt-get install nautilus-open-terminal
     *   添加右键菜单图片转换：
         *   sudo apt-get install nautilus-image-converter
@@ -319,13 +323,17 @@
     *   安装compiz特效插件： sudo apt-get install compiz-plugins-extra
 *   中文输入法 fcitx
     *   https://fcitx-im.org/wiki/Install_%28Ubuntu%29
-*   打字训练
-    *   sudo apt-get install typespeed
-    *   sudo apt-get install kTouch
-*   Kid loves it
-    *   sudo apt-get install tuxpaint
-    *   sudo apt-get install tuxtype
-    *   sudo apt-get install tuxmath
-    *   sudo apt-get install GCompris
-    *   InkScape    画图软件
+*   Ubuntu下的下载工具Uget + aria2
+    *   Windows下的下载工具--迅雷，之所以下载速度快，乃是它能搜索资源、为己所用，而不是仅仅从原始地址这单一资源处下载。Ubuntu下也有类似的工具，那就是aira2。 
+    *   aira2是一个命令行下载工具，可以配合其他图形界面的下载软件使用。我用的是uget+aria2。uget本身是一个小巧实用的多线程下载工具，加上aria2作为插件，下载速度有明显提高。
+{{{http://baike.renwuyi.com/2014-11/2153.html
+    1.uget的安装：
+　　sudo add-apt-repository ppa:plushuang-tw/uget-stable
+　　sudo apt-get update
+　　sudo apt-get install uget
+　　2.aria2的安装：
+　　sudo add-apt-repository ppa:t-tujikawa/ppa
+　　sudo apt-get update
+　　sudo apt-get install aria2
+}}}
 ---------------------------------------------------------------------------

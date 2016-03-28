@@ -22,7 +22,9 @@
     *   [[Python]] [[Python3]] [[PyQt]] [[Cython]] [[IPython]] [[Canopy]] [[Anaconda]] [[Sage]]
     *   [[Erlang]] 
     *   [[HTML]] [[JavaScript]] [[CSS]] [[LAMP]]
-    *   [[Unit Test]] [[CUnit]] [[unittest]] 
+    *   [[RabbitMQ]] [[DBUS]] 
+    *   [[Makefile]]
+    *   [[Unit Test]] [[CUnit]] [[Nose]] [[unittest]] 
 *   Tools
     *   [[Vim]] [[Eclipse]] [[Vimer]] [[Sumblime]] [[QtCreator]] [[MonoDevelop]]
     *   [[Visual Studio]] [[Windbg]] [[Visual Code Studio]]
@@ -43,9 +45,11 @@
     *   [[Cloud Compute]]  [[OpenStack]]
     *   [[Security]]
     *   [[TCP_IP]]
-    *   [[BlueZ]] [[DBUS]] 
+    *   [[BlueZ]] 
     *   [[Charset]]
     *   [[REST]] [[http://tidesdk.multipart.net/docs/user-dev/generated/??,??,|TideSDK]] XML JSON 
+*   Kid
+    *   [[KidSoft]] [[KDEdu]]
 
 == [[Reading Notes]] ==
 

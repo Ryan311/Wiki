@@ -13,3 +13,7 @@
     *   [[vimrc_for_linux]] 
 *   TODO:
     *   INF Syntax
+
+
+vim、gvim添加不识别的文件类型:
+<br>syntax文件夹里都是vim的文件类型定义文件，可以按照类似的语法文件写一个，然后在filetype.vim增加文件类型。

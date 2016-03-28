@@ -9,6 +9,7 @@ http://www.riverbankcomputing.com/news
 
 == Qt Designer ==
 *   可使用Qt的Designer来设计界面, 生成文件*.ui
+*   使用QtCreator创建UI界面， New File or Project -> Files and Classes -> Qt -> Qt Designer Form
 *   将*.ui转换成*.py:   
     *   *pyuic5 DialogUI.ui -o qtDialog.py*
     *   pyuic5 DialogUI.ui -o qtDialog.py -p    // Preview

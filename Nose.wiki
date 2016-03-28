@@ -1,0 +1,161 @@
+%toc
+
+= run test =
+*   nosetests
+    *   -w ，指定一个目录运行测试。目录可以是相对路径或绝对路径。
+    　　例如： nosetests -w c:\pythonTests\Test1，只运行目录c:\pythonTests\Test1下的测试。
+        <br>可以指定多个目录，例如： nosetests -w c:\pythonTests\Test1 -w c:\pythonTests\Test2。
+    *   -s，不捕获输出，会让你的程序里面的一些命令行上的输出显示出来。例如print所输出的内容。
+    *   -v，查看nose的运行信息和调试信息。例如会给出当前正在运行哪个测试。
+*   python testFunc.py  
+{{{ "class = python"
+    ......  # function test
+    
+    if __name__ == "__main__":
+        import nose
+        result = nose.run()
+        print result
+}}}
+
+
+nose会自动识别源文件，目录或包中的测试用例。任何符合正则表达式：
+
+    (?:^|[b_.-])[Tt]est  
+
+的类、函数、文件或目录，以及TestCase的子类都会被识别并执行。
+
+当然，可以显式的指定文件、模块或函数：
+{{{
+    nosetests only_test_this.py  
+    nosetests test.module  
+    nosetests another.test:TestCase.test_method  
+    nosetests a.test:TestCase  
+    nosetests /path/to/test/file.py:test_function  
+}}}
+如果一个对象包含了__test__属性，如果值不是True，该对象（以及它包含的所有对象）不会被nose发现
+
+
+= Setup和tearDown: =
+*   setUp:      在测试用例开始时被执行
+*   tearDown：  在测试用例结束后被执行
+ 
+== 可支持如下级别： ==
+*   模块的setUp和tearDown
+{{{"class = python"
+    def setUp():
+        print "function setup"
+
+    def tearDown():
+        print "function teardown"
+
+    def Testfunc1():
+        print "Testfunc1"
+        assert True
+
+    def Testfunc2():
+        print "Testfunc2"
+        assert True
+    
+    #执行顺序
+    setUp -> Testfunc1 -> Testfunc2 -> tearDown
+}}}
+*   测试函数的setUp和tearDown
+{{{"class = python"
+    def setUp():
+        print "function setup"
+
+    def tearDown():
+        print "function teardown"
+
+    def func1Start():
+        print "func1 start"
+
+    def func1End():
+        print "func1 end"
+
+    def func2Start():
+        print "func2 start"
+
+    def func2End():
+        print "func2 end"
+
+    def Testfunc1():
+        print "Testfunc1"
+        assert True
+
+    def Testfunc2():
+        print "Testfunc2"
+        assert True
+
+    Testfunc1.setup = func1Start
+    Testfunc1.tearDown = func1End
+    Testfunc2.setup = func2Start
+    Testfunc2.tearDown = func2End
+    
+    #执行顺序
+    setUp -> func1Start -> Testfunc1 -> func1End ->
+    func2Start -> Testfunc2 -> func2End -> tearDown
+}}}
+*   测试类的的setUp和tearDown
+{{{"class = python"
+    class TestClass():
+        arr1 = 2
+        arr2 = 2
+
+        def setUp(self):
+            self.arr1 = 1
+            self.arr2 = 3
+            print "MyTestClass setup"
+
+        def tearDown(self):
+            print "MyTestClass teardown"
+
+        def Testfunc1(self):
+            assert self.arr1 == self.arr2
+
+        def Testfunc2(self):
+            assert self.arr1 == 2
+    
+    #执行顺序
+    setUp -> Testfunc1 -> TearDown -> 
+    setUp -> Testfunc2 -> TearDown
+    #nose会对每个类的测试方法单独创建类的实例， 并有单独的setUp和tearDown
+}}}
+*   package的setUp和tearDown
+{{{
+    package的setUp和tearDown方法需要放在__init__.py这个文件中，整个package只执行一次setUp和一次tearDown
+}}}
+
+== Testing tools ==
+nose.tools provides a few convenience functions to make writing tests easier 
+
+{{{"class = python"
+    from nose.tools import with_setup, raises
+    
+    # before test
+    def setup_func():
+        print "set up func"
+
+    # after test
+    def teardown_func():
+        print "tear down func"
+
+    # @raise Error
+    @raises(RuntimeError)
+    def test_invalid_arg1():
+        print "arg1"
+        actual = add(None,1)
+
+    # @raise Error      Decorator, 当抛出的异常是raise中包含的类型时， 测试通过
+    @raises(TypeError, ValueError)   
+    def test_invalid_arg2():
+        print "arg2"
+        actual = add(1,None)
+        
+    # @with_setup   Decorator, 用于给测试函数安装setUp和tearDown
+    @with_setup(setup_func,teardown_func)
+    def test_add_Numbers():
+        actual = add(-1,1)
+        print actual
+        assert actual == 0
+}}}

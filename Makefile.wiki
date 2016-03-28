@@ -1,0 +1,28 @@
+%toc
+
+github: http://makefiletutorial.com/
+
+*   Makefile example
+    *   make all
+    *   make Send
+    *   make Recv
+    *   make clean
+{{{
+    CC = gcc
+    DBUS_CFLAGS = -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include
+    DBUS_GLIB_CFLAGS =  -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
+    DBUS_GLIB_LIBS = -lgobject-2.0 -lglib-2.0
+    DBUS_LIBS = -ldbus-1
+    LIB = $(DBUS_LIBS) $(DBUS_GLIB_LIBS) -ldbus-glib-1
+    INCLUDE = $(DBUS_CFLAGS) $(DBUS_GLIB_CFLAGS) -DDBUS_COMPLIATION
+
+    all: Send Recv
+    Send::
+        $(CC) -o sig_send sig_send.c $(INCLUDE) $(LIB)
+
+    Recv::
+        $(CC) -o sig_receive sig_receive.c $(INCLUDE) $(LIB)
+
+    clean:
+        rm sig_send sig_receive
+}}}

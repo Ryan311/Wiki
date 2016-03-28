@@ -1,0 +1,8 @@
+%toc
+
+https://code.visualstudio.com/
+
+Browse and Install Extensions in VS Code
+*   F1
+*   Install Extension
+*   Restart

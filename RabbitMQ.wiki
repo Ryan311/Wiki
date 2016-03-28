@@ -1,0 +1,85 @@
+%toc
+
+Wiki:   http://wiki.jikexueyuan.com/project/rabbitmq/
+<br>Tutorial:   http://www.rabbitmq.com/tutorials/tutorial-one-python.html
+
+= Installation =
+*   Using rabbitmq.com APT Repository
+    *   Add the following line to your /etc/apt/sources.list:   deb http://www.rabbitmq.com/debian/ testing main
+    *   wget https://www.rabbitmq.com/rabbitmq-signing-key-public.asc
+    *   sudo apt-key add rabbitmq-signing-key-public.asc
+    *   sudo apt-get update
+    *   sudo apt-get install rabbitmq-server
+    *   sudo pip install pika
+
+= Introduction =
+*   P(Producer):  A program that sends messages
+*   C(Consumer):  A program that mostly waits to receive messages
+*   Q(Queue):     A buffer that stores messages.
+*   X(exchange):  The producer can only send messages to an exchange
+    *   On one side it receives messages from producers and the other side it pushes them to queues. 
+    *   The exchange must know exactly what to do with a message it receives. 
+    *   There are a few exchange types available: direct, topic, headers and fanout.
+*   rabbitmqctrl
+    *   sudo rabbitmqctl list_queues
+    *   sudo rabbitmqctl list_bindings
+    *   sudo rabbitmqctl list_exchange
+
+= Python pika =
+== Build connection ==
+*   与RabbitMQ Server建立连接, localhost是本地， 也可换成远端IP地址。发送端和接收端都需要
+    *   connection = pika.BlockingConnection(pika.ConnectionParameters( 'localhost'))
+    *   channel = connection.channel()
+
+== Send message ==
+*   创建一个queue用于deliver message
+    *   channel.queue_declare(queue='hello')
+*   通过exchange将message发送到queue中， 不能直接发到queue中。 exchange为空表示默认的exchange
+    *   channel.basic_publish(exchange='', routing_key='hello', body='Hello World!')    // send the message to a nameless exchange
+*   发送完后断开连接
+    *   connection.close()
+
+== Receive message ==
+*   channel.queue_declare(queue='hello')
+*   定义一个callback函数
+    *   def callback(ch, method, properties, body): print(" [x] Received %r" % body)
+*   告诉RabbitMQ， 当hello queue中有message到来时， 调用回调函数
+    *   channel.basic_consume(callback, queue='hello', no_ack=True)
+*   进入无限循环， 等待消息处理
+    *   channel.start_consuming()
+
+== Work Queue ==
+*   http://www.rabbitmq.com/tutorials/tutorial-two-python.html
+*   each task is delivered to exactly one worker
+*   Work Queue will be used to distribute time-consuming tasks among multiple workers.
+== Publish/Subscribe ==
+*   http://www.rabbitmq.com/tutorials/tutorial-three-python.html   
+*   deliver a message to multiple consumers. 
+*   创建一个exchange, 并且指定type(direct, topic, headers and fanout)
+    *   channel.exchange_declare(exchange='logs', type='fanout')  // fanout：broadcasts all the messages it receives to all the queues it knows 
+*   将message发送到命名exchange中
+    *   channel.basic_publish(exchange='logs', routing_key='', body=message)
+*   创建一个随机命名的Queue, 且断开Consumer连接该Queue会被删除
+    *   result = channel.queue_declare(exclusive=True)
+*   将命名exchange与Queue绑定
+    *   channel.queue_bind(exchange='logs', queue=result.method.queue)
+== Routing ==
+*   http://www.rabbitmq.com/tutorials/tutorial-four-python.html
+*   Binding with routing_key (binding key)
+    *   channel.queue_bind(exchange=exchange_name, queue=queue_name, routing_key='black')
+*   Direct exchange:    a message goes to the queues whose binding key exactly matches the routing key of the message
+*   Create an exchange
+    *   channel.exchange declare(exchange='direct logs', type='direct)
+*   Send message
+    *   channel.basic_publish(exchange='direct_logs', routing_key=severity, body=message)  // severity will be 'info', 'warning', 'error'
+== Topics ==
+*   http://www.rabbitmq.com/tutorials/tutorial-five-python.html
+*   Topic exchange: Messages sent to a topic exchange can't have an arbitrary routing_key - it must be a list of words, delimited by dots. 
+*   Use Case: In the logging system we might want to subscribe to not only logs based on severity, but also based on the source which emitted the log. 
+== RPC ==
+*   http://www.rabbitmq.com/tutorials/tutorial-six-python.html
+*   A client sends a request message and a server replies with a response message.
+*   Callback Queue: 
+    *   result = channel.queue_declare(exclusive=True)
+    *   callback_queue = result.method.queue
+    *   channel.basic_publish(exchange='', routing_key='rpc_queue', properties=pika.BasicProperties(reply_to = callback_queue,), body=request)
