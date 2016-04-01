@@ -1,0 +1,17 @@
+%toc
+
+苹果发布编程语言Swift 2.2：支持Linux
+<br>https://swift.org/download/#releases
+
+
+The Swift Programming Language (Swift 2.2)
+<br> https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/index.html#//apple_ref/doc/uid/TP40014097-CH3-ID0
+<br> https://github.com/numbbbbb/the-swift-programming-language-in-chinese
+
+
+== Using Swift On Ubuntu ==
+*   Download the package, and extract it
+*   Add in the .bashrc:     export PATH=/path/to/Swift/usr/bin:"${PATH}"
+*   source .bashrc
+*   $swift --version
+*   $swift      start the REPL

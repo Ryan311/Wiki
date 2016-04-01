@@ -25,6 +25,7 @@
     *   [[RabbitMQ]] [[DBUS]] 
     *   [[Makefile]]
     *   [[Unit Test]] [[CUnit]] [[Nose]] [[unittest]] 
+    *   [[Swift]] [[lldb]]
 *   Tools
     *   [[Vim]] [[Eclipse]] [[Vimer]] [[Sumblime]] [[QtCreator]] [[MonoDevelop]]
     *   [[Visual Studio]] [[Windbg]] [[Visual Code Studio]]

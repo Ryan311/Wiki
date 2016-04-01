@@ -1,4 +1,4 @@
-%toc
+= %toc =
 
 HOME:    https://edu.kde.org/
 

@@ -35,6 +35,10 @@
         *   sudo apt-get clean && sudo apt-get autoclean 清理无用的包
         *   sudo apt-get check 检查是否有损坏的依赖
         *   sudo apt-get autoremove 删除系统不再使用的独立软件
+*   GNOME   安装最新的版本
+    *   sudo add-apt-repository ppa:gnome3-team/gnome3 #稳定版本
+    *   sudo apt-get update
+    *   sudo apt-get install gnome
 
 === Tricks ===
 *   查看Ubuntu版本  >lsb_release -d
