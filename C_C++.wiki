@@ -22,6 +22,7 @@
     B(1)------〉'1'
     C(1)------〉"1"
 }}}
+*   [[C++Standard]]
 
 ==  GNU C  ==
 *   Extensions to the C Language Family   http://gcc.gnu.org/onlinedocs/gcc/C-Extensions.html

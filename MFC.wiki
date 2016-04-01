@@ -691,4 +691,122 @@ MFC是微软基础类库的简称，是微软公司实现的一个c++类库，�
     LeDeviceKey.DeleteSubKey(m_BDAddrStr);	// only delete empty subkey
     LeDeviceKey.RecurseDeleteKey(m_BDAddrStr);	// can delete non-empty subkey
 }}}
+*   序列化与反序列化CArchive
+{{{
+    序列化 (Serialization)将对象的状态信息转换为可以存储或传输的形式的过程。在序列化期间，对象将其当前状态写入
+    到临时或持久性存储区。 以后，可以通过从存储区中读取或反序列化对象的状态， 重新创建该对象。 主要用于存储对象
+    状态为另一种通用格式，比如存储为二进制、xml、 json等等，把对象转换成这种格式就叫序列化，而反序列化通常是从
+    这种格式转换回来。 使用序列化主要是因为 跨平台和对象存储的需求，因为 网络上只允许字符串或者二进制格式，而文
+    件需要使用二进制流格式，如果想把一个内存中的对象存储下来就必须使用序列化转换为xml（字符串）、 json（字符串）
+    或二进制（流） 
 
+    CArchive 对象提供了一个类型安全缓冲机制，用于将可序列化对象写入 CFile 对象或从中读取可序列化对象。 给定的 
+    CArchive 对象要么存储数 据（即写入数据或将数据序列化），要么加载数据 （即读取数据或将数据反序列化），但决不
+    能同时进行。CArchive 对象的寿命只限于将对象写入 文件或从文件读取对象的一次传递。 
+    http://www.cnblogs.com/ylhome/archive/2010/03/15/1686558.html
+
+    C:       序列化与反序列化库  https://github.com/troydhanson/tpl
+    Python:  Python序列化与反序列化Module,  Pickle、CPickle
+    C#:      .NET框架提供了两种种串行化的方式:1、是使用BinaryFormatter进行串行化; 2、使用XmlSerializer进行串行化。
+             第一种方式提供了一个简单的二进制数据流以及某些附加的类型信息，而第二种将数据流格式化为XML存储。   
+}}}
+*   Button添加图片
+{{{
+1) ICON
+按钮的Icon属性设为true，然后在OnInitDialog中
+((CButton *)GetDlgItem(IDC_BUTTON))->SetIcon(AfxGetApp()->LoadIcon(IDI_ICON));
+2) BMP
+按钮的Bitmap属性设为true，然后在OnInitDialog中
+http://blog.csdn.net/lightboat09/article/details/6069710
+
+CButtonST    http://blog.csdn.net/liuyang1943/article/details/4959454
+CButtonST是功能非常全的CButton派生类，利用它你可以实现各种按钮的效果，它包括的特征如下：
+1>    CButton所有的功能
+2>    文字和图标按钮
+3>    16×16，32×32，48×48，16或256色图标的支持
+4>    支持透明按钮
+5>    支持标准的或新的平面按钮风格
+6>    运行时刻按钮风格的变换
+7>    鼠标悬浮在按钮上时图标的变化
+8>    支持tooltips
+9>    每个按钮可以有自己的鼠标形状
+10>   按钮颜色可以定制
+}}}
+*   VC的Picture Control控件加载图片BMP、PNG的方法
+{{{
+    1、加载BMP
+    CStatic* pWnd = (CStatic*)GetDlgItem(IDC_PIC); // 得到 Picture Control 句柄
+    ModifyStyle(0, SS_BITMAP); // 修改它的属性为位图
+    SetBitmap((HBITMAP)::LoadImage(NULL, _T("bmp.bmp"), IMAGE_BITMAP, 100, 50,
+            LR_CREATEDIBSECTION | LR_DEFAULTSIZE | LR_LOADFROMFILE));
+
+    2. 加载 PNG
+    CStatic* pWnd = (CStatic*)GetDlgItem(IDC_PIC); // 得到 Picture Control 句柄
+    CImage image;
+    image.Load(_T("png.png");
+    HBITMAP hBmp = image.Detach();
+    SetBitmap(hBmp);
+    SetWindowPos(NULL, 0, 0, 100, 50, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOZORDER);
+
+    3. 在资源编辑器中选定图片控件
+    打开该图片控件的“属性窗口” -> 在 “Type” 中选定图片类型 -> 在”Image”中选定图片对应的资源 ID.
+}}}
+*   获取控件在对话框上的位置
+{{{
+    CRect rect;
+    GetDlgItem(控件ID)->GetWindowRect(&rect);//获取控件的屏幕坐标
+    ScreenToClient(&rect);//转换为对话框上的客户坐标
+}}}
+*   在Dialog中嵌入Doc-View
+{{{
+    Create Doc and Create View, 可先指定文件， 之后文件更新时再更新View
+    Doc指的是文件， View是一个Win， 可以在上面作图
+}}}
+*   MFC键盘响应函数
+{{{
+    在对话框中添加响应函数
+    BOOL CHWCDlg::PreTranslateMessage(MSG* pMsg)
+    {
+        if(pMsg->message == WM_KEYDOWN)
+        {
+            switch(pMsg->wParam)
+            {
+            case VK_LEFT:
+                MessageBox(L"Left");
+                break;
+            case VK_RIGHT:
+                MessageBox(L"Right");
+                break;
+            case VK_UP:
+                MessageBox(L"Up");
+                break;
+            case VK_DOWN:
+                MessageBox(L"Down");
+                break;
+            }
+        }
+        return CDialogEx::PreTranslateMessage(pMsg);
+    }
+    遇到的问题， 在UI App打开之后， 按下一个Mode Button，这时按下键盘键， 该函数不能响应，只有再按下任意Button时才可以响应。
+    原因是在Mode Button处理函数时将Button的Disable了， 不Disable就不会有上述现象。
+}}}
+*   Create Thread to do things
+{{{
+    // thread的执行函数 
+    UINT WINAPI MyThreadProc(LPVOID pParam)
+    {
+        CString SBC_WavePath;
+        SBC_WavePath = VoiceDir + SBC_WAVE_PATH;
+        PlaySound(SBC_WavePath, NULL, SND_FILENAME);
+        return 1;
+    }
+
+    // SBC_HAIXIN_API 这个是dll的导出宏
+    extern "C"  SBC_HAIXIN_API int AudioPlay(void)
+    {
+        CWinThread *pThread = AfxBeginThread((AFX_THREADPROC)MyThreadProc,NULL);
+        return 0;
+    }
+}}}
+*   Invalidate()   
+    *   使窗口失效， 会强制窗口重绘(调用OnDraw函数)

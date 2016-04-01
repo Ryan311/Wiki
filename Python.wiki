@@ -1,4 +1,4 @@
-%toc
+[[%toc]]
 == Python ==
 *   Author: *Guido van Rossum*      1991
 *   编程范型： 命令式编程、多范型、面向对象、函数式编程、面向切面编程

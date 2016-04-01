@@ -3,15 +3,21 @@
 == Wiki ==
 http://www.gracecode.com/vimwiki-usage-notes.html
 
-# What is wiki
-    <br>http://www.baike.com/wiki/wiki
-# What is VimWiki
-# VimWiki Install
+* What is wiki
+<br>http://www.baike.com/wiki/wiki
+* What is VimWiki
+* VimWiki Install
       
-# VimWiki Configuration
-# Wiki Work group
-# VimWiki-HTML
-# Reference
+* VimWiki Configuration
+* Wiki Work group
+* VimWiki-HTML
+* Reference
+
+== VimWiki Command ==
+*   :Vimwiki2HTML
+*   :VimwikiAll2HTML
+*   :VimwikiRenameLink
+*   :VimwikiDeleteLink
 
 == 用vimwiki搭建自己的维基世界 ==
 *   http://wiki.ktmud.com/tips/vim/vimwiki-guide.html
