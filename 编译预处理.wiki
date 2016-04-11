@@ -1,0 +1,106 @@
+%toc
+
+[[http://www.cnblogs.com/haore147/p/3646962.html|c语言编译预处理和条件编译执行过程的理解]]
+<br>[[http://blog.csdn.net/benkaoya/article/details/5540205|宏使用之预处理操作符总结]]
+
+在C语言的程序中可包括各种以符号#开头的编译指令，这些指令称为预处理命令。
+<br>预处理命令属于C语言编译器，而不是C语言的组成部分。通过预处理命令可扩展C语言程序设计的环境。
+
+== 预处理指令 ==
+*   宏定义：    #define 指令定义一个宏，#undef指令删除一个宏定义。
+*   文件包含：  #include指令导致一个指定文件的内容被包含到程序中。
+*   条件编译：  #if,#ifdef,#ifndef,#elif,#else和#dendif指令可以根据编译器可以测试的条件来将一段文本包含到程序中或排除在程序之外。
+*   #error,#line和#pragma指令更特殊的指令，较少用到。
+
+== 宏展开 ==
+*   Windows
+    *   VS Project -> Property Pages -> C/C++ -> Preprocessor -> Preprocess to a File: Yes(/P)
+    *   Build完成后产生的.i文件， 这就是预编译后的文件
+*   Linux
+    *   g++/gcc -E -P a.cpp > a.prescan     宏展开的文件
+
+== 预定义宏 ==
+*   __VA_ARGS__： 将左边宏中 ... 的内容原样抄写在右边 __VA_ARGS__ 所在的位置。它是一个可变参数的宏，是新的C99规范中新增的，目前似乎只有gcc支持（VC从VC2005开始支持）。
+{{{
+    #define ErrorPrint(str, ...)                \
+        printf("ERROR: %u: "##str"\n",          \
+                __LINE__,                       \
+                __VA_ARGS__)
+    // Example 
+    ErrorPrint("Unexpected status %x.", Status);
+}}}
+*   __FILE__        宏在预编译时会替换成当前的源文件名
+*   __LINE__        宏在预编译时会替换成当前的行号
+*   __FUNCTION__    宏在预编译时会替换成当前的函数名称
+{{{
+    #define RT_DEBUG(_Level, _Comp, _Fmt)	  \
+        do {								  \
+           if (((_Comp) & gDebugComponent) && (_Level <= gDebugLevel)) { \
+               DbgPrint("\n%-5s: (%s: %s(), %d):    ", StringLevel[_Level], __FILE__,  __FUNCTION__, __LINE__);        \
+               DbgPrint ##_Fmt;                                           \
+           }                                                           \
+        } while(0)
+}}}
+*   __DATE__        在源代码中插入当前编译日期〔注意和当前系统日期区别开来〕, 格式 Aug 28 2011 
+*   __TIME__        在源代码中插入当前编译时间〔注意和当前系统时间区别开来〕, 格式 06:43:59 
+{{{
+    // 在DriverEntry里打印， 可看到Driver Build时期
+    RT_DEBUG(TRACE_LEVEL_FATAL,RTK_INIT,("INIT:     Built on %s %s\n", __DATE__, __TIME__));
+}}}
+*   __STDC__        编译器将按照ansic标准来编译c程序。 整数 1，表示兼容 ANSI/ISO C 标准，配合 #if 使用
+*   __TIMESTAMP__   最后一次修改当前文件的时间戳，char 字符串，格式 Sun Aug 28 06:43:57 2011
+*   __cplusplus     以 C++ 方式而非 C 语言方式编译时定义, 配合 #ifdef 使用
+
+== 宏转换符#和宏连接符## ==
+{{{
+    #define A(x) T_##x     连接
+    #define B(x) #@x       字符化操作符
+    #define C(x) #x        字符串化操作符
+    
+    // Unicode
+    #ifdef  UNICODE
+        #define __TEXT(quote) L##quote
+    #else
+        #define __TEXT(quote) quote
+    #endif
+    
+    // Example1
+    我们假设：x=1，则有：
+    A(1)------〉T_1
+    B(1)------〉'1'
+    C(1)------〉"1"
+    
+    // Example2
+    #define CONS(a,b)    int(a##e##b)
+    int n = CONS(2, 3);    // 被展开为int n = int(2e3);即n = 2000;
+}}}
+
+== 重置行号和文件名命令 #line ==
+使用#line命令可改变预定义宏__LINE__与__FILE__的内容，该命令的基本形如下：
+    #line number[“filename”]
+{{{
+    1：#include<stdio.h>
+    2：#include<stdlib.h>
+     
+    4：#line 1000
+      
+    6：int main()
+    7：{
+    8：    printf("当前行号：%d\n",__LINE__);
+    9：    return 0;
+    10：}　　
+    
+    在第4行中使用#line定义的行号为从1000开始(不包括#line这行)。所以第5行的编号将为1000，第6行为1001，第7行为1002，第8行为1003.
+}}}
+
+== 修改编译器设置命令 #pragma ==
+#pragma命令的作用是设定编译器的状态，或者指示编译器完全一些特定的动作。 其格式一般为：
+    #pragma Para
+*   #pragma alloc_text
+*   #pragma pack(push, 1)
+*   #pragma pack(pop)
+*   #pragma warning(...)
+
+== 产生错误信息命令 #error ==
+error命令强制编译器停止编译，并输出一个错误信息，主要用于程序调试。其使用如下：
+    #error 信息错误　

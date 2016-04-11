@@ -10,6 +10,17 @@ Windows在启动时加载了一个最小的文件系统， 分析磁盘并将注
 <br>在Windwos内核刚加载之后就是可以读/写的。Windows系统在启动过程中适当的时候将这棵子树的内容和磁盘上的注册表进行同步， 之后的注册表操作就和一般的
 <br>注册表操作别无二致了。
 
+= KMDF使用Driver黄卡 =
+{{{
+    {   // Set yellow bang
+		WDF_DEVICE_STATE	deviceState;
+		WDF_DEVICE_STATE_INIT (&deviceState);
+		deviceState.Failed = WdfTrue;
+		RT_DEBUG(TRACE_LEVEL_ERROR, RTK_HCI_EVENT,	("ERROR, yellow bang FDO"));
+		WdfDeviceSetDeviceState(FilterExt->WdfDevice,&deviceState); 	
+	}
+}}}
+
 = power concept =
 {{{
 设备的电源状态用D0-D3来标识。D0是正常状态，D1-D2是休眠状态，但深度有差别，D3是断电状态。其中D3还分Hot和Cold两种子状态。

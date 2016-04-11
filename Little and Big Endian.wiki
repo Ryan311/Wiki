@@ -1,0 +1,26 @@
+%toc
+
+<br>大端模式（Big_endian）:     字数据的高字节存储在低地址中，而字数据的低字节则存放在高地址中。
+<br>小端模式（Little_endian）:  字数据的高字节存储在高地址中，而字数据的低字节则存放在低地址中。
+
+*   用程序确认系统是大端还是小端
+{{{"class = c"
+    int checkSystem1()
+    {
+        union check
+        {
+            int i;
+            char ch;
+        } c;
+        c.i = 0x01;
+        return (c.ch == 0x01);
+    }
+    
+    int checkSystem2()
+    {
+        int i = 0x01;
+        char *p = (char*)&i;
+        
+        return ((*p) == 0x01);
+    }
+}}}
