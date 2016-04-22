@@ -49,6 +49,7 @@
     *   [[BlueZ]] 
     *   [[Charset]]
     *   [[REST]] [[http://tidesdk.multipart.net/docs/user-dev/generated/??,??,|TideSDK]] XML JSON 
+    *   [[FreeRTOS]]
 *   Kid
     *   [[KidSoft]] [[KDEdu]]
 

@@ -1,0 +1,106 @@
+%toc
+
+Home：  http://www.freertos.org/
+
+= Basic =
+*   任务
+    *   在FreeRTOS中，每个执行线程都被称为”任务”。任务的函数原型，其必须返回void，而且带有一个void 指针参数。
+    *   FreeRTOS任务不允许以任何方式从实现函数中返回——它们绝不能有一条”return”语句，也不能执行到函数末尾。
+    *   如果一个任务不再需要，可以显式地将其删除。
+    {{{
+        //典型的任务函数结构
+        void ATaskFunction( void *pvParameters ) 
+        { 
+            /* 可以像普通函数一样定义变量。用这个函数创建的每个任务实例都有一个属于自己的iVarialbleExample变
+            量。但如果iVariableExample被定义为static，这一点则不成立 – 这种情况下只存在一个变量，所有的任务实
+            例将会共享这个变量。 */ 
+            int iVariableExample = 0; 
+             
+            /* 任务通常实现在一个死循环中。 */ 
+            for( ;; ) 
+            { 
+                /* 完成任务功能的代码将放在这里。 */ 
+            } 
+             
+            /* 如果任务的具体实现会跳出上面的死循环，则此任务必须在函数运行完之前删除。传入NULL参数表示删除 的是当前任务 */ 
+            vTaskDelete( NULL ); 
+        } 
+    }}}
+    *   任务切换， 非运行状态 <--> 运行状态
+        *   任务从非运行态转移到运行态被称为”切换入或切入(switched  in)”或”交换入 (swapped  in)”。
+        *   相反，任务从运行态转移到非运行态被称为”切换出或切出(switched out)”或”交换出(swapped out)”。
+        *   FreeRTOS 的调度器是能让任务切入切出的唯一实体。
+    *   创建任务使用FreeRTOS的API函数:  xTaskCreate()
+    *   挂起状态
+        *   “挂起(suspended)”也是非运行状态的子状态。处于挂起状态的任务对调度器而言是不可见的。
+        *   让一个任务进入挂起状态的唯一办法就是调用vTaskSuspend() API函数； 
+        *   而把一个挂起状态的任务唤醒的唯一途径就是调用vTaskResume()或vTaskResumeFromISR()API函数。大多数应用程序中都不会用到挂起状态。 
+    *   就绪状态
+        *   如果任务处于非运行状态，但既没有阻塞也没有挂起，则这个任务处于就绪(ready, 准备或就绪)状态。
+        *   处于就绪态的任务能够被运行，但只是”准备(ready)”运行，而当前尚未运行。 
+    *   利用阻塞态实现延迟
+        *   void vTaskDelay(portTickType xTicksToDelay);  xTicksToDelay用来指定任务在调用vTaskDelay()到切出阻塞态整个过程包含多少个心跳周期。该函数来代替空循环。
+        *   void vTaskDelayUntil(portTickType *pxPreviousWakeTime, portTickType xTimeIncrement); 该函数参数用来指定任务离开阻塞态进入就绪态那一刻的精确心跳计数值。该函数可以用于实现一个固定执行周期的需求。
+    *   空闲任务与空闲任务钩子函数
+        *   当其它任务都处于阻塞状态，调用vTaskStartScheduler()时，调度器会自动创建一个空闲任务。空闲任务是一个非常短小的循环——和最早的示例任务十分相似，总是可以运行。
+        *   通过空闲任务钩子函数(或称回调，hook, or call-back)，可以直接在空闲任务中添加应用程序相关的功能。空闲任务钩子函数会被空闲任务每循环一次就自动调用一次。
+        *   空闲钩子函数必须命名为vApplicationIdleHook(),无参数也无返回值。
+    *   改变任务优先级 
+        *   void vTaskPrioritySet( xTaskHandle pxTask, unsigned portBASE_TYPE uxNewPriority );  该函数来改变两个任务的相对优先级
+        *   unsigned portBASE_TYPE uxTaskPriorityGet( xTaskHandle pxTask );                     用于查询一个任务的优先级
+    *   删除任务
+        *   void vTaskDelete( xTaskHandle pxTaskToDelete );     删除自己(传入NULL)或其它任务。任务被删除后就不复存在，也不会再进入运行态。
+
+*   队列管理
+    *   基于 FreeRTOS 的应用程序由一组独立的任务构成——每个任务都是具有独立权限的小程序。这些独立的任务之间很可能会通过相互通信以提供有用的系统功能。
+    *   FreeRTOS中所有的通信与同步机制都是基于队列实现的。
+    *   队列是具有自己独立权限的内核对象，并不属于或赋予任何任务。
+    *   队列由声明为 xQueueHandle 的变量进行引用。xQueueCreate()用于创建一个队列，并返回一个 xQueueHandle 句柄以便于对其创建的队列进行引用。
+    *   xQueueSendToBack()用于将数据发送到队列尾；而xQueueSendToFront()用于将数据发送到队列首。xQueueSend()完全等同于 xQueueSendToBack()。 
+    *   xQueueReceive()用于从队列中接收(读取)数据单元。接收到的单元同时会从队列中删除。xQueuePeek()也是从从队列中接收数据单元，不同的是并不从队列中删出接收到的单元。
+    *   uxQueueMessagesWaiting()用于查询队列中当前有效数据单元个数。
+    *   taskYIELD()通知调度器现在就切换到其它任务，而不必等到本任务的时间片耗尽
+*   中断管理
+    *   二值信号量      二值信号量被用于让延迟处理任务和中断服务例程进行同步， 由于只能锁存一个中断事件， 可用于硬件中断发生不是很频繁的情况
+        *   创建    void vSemaphoreCreateBinary( xSemaphoreHandle xSemaphore ); 
+        *   P(S)    除互斥信号量外，所有类型的信号量都可以调用函数 xSemaphoreTake() 来获取
+        *   V(S)    除互斥信号量外，FreeRTOS支持的其它类型的信号量都可以通过调用 xSemaphoreGiveFromISR() 给出。
+    *   计数信号量      用于延迟处理任务和中断服务例程同步， 用于中断事件多发情况，可锁存多个中断事件 
+        *   用法：
+            *   事件计数    初始化为0
+            *   资源管理    初始化为资源个数
+        *   创建    xSemaphoreHandle xSemaphoreCreateCounting( unsigned portBASE_TYPE uxMaxCount, unsigned portBASE_TYPE uxInitialCount ); 
+    *   在中断服务例程中使用队列
+        *   xQueueSendToFrontFromISR()，xQueueSendToBackFromISR()与 xQueueReceiveFromISR()      中断服务例程的版本
+*   资源管理
+    *   临界区
+        *   基本临界区是指宏taskENTER_CRITICAL()与taskEXIT_CRITICAL()之间的代码区间， 基本临界区保护一段代码区间不被其它任务或中断打断。
+        *   也可以通过挂起调度器来创建临界区，该临界区只可以保护一段代码区间不被其它任务打断，因为这种方式下，中断是使能的
+        *   通过调用 vTaskSuspendAll()来挂起调度器。挂起调度器可以停止上下文切换而不用关中断。xTaskResumeAll() 函数恢复调度
+        *   如果某个中断在调度器挂起过程中要求进行上下文切换，则个这请求也会被 挂起，直到调度器被唤醒后才会得到执行。 
+    *   互斥量
+        *   xSemaphoreHandle xSemaphoreCreateMutex( void ); 
+        *   用于互斥的信号量必须归还。 用于同步的信号量通常是完成同步之后便丢弃，不再归还。 
+        *   优先级反转  高优先级任务被低优先级任务阻塞推迟的行为被称为”优先级反转”, 使用互斥量的缺陷
+    *   守护任务
+        *   守护任务是对某个资源具有唯一所有权的任务。只有守护任务才可以直接访问其守护的资源——其它任务要访问该资源只能间接地通过守护任务提供的服务。
+        *   心跳钩子函数(或称回调函数)由内核在每次心跳中断时调用。
+*   内存管理
+    *   当内核请求内存时，其调用pvPortMalloc()；当释放内存时，调用vPortFree()
+    *   FreeRTOS自带有三种pvPortMalloc()与vPortFree()实现范例, 这三个范例对应三个源文件：heap_1.c，heap_2.c，heap_3.c
+*   栈溢出
+    *   uxTaskGetStackHighWaterMark() API函数:  用来查询指定任务的运行历史中，其栈空间还差多少就要溢出
+    *   vApplicationStackOverflowHook:          栈溢出钩子函数(或称回调函数)由内核在侦测到栈溢出时调用
+    *   运行时栈桢测        由 FreeRTOSConfig.h 中的配置常量configCHECK_FOR_STACK_OVERFLOW 进行控制
+        *   方法1： 内核会在任务上下文保存后检查栈指针是否还指向有效栈空间。一旦检测到栈指针的指向已经超出任务栈的有效范围，栈溢出钩子函数就会被调用。
+        *   方法2： 创建任务时，任务栈空间预置了一个标记。方法2会检查任务栈的最后20个字节，查看预置在这里的标记数据是否被覆盖。如果最后20个字节的标记数据与预设值不同，则栈溢出钩子函数就会被调用。 
+        *   方法2在方法1的基础上进行了一些补充, 方法2没有方法1的执行速度快, 方法2应该可以侦测到任何时候发生的栈溢出。
+
+= FreeRTOS and VS =
+*   http://www.07net01.com/linux/2016/02/1222736.html
+*   Donwload source code, VS Demo is in ~\FreeRTOSV8.2.3\FreeRTOSV8.2.3\FreeRTOS\Demo\WIN32-MSVC
+*   Open with VS2013, and compile
+*   这个Project包含两个deno App， 一个是简单的blinky style工程， 另一个是复杂的App， 通过mainCREATE_SIMPLE_BLINKY_DEMO_ONLY控制
+
+= Books =
+*   FreeRTOS中文实用教程
