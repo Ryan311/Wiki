@@ -1,0 +1,36 @@
+%toc
+
+*   VLC:    sudo apt-get install vlc
+*   libvlc: sudo apt-get install libvlc-dev
+*   Main page:  http://www.videolan.org/vlc/
+
+{{{
+    Install the latest version of VLC on Ubuntu 13.04 Raring Ringtail
+    So, if you are using Ubuntu Raring, you can install the latest version of VLC by adding the below PPA:
+
+        sudo add-apt-repository ppa:n-muench/vlc
+        sudo apt-get update
+        sudo apt-get install vlc
+}}}
+
+= Using LibVLC with Qt5 =
+*   调用libvlc_new()时出现段错误， 解决方法
+{{{
+    When calling libvlc_new() vlc modules and their dependent libraries are loaded into memory. 
+    The qt module of LibVLC was searching for Qt4 shared objects instead of Qt5 (manually installed).
+
+    The solution was to rebuild the module cache which was outdated an pointing to Qt4 binaries. You can reset it on the command line:
+
+    > sudo /usr/lib/vlc/vlc-cache-gen -f /usr/lib/vlc/plugins/
+}}}
+
+= install VLC-QT =
+*   sudo add-apt-repository ppa:ntadej/tano 
+*   sudo apt-get update
+*   sudo apt-get install libvlc-qt-core2 libvlc-qt-widgets2 libvlc-qt-dbg libvlc-qt-dev 
+
+
+= Wrapper =
+*   VLC-QT: https://vlc-qt.tano.si/             ???
+*   C++:    http://www.codeproject.com/Articles/38952/VLCWrapper-A-Little-C-wrapper-Around-libvlc
+*   C#:     http://www.codeproject.com/Articles/109639/nVLC?msg=4461666

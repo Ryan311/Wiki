@@ -1,0 +1,11 @@
+%toc
+
+Doc:    http://blog.sina.com.cn/s/blog_7187e24301016b50.html
+<br>Home:   https://cmake.org/
+
+= Using newest version =
+*   apt-get autoremove cmake
+*   download the linux version and extract
+*   ln -s /usr/cmake-***-Linux-i386/bin/* /usr/bin/
+
+

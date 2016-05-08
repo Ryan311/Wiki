@@ -30,7 +30,7 @@
     *   [[Vim]] [[Eclipse]] [[Vimer]] [[Sumblime]] [[QtCreator]] [[MonoDevelop]]
     *   [[Visual Studio]] [[Windbg]] [[Visual Code Studio]]
     *   [[Wiki]] [[MarkDown]] [[Jekyll]] [[BootStrap]] [[DISQUS]]
-    *   [[MsBuild]] GCC [[Clang]]
+    *   [[MsBuild]] GCC [[Clang]] [[CMake]]
     *   [[git_github]] [[bitbucket]] [[google code]]
     *   [[VirsualBox]]
     *   [[Blender]] [[GIMP]]
@@ -49,6 +49,7 @@
     *   [[BlueZ]] 
     *   [[Charset]]
     *   [[REST]] [[http://tidesdk.multipart.net/docs/user-dev/generated/??,??,|TideSDK]] XML JSON 
+    *   [[VLC]]
 *   Kid
     *   [[KidSoft]] [[KDEdu]]
 

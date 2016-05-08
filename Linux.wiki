@@ -5,6 +5,15 @@
 *   [[http://www.doudoulinux.org/web/english/index.html|DouDouLinux]]
  
 == Linux Command ==
+*   挂载局域网中的Windows共享盘
+    *   sudo apt-get install cifs-utils
+    *   mkdir /media/ShareDir
+    *   sudo mount -t cifs -o username=hr, password="hr830311" //192.168.1.2/Backup /media/ShareDir
+    *   username是Windows登录用户名， password是登录密码
+    *   可将上面的命令写到启动文件中， 就像挂载本地Windows磁盘一样了
+    *   当然也可以在文件浏览器中的网络中找到共享的设备并进入共享盘
+*   Ubuntu共享文件夹
+    *   http://ubuntuhandbook.org/index.php/2014/05/ubuntu1404-file-sharing-samba/
 *   Shutdown
     *   shutdown -r now     关机后重启
     *   shutdown -h now     关机后不重启
