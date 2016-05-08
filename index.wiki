@@ -50,6 +50,7 @@
     *   [[Charset]]
     *   [[REST]] [[http://tidesdk.multipart.net/docs/user-dev/generated/??,??,|TideSDK]] XML JSON 
     *   [[VLC]]
+    *   [[FreeRTOS]]
 *   Kid
     *   [[KidSoft]] [[KDEdu]]
 
