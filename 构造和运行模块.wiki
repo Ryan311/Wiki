@@ -5,15 +5,25 @@
 *   modprobe
 *   rmmod
 
+= 用于指定模块的初始化和清除函数的宏 =
+*   #include <linux/init.h>
+*   module_init(init_function)
+*   module_exit(cleanup_function)
+
 = 仅用于模块初始化或清除阶段的函数 =
 *   __init
 *   __initdata
 *   __exit
 *   __exitdata
 
-
+= 头文件 =
+*   #include <linux/sched.h>
 
 = 模块相关目录 =
 *   /sys/module     sysfs目录层次结构中包含当前已装载模块信息的目录
 *   /proc/modules   早期用法， 只在单个文件中包括模块信息， 模块名称、内存总量以及使用计数等
 
+= printk =
+*   printk用于将log信息打印出来
+*   log打印在/ver/log/kern.log中
+*   也可以用dmesg显示出来

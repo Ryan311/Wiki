@@ -8,6 +8,15 @@ Linux设备模型：
 #   设备分类， /sys/class
 #   对象生命周期, kobject是设备模式中最底层的数据结构
 
+= 主设备号与次设备号 =
+*   主设备号标识设备对应的驱动程序
+*   次设备号由内核使用， 用于正确确定设备文件所指的设备
+*   dev_t类型(<linux/types.h>中定义), 用来保存设备编号， 32 bits： 12bits（主） + 20bits（次）
+*   MAJOR(dev_t dev),  MINOR(dev_t dev)         获得主、次设备编号
+*   MKDEV(int major, int minor)                 创建一个dev_t类型的设备编号
+*   通常使用动态方式分配设备编号： alloc_chrdev_region(OUT dev_t *dev, IN unsigned int firstminor, IN unsigned int count, char *name)
+*   使用完设备编号后要释放， void unregister_chrdev_region(dev_first, unsigned int count);  通常卸载Driver时来做
+
 = kobject， kset， subsystem =
 Linux设备模型的底层结构， 它们是组成设备模型的砖块!!!
 
