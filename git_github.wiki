@@ -1,5 +1,11 @@
 %toc
 
+= gitk =
+Using gitk to understand git
+Install:
+    sudo apt-get install gitk
+Move to a git repository, and type "gitk" to show git status in GUI
+
 = git =
 == Install or Update ==
 *Install*::
