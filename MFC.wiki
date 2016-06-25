@@ -63,6 +63,35 @@ MFC是微软基础类库的简称，是微软公司实现的一个c++类库，�
         1、利用API函数SendMessage能以同步的方式向目标窗体发送一条消息，然后等待目标窗体处理过程处理此消息。
         2、利用API函数PostMessage能以异步方式向目标窗体投递一条消息，消息投递出去后，函数立即返回。
         3、PostMessage和SendMessage返回值是BOOL类型，代表消息是否发送成功。
+        区别：http://100926.blog.sohu.com/187003740.html
+        {
+            区别1： 
+                MSDN讲SendMessage用法时，有一段话讲述了两者的区别，
+                This function sends the specified message to a window or windows. SendMessage calls the window procedure for the specified 
+                window and does not return until the window procedure has processed the message. The PostMessage function, in contrast, posts
+                a message to a thread's message queue and returns immediately.
+
+                翻译成中文的意思是：
+                （SendMessage）这个函数发送指定消息到窗口，SendMessage调用窗口程序来处理消息，直到窗口程序处理完消息才返回。
+                PostMessage函数，相反，发送消息给线程消息队列并立即返回。
+
+            区别2：
+                If the specified window was created by the calling thread, the window procedure is called immediately as a subroutine. 
+                If the specified window was created by a different thread, the system switches to that thread and calls the appropriate window procedure. 
+                Messages sent between threads are processed only when the receiving thread executes message retrieval code. The sending thread is blocked
+                until the receiving thread processes the message.
+
+                翻译：如果发送的消息码在WM_USER之下(非自定义消息)且消息参数中带有指针，那么PostMessage,SendNotifyMessage,SendMessageCallback这些异步消息
+                发送函数将会调用失败。最好不要用PostMessage发送带有指针参数的消息。
+
+            区别3：
+                如果在同一个线程中，PostMessage发送消息时，消息要先放入线程的消息队列，然后通过消息循环Dispatch到目标窗口。SendMessage发送消息时，
+                系统直接调用目标窗口的消息处理程序，并将结果返回。SendMessage在同一线程中发送消息并不入线程消息队列。如果在不同线程内。
+                最好用PostThreadMessage代替PostMessage,他工作的很好。SendMessage发送消息到目标窗口所属的线程的消息队列，然后发送消息的线程等待(事实上，
+                他应该还在做一些监测工作，比如监视QS_SENDMESSAGE标志)，直到目标窗口处理完并且结果返回，发送消息的线程才继续运行。这是SendMessage的一般情况，
+                事实上，处理过程要复杂的多。比如，当发送消息的线程监测到有别的窗口 SendMessage一个消息到来时，他直接调用窗口处理过程(重入)，并将处理结果返回
+                (这个过程不需要消息循环中GetMessage等的支持)。
+        }
     
 }}}
 *   MFC消息反射机制

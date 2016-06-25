@@ -49,6 +49,32 @@
             Fallback Location:  Always use Fallback Location -> Set True
                                 Do Not Warn if Fallback Location Used  -> Set True
         }}}
+*   VS2012 to VS2013 工程转换
+    {{{
+    https://msdn.microsoft.com/en-us/library/windows/hardware/dn265174%28v=vs.85%29.aspx
+    需要用到工具ProjectUpgradeTool.exe， 该工具位置C:\Program Files (x86)\Windows Kits\8.1\bin\x86。
+    Example：
+          ProjectUpgradeTool.exe  G:\SVNWorkspace\trunk\HostSW\Vendor_Custmize\Toshiba\RtkFilter_Toshiba
+          ProjectUpgradeTool.exe  G:\SVNWorkspace\trunk\HostSW\win7-inbox-driver\RtkFilter
+
+    执行完后， 用VS2013就可以打开工程并正确Load Project了。
+    }}}
+*   自动化Build脚本， VS的各个版本都可使用Devenv来执行Build
+    {{{
+    VS2012
+    打开VS2012 x86 Native Tools Command Prompt Cmd， 在该环境下
+    调用devenv.exe来Build Driver
+    
+    VS2013
+    VS2013没有 VS2013 x86 Native Tools Command Prompt Cmd，
+    但也保留了相同的环境配置
+    C:\Program Files\Microsoft Visual Studio 12.0\Common7\Tools\VsDevCmd.bat
+    只需要创建Cmd的快捷方式， 并将目标修改为
+    %comspec% /k ""C:\Program Files\Microsoft Visual Studio 12.0\Common7\Tools\VsDevCmd.bat"
+    双击， 并在此环境下运行Build脚本就可以了， 也是调用Devenv来Build Driver的。
+    
+    VS2015与VS2013相同
+    }}}
 *   Extensions:     Tools -> Extensions and Updates...
     *   [[https://github.com/jaredpar/VsVim|VsVim]] vim extension in VS2012
         *   Options... -> VsVim -> Config Key mappings
