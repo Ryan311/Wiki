@@ -15,6 +15,9 @@
 *   安装文泉译字体
     *   sudo apt-get install ttf-wqy-microhei
     *   Chrome安装后字体会模糊， 在字体设置中选择wqy， 重启就OK了
+*   Managing Java   安装多个java版时， 选择不同的版本
+    *   sudo update-alternatives --config java
+    *   有2个候选项可用于替换java(提供 /usr/bin/java)。
 *   Ubuntu共享文件夹
     *   http://ubuntuhandbook.org/index.php/2014/05/ubuntu1404-file-sharing-samba/
 *   ls
@@ -232,18 +235,11 @@
 *   ps -eLf     -L显示进程并显示线程ID和线程个数
 *   top -H      实时显示各个线程情况
 *   ipcalc      learn ip address
-*   find <path> <condition> <action>
-    *   find . -name 'my*'
-    *   find . -name 'my*' -ls    在当前目录中搜索以ｍｙ开头的文件并显示详细信息
-    *   find . -type [dfs] -mmin -10    搜索当前目录中，所有过去１０分钟中更新过的*[目录|普通|Socket]*文件。
-    *   find . -size [+-]100M
-    *   http://blog.jobbole.com/48856/
-    *   find . -name "*.tmp" -exec rm {} \; 删除当前目录中的.tmp文件
-*   locate      find　-name的另一种写法，但是要比后者快得多，原因在于它不搜索具体目录，而是搜索一个数据库（/var/lib/locatedb），这个数据库中含有本地所有文件信息。Linux系统自动创建这个数据库，并且每天自动更新一次，所以使用locate命令查不到最新变动过的文件。为了避免这种情况，可以在使用locate之前，先使用updatedb命令，手动更新数据库。
-    *   locate /etc/sh  搜索etc目录下所有以sh开头的文件
-    *   locate　～/m搜索用户目录下所有以m开头的文件
-*   whereis     只能用于程序名的搜索，[-b|-m|-s]
-*   which   在PATH变量指定的路径中搜索某个命令的位置，并返回第一个搜索结果
+*   ctags
+    *   sudo apt-get intall ctags
+    *   ctags filename          给单个文件建立tags
+    *   ctags -R                给当前目录及子目录下的所有文件建立tags
+    *   http://blog.csdn.net/gangyanliang/article/details/6889860
 *   Ubuntu快捷键
     *   Super+W 在同一屏幕列出工作区所有窗口
     *   Super+S 俯瞰多个工作区
@@ -327,7 +323,6 @@
 ---------------------------------------------------------------------------
 == Linux Should known ==
 http://coolshell.cn/articles/8883.html
-
 *   Bash
 *   vim
 *   ssh

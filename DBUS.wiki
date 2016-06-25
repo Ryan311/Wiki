@@ -28,6 +28,7 @@ D-Bus有四种类型的消息:
 
 == Install ==
 *   sudo apt-get install libdbus-glib1.0-dev libdbus-glib1.0-cil-dev
+*   sudo apt-get upgrade dbus      升级dbus 
 
 
 == Tool ==

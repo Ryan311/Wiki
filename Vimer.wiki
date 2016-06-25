@@ -25,3 +25,72 @@
         使用 --remote-silent 的作用是,如果已经打开了对应文件,就不会打开第二次,而是在 已经打开的文件里跳转到对应行
     3.  还是同一个对话框里面,选择Keys->Assign New Key...->按F2,如果你已经将F2设置 给其他命令,选择其他的按键就行了
     4.  设置完成
+
+== Ctags & Cscope ==
+*   ctags   http://easwy.com/blog/archives/advanced-vim-skills-use-ctags-tag-file/
+    *   sudo apt install ctags
+    *   ctags –R: 生成tag文件, 有了tag文件的协助，你可以在vim查看函数调用关系，类、结构、宏等的定义，可以在任意标签中跳转、返回.
+    *   经常用到的tag跳转命令
+{{{
+    :tag {ident}            "跳转到指定的标签   如 :tag main    相当于在taglist列表中点相应标签
+    :tags                   "显示标签栈
+    CTRL-]                  "跳转到当前光标下的标签
+    CTRL-T                  "跳到标签栈中较早的标签 
+}}}
+*   cscope  http://easwy.com/blog/archives/advanced-vim-skills-cscope/
+    *   查找函数在哪里被调用，或者标签在哪些地方出现
+    *   sudo apt install cscope
+    *   为代码生成一个cscope数据库  cscope -Rbp
+    *   .vimrc中的配置, 如果是在gvim中使用, 也要将其写到.gvimrc中， 否则会出现no connections
+{{{
+    """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    " cscope 
+    " cscope 常用选项；
+    "   -R:         在生成索引文件时，搜索子目录树中的代码;
+    "   -b:         只生成索引文件，不进入cscope的界面;
+    "   -q:         生成cscope.in.out和cscope.po.out文件，加快cscope的索引速度;
+    "   -k:         在生成索引文件时，不搜索/usr/include目录;
+    "   -i:         指定源文件来源位置;
+    "   -Idir:     在-I选项指出的目录中查找头文件;
+    "   -u:         扫描所有文件，重新生成交叉索引文件;
+    "   -C:         在搜索时忽略大小写;
+    "   -P path: 在以相对路径表示的文件前加上的path; 
+    " ---------------------------------------------
+    " cs find 选项:
+    "   s:         查找C语言符号，即查找函数名、宏、枚举值等出现的地方;
+    "   g:         查找函数、宏、枚举等定义的位置，类似ctags所提供的功能;
+    "   d:         查找本函数调用的函数;
+    "   c:         查找调用本函数的函数;
+    "   t:         查找指定的字符串;
+    "   e:         查找egrep模式，相当于egrep功能，但查找速度快多了;
+    "   f:         查找并打开文件，类似vim的find功能;
+    "   i:         查找包含本文件的文件;
+    """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    if has("cscope")
+           set csprg=/usr/bin/cscope
+           set csto=1
+           set cst
+           set nocsverb
+           " add any database in current directory
+           if filereadable("cscope.out")
+               cs add cscope.out
+           endif
+           set csverb
+    endif
+    
+    nmap ,s :cs find s <C-R>=expand("<cword>")<CR><CR>
+    nmap ,g :cs find g <C-R>=expand("<cword>")<CR><CR>
+    nmap ,c :cs find c <C-R>=expand("<cword>")<CR><CR>
+    nmap ,t :cs find t <C-R>=expand("<cword>")<CR><CR>
+    nmap ,e :cs find e <C-R>=expand("<cword>")<CR><CR>
+    nmap ,f :cs find f <C-R>=expand("<cfile>")<CR><CR>
+    nmap ,i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
+    nmap ,d :cs find d <C-R>=expand("<cword>")<CR><CR>
+}}}
+*   更新索引的脚本   
+{{{
+    #!/bin/sh
+    find . -name "*.h" -o -name "*.c"-o -name "*.cc" > cscope.files
+    cscope -Rbkq -i cscope.files
+    ctags -R
+}}}
